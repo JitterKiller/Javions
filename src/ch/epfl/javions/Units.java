@@ -117,13 +117,14 @@ public final class Units {
     }
 
     /**
-     * Methode convert convertit la valeur donnée, exprimée dans l'unité fromUnit (l'unité de départ), en l'unité toUnit (l'unité d'arrivée).
+     * Methode convert convertit la valeur donnée, exprimée dans l'unité
+     * fromUnit (l'unité de départ), en l'unité toUnit (l'unité d'arrivée)
      * @param value
-     *          la valeur de l'unité de départ
+     *          la valeur de l'unité de départ.
      * @param fromUnit
-     *          l'unité de départ
+     *          l'unité de départ.
      * @param toUnit
-     *          l'unité d'arrivée
+     *          l'unité d'arrivée.
      * @return la valeur convertie.
      */
     public static double convert(double value, double fromUnit, double toUnit){
@@ -131,11 +132,11 @@ public final class Units {
     }
 
     /**
-     * Méthode équivalente à convert lorsque l'unité d'arrivée (toUnit) est l'unité de base et vaut 1.
+     * Méthode équivalente à convert lorsque l'unité d'arrivée (toUnit) est l'unité de base et vaut 1
      * @param value
-     *          la valeur de l'unité
+     *          la valeur de l'unité.
      * @param fromUnit
-     *          l'unité de départ
+     *          l'unité de départ.
      * @return la valeur convertie.
      */
     public static double convertFrom(double value, double fromUnit){
@@ -143,11 +144,11 @@ public final class Units {
     }
 
     /**
-     * Méthode équivalente à convert lorsque l'unité de départ (fromUnit) est l'unité de base et vaut 1.
+     * Méthode équivalente à convert lorsque l'unité de départ (fromUnit) est l'unité de base et vaut 1
      * @param value
-     *          la valeur de l'unité
+     *          la valeur de l'unité.
      * @param toUnit
-     *          l'unité d'arrivée
+     *          l'unité d'arrivée.
      * @return la valeur convertie.
      */
     public static double convertTo(double value, double toUnit){

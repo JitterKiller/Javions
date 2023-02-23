@@ -16,11 +16,11 @@ public class WebMercator {
     private WebMercator(){}
 
     /**
-     * Coordonnée x.
+     * Coordonnée x
      * @param zoomLevel
-     *          le niveau de zoom
+     *          le niveau de zoom.
      * @param longitude
-     *          la longitude
+     *          la longitude.
      * @return la coordonnée x correspondant à la longitude donnée (en radians) au niveau de zoom donné.
      */
     public static double x (int zoomLevel, double longitude){
@@ -29,11 +29,11 @@ public class WebMercator {
 
 
     /**
-     * Coordonnée y.
+     * Coordonnée y
      * @param zoomLevel
-     *          le niveau de zoom
+     *          le niveau de zoom.
      * @param latitude
-     *          la latitude
+     *          la latitude.
      * @return la coordonnée y correspondant à la latitude donnée (en radians) au niveau de zoom donné.
      */
     public static double y  (int zoomLevel, double latitude){

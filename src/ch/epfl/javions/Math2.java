@@ -17,35 +17,37 @@ public final class Math2 {
 
 
     /**
-     * Méthode clamp limite la valeur v dans l'intervalle allant de min à max.
+     * Méthode clamp limite la valeur v dans l'intervalle allant de min à max
      * @param min
-     *          valeur minimale
+     *          valeur minimale.
      * @param v
-     *          valeur v
+     *          valeur v.
      * @param max
-     *          valeur maximale
+     *          valeur maximale.
      * @return
-     *          min si v est inférieure à min
-     *          max si v est supérieur à max
-     *          v sinon
+     *          min si v est inférieure à min.
+     *          max si v est supérieur à max.
+     *          v sinon.
      * @throws IllegalArgumentException
-     *          si min est strictement supérieur à max.
+     *          si min est strictement supérieur à max grâce
+     *          à la méthode checkArgument() de la classe
+     *          Preconditions.
      */
     public static int clamp(int min, int v, int max){
-        if(min <= max) {
-            if(v < min) {
-                return min;
-            } else return Math.min(v, max);
-        } else {
-            throw new IllegalArgumentException();
-        }
+
+        Preconditions.checkArgument(min <= max);
+
+        if(v < min) {
+            return min;
+        } else return Math.min(v, max);
+
     }
 
     /**
-     * Méthode pour calculer le sinus hyperbolique d'une variable x.
+     * Méthode pour calculer le sinus hyperbolique d'une variable x
      * @param x
-     *          argument x
-     * @return le sinus hyperbolique réciproque de son argument x
+     *          argument x.
+     * @return le sinus hyperbolique réciproque de son argument x.
      */
     public static double asinh(double x){
         return Math.log(x+Math.sqrt(1+Math.pow(x,2)));

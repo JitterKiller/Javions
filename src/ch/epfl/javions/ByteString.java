@@ -15,9 +15,9 @@ public final class ByteString {
 
     /**
      * Constructeur de la classe ByteString qui retourne une chaîne d'octets
-     * dont le contenu est celui du tableau passé en argument.
+     * dont le contenu est celui du tableau passé en argument
      * @param bytes
-     *          tableau de bytes
+     *          tableau de bytes.
      */
     public ByteString(byte[] bytes) {
         this.bytes = Arrays.copyOf(bytes, bytes.length);
@@ -52,7 +52,7 @@ public final class ByteString {
     }
 
     /**
-     * Méthode pour connaitre la taille de la chaîne.
+     * Méthode pour connaitre la taille de la chaîne
      * @return le nombre d'octets qu'elle contient.
      */
     public int size() {
@@ -65,7 +65,8 @@ public final class ByteString {
      *          l'index de l'octet que l'on souhaite avoir.
      * @return l'octet (interprété en non signé) à l'index donné.
      * @throws IndexOutOfBoundsException
-     *          si l'index est invalide.
+     *          si l'index est invalide grâce à la méthode checkIndex()
+     *          de la classe Objects.
      */
     public int byteAt(int index) {
         Objects.checkIndex(index, bytes.length);
@@ -74,7 +75,7 @@ public final class ByteString {
 
     /**
      * Méthode pour obtenir les octets compris entre les index fromIndex (inclus) et toIndex (exclus)
-     * sous la forme d'une valeur de type long.
+     * sous la forme d'une valeur de type long
      * @param fromIndex
      *          début de l'intervalle des octets.
      * @param toIndex
@@ -82,17 +83,17 @@ public final class ByteString {
      * @return les octets compris entre ces index.
      * @throws IndexOutOfBoundsException
      *          si la plage décrite par fromIndex et toIndex n'est pas totalement comprise
-     *          entre 0 et la taille de la chaîne
+     *          entre 0 et la taille de la chaîne grâce à la méthode checkFromIndexSize()
+     *          de la classe Objects.
      * @throws IllegalArgumentException
      *          si la différence entre toIndex et fromIndex n'est pas strictement inférieure à au
-     *          nombre d'octets contenus dans une valeur de type long (8).
+     *          nombre d'octets contenus dans une valeur de type long (8) grâce à la méthode checkArgument()
+     *          de la classe Preconditions.
      */
     public long bytesInRange(int fromIndex, int toIndex) {
-        Objects.checkFromIndexSize(fromIndex, toIndex, bytes.length);
 
-        if (toIndex - fromIndex > 8) {
-            throw new IllegalArgumentException("Le nombre de bytes demandé est trop élevé");
-        }
+        Objects.checkFromIndexSize(fromIndex, toIndex, bytes.length);
+        Preconditions.checkArgument(toIndex - fromIndex <= 8);
 
         long result = 0;
 
@@ -108,7 +109,7 @@ public final class ByteString {
      * @param obj
      *          L'instance ByteString que l'on souhaite tester.
      * @return  vrai si et seulement si la valeur qu'on lui passe est aussi une instance de
-     *          ByteString et que ses octets sont identiques à ceux du récepteur.
+     *          ByteString et que ses octets sont identiques à ceux du récepteur, sinon retourne faux.
      */
     @Override
     public boolean equals(Object obj){
@@ -120,7 +121,7 @@ public final class ByteString {
 
     /**
      * Override de la méthode hashCode pour la classe ByteString
-     * @return la valeur retournée par la méthode hashCode de Arrays appliquée au tableau contenant les octets
+     * @return la valeur retournée par la méthode hashCode de Arrays appliquée au tableau contenant les octets.
      */
     @Override
     public int hashCode() {
@@ -130,7 +131,7 @@ public final class ByteString {
     /**
      * Override de la méthode toString pour la classe ByteString
      * @return  retourne une représentation des octets de la chaîne en hexadécimal,
-     *          chaque octet occupant exactement deux caractères
+     *          chaque octet occupant exactement deux caractères.
      */
     @Override
     public String toString() {

@@ -1,5 +1,7 @@
 package ch.epfl.javions;
 
+import java.util.Objects;
+
 /**
  * La classe Bits, publique et non instanciable, contient des méthodes
  * permettant d'extraire un sous-ensemble des 64 bits d'une valeur de type long.
@@ -16,27 +18,25 @@ public class Bits {
 
     /**
      * Méthode qui extrait du vecteur de 64 bits "value" la plage de "size" bits commençant
-     * au bit d'index start, qu'elle interprète comme une valeur non signée.
+     * au bit d'index start, qu'elle interprète comme une valeur non signée
      * @param value
-     *          le vecteur de 64 bits en question
+     *          le vecteur de 64 bits en question.
      * @param start
-     *          paramètre indiquant le bit où commencer l'extraction
+     *          paramètre indiquant le bit où commencer l'extraction.
      * @param size
      *          la longueur du vecteur de bits extrait.
      * @return le vecteur de bits extrait.
      * @throws IllegalArgumentException
-     *          si la taille n'est pas strictement supérieure à 0 et strictement inférieure à 32.
+     *          si la taille n'est pas strictement supérieure à 0 et strictement inférieure à 32,
+     *          grâce à la méthode checkArgument() de la classe Preconditions.
      * @throws IndexOutOfBoundsException
-     *           si la plage décrite par start et size n'est pas totalement comprise entre 0 (inclus) et 64 (exclu).
+     *           si la plage décrite par start et size n'est pas totalement comprise entre 0 (inclus) et 64 (exclu),
+     *           grâce à la méthode checkFromIndexSize() de la classe Objects.
      */
     public static int extractUInt(long value, int start, int size) {
 
-        if (size <= 0 || size >= Integer.SIZE) {
-            throw new IllegalArgumentException("La taille doit être strictement comprise entre 0 et 32 (exclus)");
-        }
-        if (start < 0 || start + size > Long.SIZE) {
-            throw new IndexOutOfBoundsException("Start doit être positive et la plage décrite par start et size doit être totalement comprise entre 0 (inclus) et 64 (exclu)");
-        }
+        Preconditions.checkArgument(size > 0 && size < Integer.SIZE);
+        Objects.checkFromIndexSize(start,size,Long.SIZE);
 
         long mask1 = (1L << size) - 1;
         return (int) ((value >>> start) & mask1);
@@ -53,13 +53,12 @@ public class Bits {
      *          Vrai (true) si le bit de "value" d'index donné vaut 1.
      *          Faux (false) si le bit de "value" d'index donné vaut 0.
      * @throws IndexOutOfBoundsException
-     *          si le bit n'est pas compris entre 0 (inclus) et 64 (exclu).
+     *          si le bit n'est pas compris entre 0 (inclus) et 64 (exclu),
+     *          grâce à la méthode checkIndex() de la classe Objects.
      */
     public static boolean testBit(long value, int index) {
 
-        if (index < 0 || index >= 64) {
-            throw new IndexOutOfBoundsException("L'index doit être compris entre 0 (inclus) et 64 (exclu)");
-        }
+        Objects.checkIndex(index, Long.SIZE);
 
         long mask2 = 1L << index;
         return (value & mask2) != 0;

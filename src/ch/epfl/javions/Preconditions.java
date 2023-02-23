@@ -15,13 +15,15 @@ public final class Preconditions {
     private Preconditions() {}
 
     /**
-     * L'unique méthode de la classe, vérifie si un argument entré en paramètre est vrai ou faux
+     * L'unique méthode de la classe, vérifie si un argument entré en paramètre est vrai ou faux.
+     * Cette méthode est utilisée pour lancer l'exception "IllegalArgumentException" lorsque le booléen
+     * entré en paramètre est faux
      * @param shouldBeTrue
-     *          booléen qui doit être vrai pour ne paas lancer d'exception
+     *          booléen qui doit être vrai pour ne paas lancer d'exception.
      * @throws IllegalArgumentException
      *          si le booléen est faux.
      */
-    public static  void checkArgument(boolean shouldBeTrue){
+    public static void checkArgument(boolean shouldBeTrue){
         if(!shouldBeTrue){
             throw new IllegalArgumentException();
         }
