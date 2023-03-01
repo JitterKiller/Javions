@@ -4,17 +4,13 @@ import ch.epfl.javions.Preconditions;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public record AircraftDescription(String Description) {
+public record AircraftDescription(String string) {
 
     private static final Pattern pattern = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
 
     public AircraftDescription {
-        Preconditions.checkArgument(isAircraftDescriptionValid(Description));
+        Preconditions.checkArgument(pattern.matcher(string).matches());
     }
 
-    private boolean isAircraftDescriptionValid (String Description) {
-        Matcher matcher = pattern.matcher(Description);
-        return matcher.matches();
-    }
 
 }

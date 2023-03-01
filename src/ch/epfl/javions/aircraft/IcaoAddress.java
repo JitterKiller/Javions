@@ -2,19 +2,14 @@ package ch.epfl.javions.aircraft;
 import ch.epfl.javions.Preconditions;
 
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
-public record IcaoAddress(String OACI) {
+public record IcaoAddress(String string) {
 
     private static final Pattern pattern = Pattern.compile("[0-9A-F]{6}");
 
     public IcaoAddress {
-        Preconditions.checkArgument(isIcaoValid(OACI));
-        Preconditions.checkArgument(OACI != null && !OACI.isEmpty());
+        Preconditions.checkArgument(pattern.matcher(string).matches());
+        Preconditions.checkArgument(!string.isEmpty());
     }
 
-    private boolean isIcaoValid(String OACI) {
-        Matcher matcher = pattern.matcher(OACI);
-        return matcher.matches();
-    }
 }
