@@ -109,6 +109,4 @@ class Crc24Test {
         assertEquals(expected, actual);
     }
 
-
-
 }

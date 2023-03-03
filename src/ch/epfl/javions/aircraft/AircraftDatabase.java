@@ -51,36 +51,35 @@ public final class AircraftDatabase {
 
         try (ZipFile zipFile = new ZipFile(fileName)) {
 
-            /* Parcourir tous les fichiers CSV dans le fichier ZIP */
-            for (ZipEntry entry : zipFile.stream().filter(entry -> !entry.isDirectory() && entry.getName().endsWith(".csv")).toArray(ZipEntry[]::new)) {
-                try (InputStream inputStream = zipFile.getInputStream(entry);
-                     Reader reader = new InputStreamReader(inputStream, UTF_8);
-                     BufferedReader bufferedReader = new BufferedReader(reader)) {
-                    String line;
+            String entry = address.string().substring(address.string().length()-2) + ".csv";
+            /* Ouvre le fichier CSV correspondant à l'adresse courante dans le fichier ZIP */
+            try (InputStream inputStream = zipFile.getInputStream(zipFile.getEntry(entry));
+                 Reader reader = new InputStreamReader(inputStream, UTF_8);
+                 BufferedReader bufferedReader = new BufferedReader(reader)) {
+                String line;
 
-                    /* Parcourir toutes les lignes du fichier CSV */
-                    while ((line = bufferedReader.readLine()) != null) {
-                        String[] fields = line.split(",", -1);
-                        IcaoAddress currentAddress = new IcaoAddress(fields[0]);
+                /* Parcourir toutes les lignes du fichier CSV */
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] fields = line.split(",", -1);
+                    IcaoAddress currentAddress = new IcaoAddress(fields[0]);
 
-                        /* Si l'adresse ICAO correspond, créer un objet AircraftData avec les informations de
-                         l'aéronef et le retourner */
-                        if (currentAddress.string().compareTo(address.string()) == 0) {
-                            AircraftRegistration registration = new AircraftRegistration(fields[1]);
-                            AircraftTypeDesignator typeDesignator = new AircraftTypeDesignator(fields[2]);
-                            String model = fields[3];
-                            AircraftDescription description = new AircraftDescription(fields[4]);
-                            WakeTurbulenceCategory wakeTurbulenceCategory = WakeTurbulenceCategory.of(fields[5]);
-                            return new AircraftData(registration, typeDesignator, model, description, wakeTurbulenceCategory);
-                        }
-                        /* Si l'adresse ICAO recherchée est inférieure à l'adresse courante, sortir de la boucle */
-                        else if (currentAddress.string().compareTo(address.string()) > 0) {
-                            break;
-                        }
+                    /* Si l'adresse ICAO correspond, créer un objet AircraftData avec les informations de
+                    l'aéronef et le retourner */
+                    if (currentAddress.string().compareTo(address.string()) == 0) {
+                        AircraftRegistration registration = new AircraftRegistration(fields[1]);
+                        AircraftTypeDesignator typeDesignator = new AircraftTypeDesignator(fields[2]);
+                        String model = fields[3];
+                        AircraftDescription description = new AircraftDescription(fields[4]);
+                        WakeTurbulenceCategory wakeTurbulenceCategory = WakeTurbulenceCategory.of(fields[5]);
+                        return new AircraftData(registration, typeDesignator, model, description, wakeTurbulenceCategory);
                     }
-                } catch (IOException e){
-                    throw new IOException("Erreur lors de la lecture du fichier "+ entry.getName());
+                    /* Si l'adresse ICAO recherchée est inférieure à l'adresse courante, sortir de la boucle */
+                    else if (currentAddress.string().compareTo(address.string()) > 0) {
+                        break;
+                    }
                 }
+            } catch (IOException e){
+                throw new IOException("Erreur lors de la lecture du fichier "+ entry);
             }
         } catch (IOException e) {
             throw new IOException("Erreur lors de l'ouverture du fichier ZIP", e);
