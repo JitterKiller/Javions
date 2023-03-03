@@ -91,4 +91,24 @@ class Crc24Test {
         byte[] mOnly = HexFormat.of().parseHex(mS);
         assertEquals(c, crc24.crc(mOnly));
     }
+
+    @Test
+    public void testGenerator() {
+        Crc24 crc24 = new Crc24(0xFFF409);
+        int expected = 0xFFF409;
+        int actual = Crc24.GENERATOR;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testEmpty() {
+        Crc24 crc24 = new Crc24(0xFFF409);
+        byte[] bytes = {};
+        int expected = 0;
+        int actual = crc24.crc(bytes);
+        assertEquals(expected, actual);
+    }
+
+
+
 }

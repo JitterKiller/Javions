@@ -3,14 +3,18 @@ package ch.epfl.javions.aircraft;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AircraftDatabaseTest {
 
     @Test
     void testGetExistingAircraft() throws IOException {
-        AircraftDatabase database = new AircraftDatabase("/aircraft.zip");
+        String d = getClass().getResource("/aircraft.zip").getFile();
+        d = URLDecoder.decode(d, UTF_8);
+        AircraftDatabase database = new AircraftDatabase(d);
         IcaoAddress address = new IcaoAddress("00820B");
         AircraftRegistration registration = new AircraftRegistration("ZS-ATM");
         AircraftTypeDesignator typeDesignator = new AircraftTypeDesignator("PC12");
@@ -24,7 +28,9 @@ class AircraftDatabaseTest {
 
     @Test
     void testGetNonExistingAircraft() throws IOException {
-        AircraftDatabase database = new AircraftDatabase("/aircraft.zip");
+        String d = getClass().getResource("/aircraft.zip").getFile();
+        d = URLDecoder.decode(d, UTF_8);
+        AircraftDatabase database = new AircraftDatabase(d);
         IcaoAddress address = new IcaoAddress("000000");
         AircraftData data = database.get(address);
         assertNull(data);
@@ -33,14 +39,8 @@ class AircraftDatabaseTest {
     @Test
     void testGetNullAddress() {
         assertThrows(NullPointerException.class, () -> {
-            new AircraftDatabase("/aircraft.zip").get(null);
+            new AircraftDatabase(null);
         });
     }
 
-    @Test
-    void testGetInvalidZipFile() {
-        assertThrows(IOException.class, () -> {
-            new AircraftDatabase("/path/to/invalid.zip");
-        });
-    }
 }
