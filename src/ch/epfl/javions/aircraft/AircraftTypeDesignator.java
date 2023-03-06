@@ -23,7 +23,7 @@ public record AircraftTypeDesignator(String string) {
      *              cela on utilise certaines méthodes des classes Pattern et Matcher ainsi que checkArgument).
      */
     public AircraftTypeDesignator {
-        Preconditions.checkArgument(pattern.matcher(string).matches());
+        Preconditions.checkArgument(pattern.matcher(string).matches() || string.isEmpty());
     }
 
 }

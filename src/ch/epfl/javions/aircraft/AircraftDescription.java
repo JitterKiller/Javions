@@ -26,7 +26,7 @@ public record AircraftDescription(String string) {
      *              Pattern et Matcher ainsi que checkArgument).
      */
     public AircraftDescription {
-        Preconditions.checkArgument(pattern.matcher(string).matches());
+        Preconditions.checkArgument(pattern.matcher(string).matches() || string.isEmpty());
     }
 
 

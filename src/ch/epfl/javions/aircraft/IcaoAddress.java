@@ -30,7 +30,6 @@ public record IcaoAddress(String string) {
      */
     public IcaoAddress {
         Preconditions.checkArgument(pattern.matcher(string).matches());
-        Preconditions.checkArgument(!string.isEmpty());
     }
 
 }
