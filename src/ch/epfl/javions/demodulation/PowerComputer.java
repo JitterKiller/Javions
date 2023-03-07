@@ -12,9 +12,8 @@ public class PowerComputer {
     private final int batchSize;
 
     public PowerComputer(InputStream stream, int batchSize) {
-        if (batchSize <= 0 || batchSize % 8 != 0) {
-            throw new IllegalArgumentException("Batch size must be a positive multiple of 8.");
-        }
+
+        Preconditions.checkArgument(batchSize > 0 && batchSize % 8 == 0);
 
         decoder = new SamplesDecoder(stream, batchSize / 2);
         circularBuffer = new short[8];
