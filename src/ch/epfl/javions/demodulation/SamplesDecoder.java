@@ -8,9 +8,9 @@ import java.util.Objects;
 
 public final class SamplesDecoder {
 
-    private InputStream stream;
+    private final InputStream stream;
     private final int batchSize;
-    private byte[] bytesBuffer;
+    private final byte[] bytesBuffer;
 
     public SamplesDecoder(InputStream stream, int batchSize){
         Preconditions.checkArgument(batchSize > 0);
