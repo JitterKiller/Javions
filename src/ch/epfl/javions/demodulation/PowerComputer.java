@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public final class PowerComputer {
+
     private final SamplesDecoder decoder;
     private final short[] circularBuffer;
-
     private final short[] powerBuffer;
     private final int batchSize;
 
@@ -38,5 +38,4 @@ public final class PowerComputer {
 
         return samplesRead / 2;
     }
-
 }

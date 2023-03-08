@@ -17,9 +17,9 @@ class PowerComputerTest {
     void PowerComputerTest10FirstValuesSamplesDOTBin() throws IOException {
         var samplesResourceUrl = getClass().getResource("/samples.bin");
         InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
-        var power = new PowerComputer(stream,32);
+        var power = new PowerComputer(stream,24);
         var expectedValues = new int[]{73, 292, 65, 745, 98, 4226, 12244, 25722, 36818, 23825};
-        var samplesBuffer = new int[32];
+        var samplesBuffer = new int[24];
         power.readBatch(samplesBuffer);
         for(int i = 0; i < 10; ++i){
             assertEquals(expectedValues[i],samplesBuffer[i]);
