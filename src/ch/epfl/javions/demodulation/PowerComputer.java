@@ -8,46 +8,35 @@ import java.io.InputStream;
 public class PowerComputer {
     private final SamplesDecoder decoder;
     private final short[] circularBuffer;
-    private int bufferIndex;
+
+    private final short[] powerBuffer;
     private final int batchSize;
 
     public PowerComputer(InputStream stream, int batchSize) {
 
         Preconditions.checkArgument(batchSize > 0 && batchSize % 8 == 0);
 
-        decoder = new SamplesDecoder(stream, batchSize / 2);
-        circularBuffer = new short[8];
-        bufferIndex = 0;
         this.batchSize = batchSize;
+        decoder = new SamplesDecoder(stream, batchSize);
+        circularBuffer = new short[8];
+        powerBuffer = new short[batchSize];
     }
 
-    public int readBatch(int[] sampleBuffer) throws IOException {
-        Preconditions.checkArgument(sampleBuffer.length == batchSize);
+    public int readBatch(int[] batch) throws IOException {
+        Preconditions.checkArgument(batch.length == batchSize);
 
-        int numSamples = decoder.readBatch(convertIntToShortArray(sampleBuffer));
+        int samplesRead = decoder.readBatch(powerBuffer);
 
-        // Calculate power samples
-        for (int i = 0; i < numSamples; i++) {
-            int[] x = new int[8];
-            int[] y = new int[8];
-            for (int j = 0; j < 8; j++) {
-                x[j] = circularBuffer[(bufferIndex + j) % 8] << 16 >> 16;
-                y[j] = circularBuffer[(bufferIndex + j) % 8] >> 16;
-            }
-            double power = Math.pow(x[2] - x[0] - x[1] - x[3], 2) + Math.pow(y[2] - y[0] - y[1] - y[3], 2);
-            sampleBuffer[i] = (int) power;
-            circularBuffer[bufferIndex] = (short) sampleBuffer[i];
-            bufferIndex = (bufferIndex + 1) % 8;
+        int bufferIndex = 0;
+        for (int i = 0; i < samplesRead; i+=2) {
+            circularBuffer[bufferIndex % 8] = powerBuffer[i];
+            circularBuffer[(bufferIndex+1) % 8] = powerBuffer[i+1];
+            bufferIndex +=2;
+            double power = Math.pow(circularBuffer[0] - circularBuffer [2] + circularBuffer [4] - circularBuffer [6], 2) + Math.pow(circularBuffer[1] - circularBuffer [3] + circularBuffer [5] - circularBuffer [7], 2);
+            batch[i/2] = (int) power;
         }
 
-        return numSamples;
+        return samplesRead / 2;
     }
 
-    private short[] convertIntToShortArray(int[] arr) {
-        short[] result = new short[arr.length];
-        for (int i = 0; i < arr.length; i++) {
-            result[i] = (short) arr[i];
-        }
-        return result;
-    }
 }

@@ -15,12 +15,12 @@ class PowerComputerTest {
     void PowerComputerTest10FirstValuesSamplesDOTBin() throws IOException {
         var samplesResourceUrl = getClass().getResource("/samples.bin");
         InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
-        var power = new PowerComputer(stream,8);
+        var power = new PowerComputer(stream,16);
         var expectedValues = new int[]{73, 292, 65, 745, 98, 4226, 12244, 25722};
-        var samplesBuffer = new int[8];
+        var samplesBuffer = new int[16];
         power.readBatch(samplesBuffer);
-        for(int i = 0; i < 10; ++i){
-            assertEquals(expectedValues[i+1],samplesBuffer[i+1]);
+        for(int i = 0; i < 8; ++i){
+            assertEquals(expectedValues[i],samplesBuffer[i]);
         }
     }
 
