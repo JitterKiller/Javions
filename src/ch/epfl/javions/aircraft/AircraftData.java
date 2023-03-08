@@ -16,7 +16,6 @@ public record AircraftData(AircraftRegistration registration, AircraftTypeDesign
 
     /**
      * Le constructeur compact de cet enregistrement vérifie que les paramètres suivants ne sont pas nuls.
-     *
      * @throws NullPointerException
      *          si l'un des paramètres est nul
      *          (on utilise la méthode requireNonNull de la classe Objects).

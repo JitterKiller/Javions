@@ -27,7 +27,8 @@ public final class AircraftDatabase {
     /**
      * Construit une base de données d'aéronefs à partir du nom de fichier spécifié.
      *
-     * @param fileName le nom du fichier ZIP contenant la base de données
+     * @param fileName
+     *          le nom du fichier ZIP contenant la base de données
      * @throws NullPointerException si le nom de fichier est nul
      */
     public AircraftDatabase(String fileName) {
@@ -37,10 +38,10 @@ public final class AircraftDatabase {
     /**
      * Récupère les informations d'un aéronef à partir de son adresse ICAO.
      *
-     * @param address l'adresse ICAO de l'aéronef à rechercher
+     * @param address
+     *          l'adresse ICAO de l'aéronef à rechercher
      * @return les informations de l'aéronef (AircraftData) associées à l'adresse ICAO spécifiée, null si aucune
      * information n'a été trouvée.
-     *
      * @throws IOException si une erreur se produit lors de l'accès au fichier ZIP ou à un des fichiers
      * CSV de la base de données
      * @throws NullPointerException si l'adresse ICAO est nulle

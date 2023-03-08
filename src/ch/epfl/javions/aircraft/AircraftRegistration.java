@@ -19,11 +19,10 @@ public record AircraftRegistration(String string) {
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
      * "IllegalArgumentException" si elle ne représente pas une immatriculation de véhicule aérien valide.
-     *
      * @throws IllegalArgumentException
      *              si une chaîne n'est pas conforme à une expression régulière
      *              (pour vérifier cela on utilise certaines méthodes des classes
-     *              Pattern et Matcher ainsi que checkArgument)
+     *              Pattern et Matcher ainsi que checkArgument).
      * @throws IllegalArgumentException
      *              si cette chaine est vide.
      */

@@ -38,7 +38,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
     }
 
     /**
-     * Méthode convertie la longitude de T32 à radian
+     * Méthode qui convertie la longitude de T32 à radian
      * @return la longitude convertie de T32 à radian.
      */
     public double longitude(){
@@ -46,7 +46,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
     }
 
     /**
-     * Méthode convertie la latitude de T32 à radian
+     * Méthode qui convertie la latitude de T32 à radian
      * @return la latitude convertie de T32 à radian.
      */
     public double latitude() {

@@ -17,7 +17,7 @@ public final class Math2 {
 
 
     /**
-     * Méthode clamp limite la valeur v dans l'intervalle allant de min à max
+     * Méthode clamp qui limite la valeur v dans l'intervalle allant de min à max
      * @param min
      *          valeur minimale.
      * @param v

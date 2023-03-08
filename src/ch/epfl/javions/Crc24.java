@@ -27,7 +27,8 @@ public final class Crc24 {
     /**
      * Constructeur public de la classe Crc24 (appelle la méthode buildTable() pour
      * initialiser la table de 256 entrées
-     * @param generator le générateur du Crc utilisé pour générer la table.
+     * @param generator
+     *          le générateur du Crc utilisé pour générer la table.
      */
     public Crc24(int generator) {
         /* Construction de la table de CRC */
@@ -36,7 +37,8 @@ public final class Crc24 {
 
     /**
      * Méthode principale de la classe Crc24 travaillant octet par octet.
-     * @param bytes message de bytes ADS-B.
+     * @param bytes
+     *          message de bytes ADS-B.
      * @return le CRC24 du tableau de bits donné.
      */
     public int crc(byte[] bytes) {
@@ -56,8 +58,10 @@ public final class Crc24 {
 
     /**
      * Algorithme travaillant bit par bit utilisé pour générer la table.
-     * @param generator le générateur du Crc utilisé pour générer la table.
-     * @param bytes message de bytes ADS-B.
+     * @param generator
+     *          le générateur du Crc utilisé pour générer la table.
+     * @param bytes
+     *          message de bytes ADS-B.
      * @return le CRC24 du tableau de bits donné.
      */
     private static int crc_bitwise(int generator, byte[] bytes) {
@@ -81,7 +85,8 @@ public final class Crc24 {
 
     /**
      * Méthode privée pour construire la table.
-     * @param generator le générateur du Crc utilisé pour générer la table.
+     * @param generator
+     *          le générateur du Crc utilisé pour générer la table.
      */
     private static void buildTable(int generator) {
         int[] table = new int[256];

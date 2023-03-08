@@ -19,7 +19,6 @@ public record CallSign(String string) {
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
      * "IllegalArgumentException" si elle ne représente pas un identifiant de l'appareil valide.
-     *
      * @throws IllegalArgumentException
      *              si une chaîne n'est pas conforme à une expression régulière
      *              (pour vérifier cela on utilise certaines méthodes des classes

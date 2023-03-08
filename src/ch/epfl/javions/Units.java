@@ -117,7 +117,7 @@ public final class Units {
     }
 
     /**
-     * Methode convert convertit la valeur donnée, exprimée dans l'unité
+     * Methode convert qui convertit la valeur donnée, exprimée dans l'unité
      * fromUnit (l'unité de départ), en l'unité toUnit (l'unité d'arrivée)
      * @param value
      *          la valeur de l'unité de départ.
