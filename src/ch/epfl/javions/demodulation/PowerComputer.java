@@ -26,10 +26,6 @@ public class PowerComputer {
 
         int numSamples = decoder.readBatch(convertIntToShortArray(sampleBuffer));
 
-        if (numSamples == -1) {
-            return 0;
-        }
-
         // Calculate power samples
         for (int i = 0; i < numSamples; i++) {
             int[] x = new int[8];

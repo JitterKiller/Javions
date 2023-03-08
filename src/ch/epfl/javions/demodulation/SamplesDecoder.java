@@ -22,15 +22,17 @@ public final class SamplesDecoder {
 
     public int readBatch(short[] batch) throws IOException {
         Preconditions.checkArgument(batch.length == batchSize);
-        int bytesToRead = batchSize * 2;
-        int bytesRead = stream.readNBytes(bytesBuffer, 0, bytesToRead);
-        if( bytesRead == -1) {
-            return 0;
+        int bytesRead = stream.readNBytes(bytesBuffer, 0, batchSize * 2);
+        int samplesToConvert;
+        if( bytesRead < batchSize * 2) {
+            samplesToConvert = bytesRead / 2;
+        } else {
+            samplesToConvert = batchSize;
         }
-        int samplesToConvert = bytesToRead / 2;
+
         for(int i = 0; i < samplesToConvert; ++i) {
             int byteIndex = i * 2;
-            int sample = (Byte.toUnsignedInt(bytesBuffer[byteIndex]) << 8) | Byte.toUnsignedInt(bytesBuffer[byteIndex + 1]);
+            int sample = (Byte.toUnsignedInt(bytesBuffer[byteIndex+1]) << 8) | (Byte.toUnsignedInt(bytesBuffer[byteIndex]));
             batch[i] = (short) (sample - 2048);
         }
         return samplesToConvert;
