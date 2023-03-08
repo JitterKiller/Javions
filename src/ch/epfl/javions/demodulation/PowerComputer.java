@@ -5,7 +5,7 @@ import ch.epfl.javions.Preconditions;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class PowerComputer {
+public final class PowerComputer {
     private final SamplesDecoder decoder;
     private final short[] circularBuffer;
 

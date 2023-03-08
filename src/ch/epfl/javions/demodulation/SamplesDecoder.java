@@ -59,7 +59,7 @@ public final class SamplesDecoder {
      */
     public int readBatch(short[] batch) throws IOException {
         Preconditions.checkArgument(batch.length == batchSize);
-        int bytesRead = stream.readNBytes(bytesBuffer, 0, batchSize * 2);
+        int bytesRead = stream.readNBytes(bytesBuffer, 0, bytesBuffer.length);
 
         for(int i = 0; i < bytesRead / 2; ++i) {
             int byteIndex = i * 2;
