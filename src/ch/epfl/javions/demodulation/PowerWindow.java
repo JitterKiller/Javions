@@ -17,15 +17,13 @@ import java.util.Objects;
 public final class PowerWindow {
 
     private final int windowSize;
+    private final static int batchSize = 1<<16;
     private final PowerComputer powerComputer;
     private int[] powerSamples;
     private int[] powerSamples_bis;
+    private long position;
+    private int powerSamplesRead;
 
-    /* Initialisation de la position du début de la fenêtre à 0 */
-    private long position = 0;
-
-    /* Initialisation à 0 d'un compteur d'échantillons de puissance lus */
-    private int powerSamplesRead = 0;
 
     /**
      * Constructeur public de la classe PowerWindow qui initialise la taille de la fenêtre,
@@ -43,13 +41,14 @@ public final class PowerWindow {
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException {
 
-        Preconditions.checkArgument(windowSize > 0 && windowSize <= Math.scalb(1, 16));
+        Preconditions.checkArgument(windowSize > 0 && windowSize <= batchSize);
 
         this.windowSize = windowSize;
-        this.powerComputer = new PowerComputer(stream, (int) Math.scalb(1, 16));
-        this.powerSamples = new int[(int) Math.scalb(1, 16)];
-        this.powerSamples_bis = new int[(int) Math.scalb(1, 16)];
-        powerComputer.readBatch(powerSamples);
+        this.powerComputer = new PowerComputer(stream, batchSize);
+        this.powerSamples = new int[batchSize];
+        this.powerSamples_bis = new int[batchSize];
+        powerSamplesRead = powerComputer.readBatch(powerSamples);
+        position = 0;
     }
 
     /**
@@ -73,7 +72,7 @@ public final class PowerWindow {
      * @return vrai si la fenêtre est pleine, sinon faux.
      */
     public boolean isFull() {
-        return (position() + size() + 1) <= powerSamplesRead;
+        return size() <= powerSamplesRead;
     }
 
     /**
@@ -119,7 +118,7 @@ public final class PowerWindow {
             powerSamples_bis = tempTab;
             ++position;
         }
-
+        --powerSamplesRead;
     }
 
     /**

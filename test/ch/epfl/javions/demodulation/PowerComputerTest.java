@@ -2,10 +2,10 @@ package ch.epfl.javions.demodulation;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.util.Objects;
 
@@ -80,7 +80,6 @@ class PowerComputerTest {
         for (int i : samplesBuffer) {
             System.out.println(i);
         }
-
     }
 
     private static int[] concat(int[]... tabs) {
