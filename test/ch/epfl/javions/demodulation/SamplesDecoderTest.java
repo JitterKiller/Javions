@@ -88,4 +88,16 @@ class SamplesDecoderTest {
             assertEquals(expected[i],actual[i]);
         }
     }
+
+    @Test
+    void SamplesDOTBinDecodeAllValues() throws IOException{
+        var samplesResourceUrl = getClass().getResource("/samples.bin");
+        InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
+        var decoder = new SamplesDecoder(stream,2402);
+        var samples = new short[2402];
+        decoder.readBatch(samples);
+        for (short sample : samples) {
+            System.out.println(sample);
+        }
+    }
 }

@@ -38,9 +38,9 @@ public final class PowerComputer {
         Preconditions.checkArgument(batchSize > 0 && batchSize % 8 == 0);
 
         this.batchSize = batchSize;
-        decoder = new SamplesDecoder(stream, batchSize);
+        decoder = new SamplesDecoder(stream, batchSize * 2);
         circularBuffer = new short[8];
-        powerBuffer = new short[batchSize];
+        powerBuffer = new short[batchSize * 2];
     }
 
     /**

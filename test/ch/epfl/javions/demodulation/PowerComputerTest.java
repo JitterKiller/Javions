@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.util.Objects;
 
@@ -69,4 +70,55 @@ class PowerComputerTest {
         assertThrows(IllegalArgumentException.class, () -> powerComputer.readBatch(testArray));
     }
 
+    @Test
+    void testAll4804SamplesDOTBin() throws IOException {
+        var samplesResourceUrl = getClass().getResource("/samples.bin");
+        InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
+        var power = new PowerComputer(stream, 1208);
+        var samplesBuffer = new int[1208];
+        power.readBatch(samplesBuffer);
+        for (int i : samplesBuffer) {
+            System.out.println(i);
+        }
+
+    }
+
+    private static int[] concat(int[]... tabs) {
+        // Check if the input in null
+        assert tabs != null : "Input is null";
+        // Check if an array from the input in null
+        int FinalLength = 0;
+        for (int[] tab : tabs) {
+            assert tab != null : "One of the inner arrays is null";
+            FinalLength += tab.length; //Get full length of tabs;
+        }
+
+        int[] array = new int[FinalLength];
+
+        int pos = 0;
+
+        for (int[] tab : tabs) {
+            for (int b : tab) {
+                array[pos] = b;
+                pos += 1;
+            }
+        }
+        return array;
+    }
+
+    private static int[] extract(int[] input, int start, int length) {
+
+        assert input != null : "Input is null";
+        assert 0 <= start && start < input.length : "Start value is invalid";
+        assert length >= 0 : "Length is invalid";
+        assert start + length <= input.length : "Invalid entries";
+
+        int[] array = new int[length];
+
+        for (int i = 0; i < array.length; ++i) {
+            array[i] = input[start];
+            start += 1;
+        }
+        return array;
+    }
 }

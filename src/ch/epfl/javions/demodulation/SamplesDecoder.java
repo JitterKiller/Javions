@@ -21,7 +21,7 @@ public final class SamplesDecoder {
     private final byte[] bytesBuffer;
 
     /* Biais de 2048 */
-    private final int OFFSET = 2048;
+    private final static int OFFSET = 2048;
 
     /**
      * Le constructeur de la classe initialise un flot d'entrée (grâce au stream entré en argument),
