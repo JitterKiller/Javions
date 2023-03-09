@@ -18,7 +18,7 @@ class PowerWindowTest {
         int[] tab2 = new int[]{1370, 200, 292, 290, 106, 116, 194, 64};
         int[] tab3 = new int[]{37, 50, 149, 466, 482, 180, 148, 5576};
         InputStream stream = new FileInputStream("resources/Samples.bin");
-        int windowSize = 5;
+        int windowSize = 8;
         PowerWindow window = new PowerWindow(stream, windowSize);
 
         assertEquals(tab[0], window.get(0));

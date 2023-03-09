@@ -73,7 +73,7 @@ public final class PowerWindow {
      * @return vrai si la fenêtre est pleine, sinon faux.
      */
     public boolean isFull() {
-        return (position + windowSize + 1) <= powerSamplesRead;
+        return (position() + size() + 1) <= powerSamplesRead;
     }
 
     /**
@@ -87,12 +87,12 @@ public final class PowerWindow {
      */
     public int get(int i) {
 
-        Objects.checkIndex(0, windowSize);
+        Objects.checkIndex(0, size());
 
-        if ((position + i) % powerSamples.length < i) {
-            return powerSamples_bis[(int) ((position + i) % powerSamples.length)];
+        if ((position() + i) % powerSamples.length < i) {
+            return powerSamples_bis[(int) ((position() + i) % powerSamples.length)];
         } else {
-            return powerSamples[(int) ((position + i) % powerSamples.length)];
+            return powerSamples[(int) ((position() + i) % powerSamples.length)];
         }
     }
 
@@ -103,9 +103,9 @@ public final class PowerWindow {
      */
     public void advance() throws IOException {
 
-        if (position % powerSamples.length < powerSamples.length - 1) {
+        if (position() % powerSamples.length < powerSamples.length - 1) {
 
-            if ((position + windowSize) % powerSamples.length < powerSamples.length - 1) {
+            if ((position() + size()) % powerSamples.length < powerSamples.length - 1) {
                 ++position;
             } else {
                 powerSamplesRead += powerComputer.readBatch(powerSamples_bis);
