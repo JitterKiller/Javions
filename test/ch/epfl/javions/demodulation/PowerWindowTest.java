@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,5 +67,35 @@ class PowerWindowTest {
         window.advanceBy(8);
         assertFalse(window.isFull());
 
+    }
+
+    @Test
+    void isFullIfTheWindowIsOn2Batches() throws IOException {//je change les tableaux à une taille de 800
+        List<Byte> bytes = new ArrayList<>();
+        for (int i = 0; i < (Math.scalb(1,16) -600) * 4; i+=2) {
+            bytes.add((byte) 0);
+            bytes.add((byte) 8);
+        }
+        InputStream stream = new FileInputStream("resources/samples.bin");
+        byte[] bytes1 = new byte[4804];
+
+        int readBatch = stream.readNBytes(bytes1,0,bytes1.length);
+        for (byte b : bytes1) {
+            bytes.add(b);
+        }
+        byte[] bytesFinal = new byte[bytes.size()];
+        for (int i = 0; i < bytes.size(); i++) {
+            bytesFinal[i]=bytes.get(i);
+        }
+        InputStream stream2 = new ByteArrayInputStream(bytesFinal);
+        PowerWindow powerWindow = new PowerWindow(stream2,5);
+        for (int i = 0; i < Math.scalb(1,16) +597; i++) {
+            powerWindow.advance();
+            if(i== Math.scalb(1,16)-5 ){
+                powerWindow.isFull();
+            }
+        }
+        assertFalse(powerWindow.isFull());
+        System.out.println(bytesFinal[(int) Math.scalb(1,16)]);
     }
 }
