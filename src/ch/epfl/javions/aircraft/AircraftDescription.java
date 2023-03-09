@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  * @param string une chaîne représentant une immatriculation de véhicule aérien.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public record AircraftDescription(String string) {
 

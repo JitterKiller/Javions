@@ -5,12 +5,12 @@ package ch.epfl.javions;
  * est vrai ou faux
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class Preconditions {
 
     /**
-     * Constructeur privé de la classe (non instanciable).
+     * Constructeur privé de la classe (non instantiable).
      */
     private Preconditions() {}
 

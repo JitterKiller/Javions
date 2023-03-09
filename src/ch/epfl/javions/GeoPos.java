@@ -5,7 +5,7 @@ package ch.epfl.javions;
  * Ces coordonnées sont exprimées en t32 et stockées sous la forme d'entiers de 32 bits (type int).
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  *
  * @param latitudeT32
  *          la valeur de l'unité de la latitude.

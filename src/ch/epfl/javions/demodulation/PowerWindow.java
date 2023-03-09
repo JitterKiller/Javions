@@ -11,12 +11,10 @@ import java.util.Objects;
  * taille fixe sur une séquence d'échantillons de puissance produits par un calculateur de puissance.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 
 public final class PowerWindow {
-
-    private final InputStream stream;
     private final int windowSize;
     private final PowerComputer powerComputer;
     private int[] powerSamples;
@@ -37,7 +35,6 @@ public final class PowerWindow {
 
         Preconditions.checkArgument(windowSize > 0 && windowSize <= Math.scalb(1, 16));
 
-        this.stream = stream;
         this.windowSize = windowSize;
         this.powerComputer = new PowerComputer(stream, (int) Math.scalb(1, 16));
         this.powerSamples = new int[(int) Math.scalb(1, 16)];

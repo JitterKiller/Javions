@@ -7,7 +7,7 @@ import java.util.Objects;
  * permettant d'extraire un sous-ensemble des 64 bits d'une valeur de type long.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public class Bits {
 

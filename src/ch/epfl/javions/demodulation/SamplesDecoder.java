@@ -12,13 +12,16 @@ import java.util.Objects;
  * effectivement convertis.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class SamplesDecoder {
 
     private final InputStream stream;
     private final int batchSize;
     private final byte[] bytesBuffer;
+
+    /* Biais de 2048 */
+    private final int OFFSET = 2048;
 
     /**
      * Le constructeur de la classe initialise un flot d'entrée (grâce au stream entré en argument),
@@ -64,7 +67,7 @@ public final class SamplesDecoder {
         for(int i = 0; i < bytesRead / 2; ++i) {
             int byteIndex = i * 2;
             int sample = (Byte.toUnsignedInt(bytesBuffer[byteIndex+1]) << 8) | (Byte.toUnsignedInt(bytesBuffer[byteIndex]));
-            batch[i] = (short) (sample - 2048);
+            batch[i] = (short) (sample - OFFSET);
         }
         return bytesRead / 2;
     }

@@ -8,7 +8,7 @@ import java.util.Objects;
  * C'est une classe immuable et ces octets sont interprétés de manière non signée.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class ByteString {
     private final byte[] bytes;

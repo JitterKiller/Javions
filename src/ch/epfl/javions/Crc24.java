@@ -5,7 +5,7 @@ package ch.epfl.javions;
  * représente un calculateur de CRC de 24 bits.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class Crc24 {
 

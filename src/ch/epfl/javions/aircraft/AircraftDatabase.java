@@ -14,7 +14,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * (AircraftData) associées à cette adresse.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  *
  */
 public final class AircraftDatabase {

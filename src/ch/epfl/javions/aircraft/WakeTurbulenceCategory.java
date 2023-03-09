@@ -5,7 +5,7 @@ package ch.epfl.javions.aircraft;
  *  représente la catégorie de turbulence du véhicule aérien (LIGHT, MEDIUM, HEAVY, UNKNOWN).
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public enum WakeTurbulenceCategory {
     LIGHT, MEDIUM, HEAVY, UNKNOWN;

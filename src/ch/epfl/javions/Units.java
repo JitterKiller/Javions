@@ -100,7 +100,7 @@ public final class Units {
      * Classe imbriquée Speed contenant les définitions des unités de vitesse.
      *
      * @author Adam AIT BOUSSELHAM (356365)
-     * @author Abdellah Janati Idrissi (362341)
+     * @author Abdellah JANATI IDRISSI (362341)
      */
     public final class Speed {
 

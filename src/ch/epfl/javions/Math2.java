@@ -5,7 +5,7 @@ package ch.epfl.javions;
  * Elle est donc similaire à la classe Math de la bibliothèque standard Java.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 
 public final class Math2 {

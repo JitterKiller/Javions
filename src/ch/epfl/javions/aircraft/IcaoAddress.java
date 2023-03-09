@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * @param string la chaîne contenant la représentation textuelle de l'adresse OACI.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public record IcaoAddress(String string) {
 
