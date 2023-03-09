@@ -64,5 +64,6 @@ class PowerWindowTest {
 
         window.advanceBy(8);
         assertFalse(window.isFull());
+
     }
 }

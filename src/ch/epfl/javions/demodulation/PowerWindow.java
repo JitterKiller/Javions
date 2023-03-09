@@ -11,7 +11,7 @@ import java.util.Objects;
  * taille fixe sur une séquence d'échantillons de puissance produits par un calculateur de puissance.
  *
  * @author Adam AIT BOUSSELHAM (356365)
- * @author Abdellah Janati Idrissi (362341)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 
 public final class PowerWindow {
