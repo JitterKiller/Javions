@@ -20,7 +20,8 @@ public record AircraftTypeDesignator(String string) {
      * "IllegalArgumentException" si elle ne représente pas un type de véhicule aérien valide.
      * @throws IllegalArgumentException
      *              si une chaîne n'est pas conforme à une expression régulière (pour vérifier
-     *              cela on utilise certaines méthodes des classes Pattern et Matcher ainsi que checkArgument).
+     *              cela on utilise certaines méthodes des classes Pattern et Matcher ainsi que
+     *              la méthode checkArgument()).
      */
     public AircraftTypeDesignator {
         Preconditions.checkArgument(pattern.matcher(string).matches() || string.isEmpty());

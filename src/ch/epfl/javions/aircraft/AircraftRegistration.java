@@ -22,7 +22,7 @@ public record AircraftRegistration(String string) {
      * @throws IllegalArgumentException
      *              si une chaîne n'est pas conforme à une expression régulière
      *              (pour vérifier cela on utilise certaines méthodes des classes
-     *              Pattern et Matcher ainsi que checkArgument).
+     *              Pattern et Matcher ainsi que la méthode checkArgument()).
      * @throws IllegalArgumentException
      *              si cette chaine est vide.
      */

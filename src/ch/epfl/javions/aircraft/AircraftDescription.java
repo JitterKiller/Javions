@@ -23,7 +23,7 @@ public record AircraftDescription(String string) {
      * @throws IllegalArgumentException
      *              si une chaîne n'est pas conforme à une expression régulière
      *              (pour vérifier cela on utilise certaines méthodes des classes
-     *              Pattern et Matcher ainsi que checkArgument).
+     *              Pattern et Matcher ainsi que la méthode checkArgument()).
      */
     public AircraftDescription {
         Preconditions.checkArgument(pattern.matcher(string).matches() || string.isEmpty());

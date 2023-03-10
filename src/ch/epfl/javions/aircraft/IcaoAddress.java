@@ -24,7 +24,7 @@ public record IcaoAddress(String string) {
      * @throws IllegalArgumentException
      *              Si une chaîne n'est pas conforme à une expression régulière
      *              (pour verifier cela on utilise certaines méthodes des classes Pattern
-     *              et Matcher ainsi que checkArgument).
+     *              et Matcher ainsi que la méthode checkArgument()).
      * @throws IllegalArgumentException
      *              Si cette chaine est vide.
      */

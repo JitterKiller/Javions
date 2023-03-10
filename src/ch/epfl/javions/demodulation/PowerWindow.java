@@ -17,10 +17,10 @@ import java.util.Objects;
 public final class PowerWindow {
 
     private final int windowSize;
-    private final static int batchSize = 1<<16;
+    private final static int BATCH_SIZE = 1<<16;
     private final PowerComputer powerComputer;
     private int[] powerSamples;
-    private int[] powerSamples_bis;
+    private int[] powerSamplesBis;
     private long position;
     private int powerSamplesRead;
 
@@ -41,12 +41,12 @@ public final class PowerWindow {
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException {
 
-        Preconditions.checkArgument(windowSize > 0 && windowSize <= batchSize);
+        Preconditions.checkArgument(windowSize > 0 && windowSize <= BATCH_SIZE);
 
         this.windowSize = windowSize;
-        this.powerComputer = new PowerComputer(stream, batchSize);
-        this.powerSamples = new int[batchSize];
-        this.powerSamples_bis = new int[batchSize];
+        this.powerComputer = new PowerComputer(stream, BATCH_SIZE);
+        this.powerSamples = new int[BATCH_SIZE];
+        this.powerSamplesBis = new int[BATCH_SIZE];
         powerSamplesRead = powerComputer.readBatch(powerSamples);
         position = 0;
     }
@@ -86,10 +86,10 @@ public final class PowerWindow {
      */
     public int get(int i) {
 
-        Objects.checkIndex(0, size());
+        Objects.checkIndex(i, size());
 
         if ((position() + i) % powerSamples.length < i) {
-            return powerSamples_bis[(int) ((position() + i) % powerSamples.length)];
+            return powerSamplesBis[(int) ((position() + i) % powerSamples.length)];
         } else {
             return powerSamples[(int) ((position() + i) % powerSamples.length)];
         }
@@ -103,21 +103,17 @@ public final class PowerWindow {
     public void advance() throws IOException {
 
         if (position() % powerSamples.length < powerSamples.length - 1) {
-
-            if ((position() + size()) % powerSamples.length < powerSamples.length - 1) {
-                ++position;
-            } else {
-                powerSamplesRead += powerComputer.readBatch(powerSamples_bis);
-                ++position;
+            if ((position() + size()) % powerSamples.length >= powerSamples.length - 1) {
+                powerSamplesRead += powerComputer.readBatch(powerSamplesBis);
             }
-
         } else {
             int[] tempTab;
             tempTab = powerSamples;
-            powerSamples = powerSamples_bis;
-            powerSamples_bis = tempTab;
-            ++position;
+            powerSamples = powerSamplesBis;
+            powerSamplesBis = tempTab;
         }
+
+        ++position;
         --powerSamplesRead;
     }
 
@@ -127,7 +123,7 @@ public final class PowerWindow {
      * @throws IOException
      *          en cas d'erreur d'entrée/sortie lors de la lecture du flux de données.
      * @throws IllegalArgumentException
-     *          si le nombre donné d'échantillon par lequel on deplace la fenêtre est nul
+     *          si le nombre donné d'échantillon par lequel on déplace la fenêtre est nul.
      */
     public void advanceBy(int offset) throws IOException {
 

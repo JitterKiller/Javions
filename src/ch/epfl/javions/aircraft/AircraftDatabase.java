@@ -2,7 +2,6 @@ package ch.epfl.javions.aircraft;
 
 import java.io.*;
 import java.util.Objects;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

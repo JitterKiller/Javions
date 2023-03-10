@@ -60,6 +60,7 @@ public final class PowerComputer {
      *          (on utilise la méthode checkArgument()).
      */
     public int readBatch(int[] batch) throws IOException {
+
         Preconditions.checkArgument(batch.length == batchSize);
 
         int samplesRead = decoder.readBatch(powerBuffer);
