@@ -20,7 +20,7 @@ class PowerWindowTest {
         int[] tab1 = new int[]{36818, 23825, 10730, 1657, 1285, 1280, 394, 521};
         int[] tab2 = new int[]{1370, 200, 292, 290, 106, 116, 194, 64};
         int[] tab3 = new int[]{37, 50, 149, 466, 482, 180, 148, 5576};
-        InputStream stream = new FileInputStream("resources/Samples.bin");
+        InputStream stream = new FileInputStream("resources/samples.bin");
         int windowSize = 5;
         PowerWindow window = new PowerWindow(stream, windowSize);
 
@@ -97,5 +97,35 @@ class PowerWindowTest {
         }
         assertFalse(powerWindow.isFull());
         System.out.println(bytesFinal[(int) Math.scalb(1,16)]);
+    }
+
+    @Test
+    void getIfTheWindowIsOn2Batches() throws IOException {
+        List<Byte> bytes = new ArrayList<>();
+        for (int i = 0; i < (Math.scalb(1,16) -1200) * 4; i+=2) {
+            bytes.add((byte) 0);
+            bytes.add((byte) 8);
+        }
+        InputStream stream = new FileInputStream("resources/samples.bin");
+        byte[] bytes1 = new byte[4804];
+
+        int readBatch = stream.readNBytes(bytes1,0,bytes1.length);
+
+        for (byte b : bytes1) {
+            bytes.add(b);
+        }
+        byte[] bytesFinal = new byte[bytes.size()];
+        for (int i = 0; i < bytes.size(); i++) {
+            bytesFinal[i]=bytes.get(i);
+        }
+        InputStream stream2 = new ByteArrayInputStream(bytesFinal);
+        PowerWindow powerWindow = new PowerWindow(stream2,5);
+        for (int i = 0; i < Math.scalb(1,16) -4; i++) {
+            powerWindow.advance();
+            if(i== Math.scalb(1,16)-5 ){
+                powerWindow.isFull();
+            }
+        }
+        assertEquals(585,powerWindow.get(4));
     }
 }
