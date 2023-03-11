@@ -1,5 +1,6 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.Bits;
 import ch.epfl.javions.ByteString;
 import ch.epfl.javions.Crc24;
 import ch.epfl.javions.Preconditions;
@@ -14,7 +15,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     public static final int LENGTH = 14;
 
     public RawMessage {
-        Preconditions.checkArgument((timeStampNs() >= 0) && (bytes().size() == LENGTH));
+        Preconditions.checkArgument((timeStampNs >= 0) && (bytes.size() == LENGTH));
     }
 
     public static RawMessage of(long timeStampNs, byte[] bytes) {
@@ -30,7 +31,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     }
 
     public static int typeCode(long payload) {
-        return (int) (payload >>> 51) & 0x1F;
+        return Bits.extractUInt(payload,0,5);
     }
 
     public int downLinkFormat() {
