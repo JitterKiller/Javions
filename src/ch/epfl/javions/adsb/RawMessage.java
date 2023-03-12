@@ -37,7 +37,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     }
 
     public IcaoAddress icaoAddress() {
-        return new IcaoAddress(HexFormat.of().toHexDigits(bytes().bytesInRange(1,4),6));
+        return new IcaoAddress(HexFormat.of().toHexDigits(bytes().bytesInRange(1,4),6).toUpperCase());
     }
 
     public long payload() {
