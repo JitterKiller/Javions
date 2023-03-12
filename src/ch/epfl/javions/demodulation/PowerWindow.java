@@ -88,10 +88,10 @@ public final class PowerWindow {
 
         Objects.checkIndex(i, size());
 
-        if ((position() + i) % powerSamples.length < i) {
-            return powerSamplesBis[(int) ((position() + i) % powerSamples.length)];
+        if ((position() + i) % BATCH_SIZE < i) {
+            return powerSamplesBis[(int) ((position() + i) % BATCH_SIZE)];
         } else {
-            return powerSamples[(int) ((position() + i) % powerSamples.length)];
+            return powerSamples[(int) ((position() + i) % BATCH_SIZE)];
         }
     }
 
@@ -102,13 +102,12 @@ public final class PowerWindow {
      */
     public void advance() throws IOException {
 
-        if (position() % powerSamples.length < powerSamples.length - 1) {
-            if ((position() + size()) % powerSamples.length >= powerSamples.length - 1) {
+        if (position() % powerSamples.length < BATCH_SIZE - 1) {
+            if ((position() + size()) % BATCH_SIZE >= BATCH_SIZE - 1) {
                 powerSamplesRead += powerComputer.readBatch(powerSamplesBis);
             }
         } else {
-            int[] tempTab;
-            tempTab = powerSamples;
+            int[] tempTab = powerSamples;
             powerSamples = powerSamplesBis;
             powerSamplesBis = tempTab;
         }

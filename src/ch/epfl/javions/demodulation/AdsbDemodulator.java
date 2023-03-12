@@ -1,6 +1,5 @@
 package ch.epfl.javions.demodulation;
 
-import ch.epfl.javions.ByteString;
 import ch.epfl.javions.adsb.RawMessage;
 
 import java.io.IOException;
@@ -8,9 +7,6 @@ import java.io.InputStream;
 
 public final class AdsbDemodulator {
     private final PowerWindow window;
-    private int sumCarrierPeak;
-    private int sumCarrierBottomOut;
-    private int previousSumCarrierPeak;
     private final byte[] message = new byte[14];
 
     public AdsbDemodulator(InputStream stream) throws IOException {
@@ -19,27 +15,30 @@ public final class AdsbDemodulator {
 
     public RawMessage nextMessage() throws IOException {
 
-        sumCarrierPeak = 0;
+        int sumCarrierPeak;
+        int previousSumCarrierPeak = 0;
 
         for (; window.isFull(); window.advance()) {
-            computeCarrierSum();
-            if (isPeakDetected()) {
-                computeBottomOutSums();
-                if (sumCarrierPeak >= 2 * sumCarrierBottomOut) {
-                    for (int i = 0; i < message.length; ++i) {
-                        byte b = 0;
-                        for (int j = 0; j < Byte.SIZE; ++j) {
-                            int index = i * 8 + j;
-                            if (decodeBits(index)) {
-                                b |= (1 << (7 - j));
+            sumCarrierPeak = computeCarrierSum();
+            if (isPeakDetected(sumCarrierPeak,previousSumCarrierPeak)) {
+                if (computeCarrierSum() >= computeTwiceBottomOutSums()) {
+                    if (RawMessage.size(computeFirstByte()) == RawMessage.LENGTH) {
+                        for(int i = 1; i < message.length; ++i) {
+                            byte b = 0;
+                            int index = i * Byte.SIZE;
+                            for (int j = 0; j < Byte.SIZE; ++j) {
+                                if (decodeBits(index)) {
+                                    b |= (1 << (7 - j));;
+                                }
+                                ++index;
                             }
+                            message[i] = b;
                         }
-                        message[i] = b;
-                    }
-                    if ((RawMessage.size(message[0]) == RawMessage.LENGTH) && (RawMessage.of((window.position() - window.size()) * 100, message) != null)) {
-                        ByteString byteString = new ByteString(message);
-                        window.advanceBy(1200);
-                        return new RawMessage((window.position() - window.size()) * 100, byteString);
+                        RawMessage rawMessage = RawMessage.of((window.position() * 100), message);
+                        if(rawMessage != null) {
+                            window.advanceBy(1200);
+                            return rawMessage;
+                        }
                     }
                 }
             }
@@ -48,20 +47,30 @@ public final class AdsbDemodulator {
         return null;
     }
 
-    private boolean isPeakDetected() {
+    private boolean isPeakDetected(int sumCarrierPeak, int previousSumCarrierPeak) {
         int nextSumCarrierPeak = window.get(1) + window.get(11) + window.get(36) + window.get(46);
         return (sumCarrierPeak > previousSumCarrierPeak) && (sumCarrierPeak > nextSumCarrierPeak);
     }
 
-    private void computeCarrierSum() {
-        sumCarrierPeak = window.get(0) + window.get(10) + window.get(35) + window.get(45);
+    private int computeCarrierSum() {
+        return (window.get(0) + window.get(10) + window.get(35) + window.get(45));
     }
 
-    private void computeBottomOutSums() {
-        sumCarrierBottomOut = window.get(5) + window.get(15) + window.get(20) + window.get(30) + window.get(40);
+    private int computeTwiceBottomOutSums() {
+        return 2 * (window.get(5) + window.get(15) + window.get(20) + window.get(30) + window.get(40));
     }
 
     private boolean decodeBits(int i) {
         return window.get(80 + (10 * i)) >= window.get(85 + (10 * i));
+    }
+    private byte computeFirstByte() {
+        byte byte0 = 0;
+        for (int i = 0; i < Byte.SIZE; ++i) {
+            if(decodeBits(i)) {
+                byte0 |= (1 << (7 - i));
+            }
+        }
+        message[0] = byte0;
+        return byte0;
     }
 }

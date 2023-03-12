@@ -21,13 +21,11 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
 
     public static RawMessage of(long timeStampNs, byte[] bytes) {
         Objects.requireNonNull(bytes);
-        int crc = Crc24.crc(bytes);
-        return crc == 0 ? new RawMessage(timeStampNs, new ByteString(bytes)) : null;
+        return Crc24.crc(bytes) == 0 ? new RawMessage(timeStampNs, new ByteString(bytes)) : null;
     }
 
     public static int size(byte byte0) {
-        int DF = Byte.toUnsignedInt(byte0) >>> 3;
-        return DF == 17 ? LENGTH : 0;
+        return Byte.toUnsignedInt(byte0) >>> 3 == 17 ? LENGTH : 0;
     }
 
     public static int typeCode(long payload) {
