@@ -12,9 +12,8 @@ class AdsbDemodulatorTest {
 
     @Test
     void testPrintRawMessages() throws IOException {
-        var samplesResourceUrl = getClass().getResource("/samples_20230304_1442.bin");
-        assert samplesResourceUrl != null;
-        try (InputStream s = new FileInputStream(samplesResourceUrl.getFile())) {
+        String f = "resources/samples_20230304_1442.bin";
+        try (InputStream s = new FileInputStream(f)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             while ((m = d.nextMessage()) != null)
