@@ -12,8 +12,9 @@ class AdsbDemodulatorTest {
 
     @Test
     void testPrintRawMessages() throws IOException {
-        String f = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
-        try (InputStream s = new FileInputStream(f)) {
+        var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
+        var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
+        try (InputStream s = new FileInputStream(samplesResourceMac)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             while ((m = d.nextMessage()) != null)
