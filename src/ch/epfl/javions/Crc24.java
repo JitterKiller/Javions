@@ -10,13 +10,13 @@ package ch.epfl.javions;
 public final class Crc24 {
 
     /* La taille du Crc de 24 bits, constante */
-    private static final int CRCWIDTH = 24;
+    private static final int CRC_WIDTH = 24;
 
     /* Le bit le plus fort du CRC24 */
-    private static final int TOPBIT = CRCWIDTH - 1;
+    private static final int TOP_BIT = CRC_WIDTH - 1;
 
     /* L'octet le plus fort du CRC24 */
-    private static final int TOPBYTE = CRCWIDTH - 8;
+    private static final int TOP_BYTE = CRC_WIDTH - 8;
 
     /* La table de 256 entrées correspondant à un générateur */
     private static int[] table;
@@ -46,14 +46,14 @@ public final class Crc24 {
 
         /* Première boucle traitant les octets du message */
         for (byte b : bytes) {
-            crc = ((crc << 8) | Byte.toUnsignedInt(b)) ^ table[Bits.extractUInt(crc,TOPBYTE,8)];
+            crc = ((crc << 8) | Byte.toUnsignedInt(b)) ^ table[Bits.extractUInt(crc,TOP_BYTE,8)];
         }
 
         /* Seconde boucle traitant les 3 octets ajoutés */
         for(int i = 0; i < 3; ++i) {
-            crc = ((crc << 8)) ^ table[Bits.extractUInt(crc,TOPBYTE,8)];
+            crc = ((crc << 8)) ^ table[Bits.extractUInt(crc,TOP_BYTE,8)];
         }
-        return Bits.extractUInt(crc,0,CRCWIDTH);
+        return Bits.extractUInt(crc,0,CRC_WIDTH);
     }
 
     /**
@@ -71,16 +71,16 @@ public final class Crc24 {
         /* Première boucle traitant les bits du message */
         for (byte b : bytes) {
             for (int i = 0; i < 8; ++i) {
-                crc = ((crc << 1) | Byte.toUnsignedInt(b) >> (7-i)) ^ table[Bits.extractUInt(crc,TOPBIT, 1)];
+                crc = ((crc << 1) | Byte.toUnsignedInt(b) >> (7-i)) ^ table[Bits.extractUInt(crc,TOP_BIT, 1)];
             }
         }
 
         /* Seconde boucle traitant les 24 bits ajoutés */
         for (int i = 0; i < 24; ++i) {
-            crc = ((crc << 1)) ^ table[Bits.extractUInt(crc,TOPBIT, 1)];
+            crc = ((crc << 1)) ^ table[Bits.extractUInt(crc,TOP_BIT, 1)];
         }
 
-        return Bits.extractUInt(crc,0,CRCWIDTH);
+        return Bits.extractUInt(crc,0,CRC_WIDTH);
     }
 
     /**
