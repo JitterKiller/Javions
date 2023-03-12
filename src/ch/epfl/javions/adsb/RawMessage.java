@@ -13,6 +13,7 @@ import static ch.epfl.javions.Crc24.GENERATOR;
 
 public record RawMessage(long timeStampNs, ByteString bytes) {
     public static final int LENGTH = 14;
+    private static final Crc24 Crc24 = new Crc24(GENERATOR);
 
     public RawMessage {
         Preconditions.checkArgument((timeStampNs >= 0) && (bytes.size() == LENGTH));
@@ -20,7 +21,6 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
 
     public static RawMessage of(long timeStampNs, byte[] bytes) {
         Objects.requireNonNull(bytes);
-        Crc24 Crc24 = new Crc24(GENERATOR);
         int crc = Crc24.crc(bytes);
         return crc == 0 ? new RawMessage(timeStampNs, new ByteString(bytes)) : null;
     }
