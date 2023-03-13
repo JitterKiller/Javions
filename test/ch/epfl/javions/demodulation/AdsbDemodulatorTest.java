@@ -17,8 +17,12 @@ class AdsbDemodulatorTest {
         try (InputStream s = new FileInputStream(samplesResourceMac)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
-            while ((m = d.nextMessage()) != null)
+            int numberOfMessages = 0;
+            while ((m = d.nextMessage()) != null) {
                 System.out.println(m);
+                ++numberOfMessages;
+            }
+            System.out.println(numberOfMessages);
         }
     }
 }

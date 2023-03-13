@@ -48,8 +48,11 @@ public final class AdsbDemodulator {
     }
 
     private boolean isPeakDetected(int sumCarrierPeak, int previousSumCarrierPeak) {
-        int nextSumCarrierPeak = window.get(1) + window.get(11) + window.get(36) + window.get(46);
-        return (sumCarrierPeak > previousSumCarrierPeak) && (sumCarrierPeak > nextSumCarrierPeak);
+        if(sumCarrierPeak > previousSumCarrierPeak) {
+            int nextSumCarrierPeak = window.get(1) + window.get(11) + window.get(36) + window.get(46);
+            return sumCarrierPeak > nextSumCarrierPeak;
+        }
+        return false;
     }
 
     private int computeCarrierSum() {
