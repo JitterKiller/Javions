@@ -29,7 +29,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     }
 
     public static int typeCode(long payload) {
-        return Bits.extractUInt(payload,0,5);
+        return Bits.extractUInt(payload,51,5);
     }
 
     public int downLinkFormat() {

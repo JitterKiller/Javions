@@ -38,8 +38,8 @@ public class Bits {
         Preconditions.checkArgument(size > 0 && size < Integer.SIZE);
         Objects.checkFromIndexSize(start,size,Long.SIZE);
 
-        long mask1 = (1L << size) - 1;
-        return (int) ((value >>> start) & mask1);
+        long mask = (1L << size) - 1;
+        return (int) ((value >>> start) & mask);
 
     }
 
@@ -60,8 +60,8 @@ public class Bits {
 
         Objects.checkIndex(index, Long.SIZE);
 
-        long mask2 = 1L << index;
-        return (value & mask2) != 0;
+        long mask = 1L << index;
+        return (value & mask) != 0;
     }
 }
 

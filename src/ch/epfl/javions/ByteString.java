@@ -92,7 +92,7 @@ public final class ByteString {
      */
     public long bytesInRange(int fromIndex, int toIndex) {
 
-        Objects.checkFromIndexSize(fromIndex, toIndex, bytes.length);
+        Objects.checkFromIndexSize(fromIndex, toIndex - fromIndex, bytes.length);
         Preconditions.checkArgument(toIndex - fromIndex <= 8);
 
         long result = 0;
