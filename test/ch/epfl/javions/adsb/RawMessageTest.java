@@ -37,14 +37,6 @@ class RawMessageTest {
         var validBytes = HexFormat.of().parseHex("8D4B17E5F8210002004BB8B1F1AC");
         var validByeString = new ByteString(validBytes);
         var validRawMessage = new RawMessage(timeStampNs,validByeString);
-        StringBuilder bitStringBuilder = new StringBuilder();
-        for(byte b : validBytes) {
-            for(int i = 7; i >= 0; i--) {
-                bitStringBuilder.append((b >> i) & 1);
-            }
-        }
-        String bitString = bitStringBuilder.toString();
-        System.out.println(bitString);
         assertEquals(17,validRawMessage.downLinkFormat());
 
         var invalidBytes = HexFormat.of().parseHex("7A6E944F3AD0CC5A3101CC7299D8");
