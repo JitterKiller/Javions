@@ -36,7 +36,7 @@ public final class AdsbDemodulator {
                         }
                         RawMessage rawMessage = RawMessage.of((window.position() * 100), message);
                         if(rawMessage != null) {
-                            window.advanceBy(1200);
+                            window.advanceBy(1199);
                             return rawMessage;
                         }
                     }

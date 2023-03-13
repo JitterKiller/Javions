@@ -2,102 +2,91 @@ package ch.epfl.javions.demodulation;
 
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
-import java.net.URLDecoder;
-import java.util.Objects;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class SamplesDecoderTest {
+    private static final int SAMPLES_COUNT = 1 << 12;
+    private static final int BIAS = 1 << 11;
 
-    @Test
-    void SamplesDecoderTest10FirstValuesSamplesDOTBin() throws IOException {
-        var samplesResourceUrl = getClass().getResource("/samples.bin");
-        InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
-        var decoder = new SamplesDecoder(stream,10);
-        var expectedValues = new short[]{-3, 8, -9, -8, -5, -8, -12, -16, -23, -9};
-        var batch = new short[10];
-        decoder.readBatch(batch);
-        for(int i = 0; i < 10; ++i) {
-            assertEquals(expectedValues[i],batch[i]);
-        }
+    private static byte[] getSampleBytes() {
+        var sampleBytes = new byte[SAMPLES_COUNT * Short.BYTES];
+        var sampleBytesBuffer = ByteBuffer.wrap(sampleBytes)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .asShortBuffer();
+
+        for (int i = 0; i < SAMPLES_COUNT; i += 1)
+            sampleBytesBuffer.put((short) i);
+        return sampleBytes;
     }
 
     @Test
-    void constructorThrowsNegativeSize() throws IOException {
-        var samplesResourceUrl = getClass().getResource("/samples.bin");
-        InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
-        assertThrows(IllegalArgumentException.class,()->{
-            new SamplesDecoder(stream,-1);
+    void samplesDecoderConstructorThrowsWithInvalidBatchSize() {
+        var stream = new ByteArrayInputStream(new byte[0]);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new SamplesDecoder(stream, -1));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new SamplesDecoder(stream, 0));
+    }
+
+    @Test
+    void samplesDecoderConstructorThrowsWithNullStream() {
+        assertThrows(
+                NullPointerException.class,
+                () -> new SamplesDecoder(null, 1));
+    }
+
+    @Test
+    void samplesDecoderReadBatchThrowsOnInvalidBatchSize() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (var byteStream = new ByteArrayInputStream(getSampleBytes())) {
+                var batchSize = 1024;
+                var actualSamples = new short[batchSize - 1];
+                var samplesDecoder = new SamplesDecoder(byteStream, batchSize);
+                samplesDecoder.readBatch(actualSamples);
+            }
         });
     }
 
     @Test
-    void ValuesOfBatch() throws IOException{
-        String s = getClass().getResource("/samples.bin").getFile();
-        s = URLDecoder.decode(s, UTF_8);
-        InputStream stream = new FileInputStream(s);
-        SamplesDecoder decoder = new SamplesDecoder(stream,4804/2);
-        short[] batch = new short[4804/2];
-        decoder.readBatch(batch);
-        int [] expected = new int[]{-3,8,-9,-8,-5,-8,-12,-16,-23,-9};
-        for (int i = 0; i <10 ; i++) {
-            System.out.println(batch[i]);
-            assertEquals(expected[i],batch[i]);
+    void samplesDecoderReadBatchCorrectlyReadsSamples() throws IOException {
+        try (var byteStream = new ByteArrayInputStream(getSampleBytes())) {
+            var expectedSamples = new short[SAMPLES_COUNT];
+            for (int i = 0; i < SAMPLES_COUNT; i += 1)
+                expectedSamples[i] = (short) (i - BIAS);
+
+            var actualSamples = new short[SAMPLES_COUNT];
+            var samplesDecoder = new SamplesDecoder(byteStream, actualSamples.length);
+            var readSamples = samplesDecoder.readBatch(actualSamples);
+            assertEquals(SAMPLES_COUNT, readSamples);
+            assertArrayEquals(expectedSamples, actualSamples);
         }
     }
 
     @Test
-    void readBatchWorks() throws IOException {
-        File initialFile = new File("resources/samples.bin");
-        try {
-            short[] tab = new short[4804];
-            InputStream stream = new FileInputStream(initialFile);
-            SamplesDecoder decode = new SamplesDecoder(stream, 4804);
-            decode.readBatch(tab);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    void samplesDecoderWorksWithDifferentBatchSizes() throws IOException {
+        var expectedSamples = new short[SAMPLES_COUNT];
+        for (int i = 0; i < SAMPLES_COUNT; i += 1)
+            expectedSamples[i] = (short) (i - BIAS);
 
-    @Test
-    void testsIfConstructorWorks() throws IOException {
-        File initialFile = new File("resources/samples.bin");
-        try {
-            short[] tab = new short[4804];
-            InputStream stream = new FileInputStream(initialFile);
-            SamplesDecoder decode = new SamplesDecoder(stream, 4804);
-            decode.readBatch(tab);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-
-    }
-    @Test
-    void readBatchTest() throws IOException {
-        short[] expected = new short[]{-3, 8 ,-9 ,-8, -5 ,-8, -12, -16, -23 ,-9};
-        short[] actual = new short[1200];
-
-        InputStream stream = new FileInputStream("resources/samples.bin");
-        SamplesDecoder a = new SamplesDecoder(stream,1200);
-        int b = a.readBatch(actual);
-        for (int i = 0; i < 10; i++) {
-            assertEquals(expected[i],actual[i]);
-        }
-    }
-
-    @Test
-    void SamplesDOTBinDecodeAllValues() throws IOException{
-        var samplesResourceUrl = getClass().getResource("/samples.bin");
-        InputStream stream = new FileInputStream(Objects.requireNonNull(samplesResourceUrl).getFile());
-        var decoder = new SamplesDecoder(stream,2402);
-        var samples = new short[2402];
-        decoder.readBatch(samples);
-        for (short sample : samples) {
-            System.out.println(sample);
+        for (var batchSize = 1; batchSize < SAMPLES_COUNT; batchSize *= 2) {
+            try (var byteStream = new ByteArrayInputStream(getSampleBytes())) {
+                var samplesDecoder = new SamplesDecoder(byteStream, batchSize);
+                var actualSamples = new short[SAMPLES_COUNT];
+                var batch = new short[batchSize];
+                for (var i = 0; i < SAMPLES_COUNT / batchSize; i += 1) {
+                    var samplesRead = samplesDecoder.readBatch(batch);
+                    assertEquals(batchSize, samplesRead);
+                    System.arraycopy(batch, 0, actualSamples, i * batchSize, batchSize);
+                }
+                assertArrayEquals(expectedSamples, actualSamples);
+            }
         }
     }
 }
