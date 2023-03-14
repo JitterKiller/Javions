@@ -20,7 +20,7 @@ public final class AdsbDemodulator {
     /* Tableau pour stocker les octets des messages bruts */
     private final byte[] message = new byte[14];
 
-    /* Constante représentant la taille de fenêtre de puissance */
+    /* Constante représentant la taille de fenêtre d'échantillons de puissance */
     private final static int WINDOW_SIZE = 1200;
 
     /* Constante représentant le temps entre deux échantillons de puissance en nanosecondes */
@@ -60,19 +60,14 @@ public final class AdsbDemodulator {
             la puissance est suffisante, on décode le message brut */
             if (isPeakDetected(sumCarrierPeak,previousSumCarrierPeak)) {
                 if (computeCarrierSum() >= computeTwiceBottomOutSums()) {
+                    /* Si le downlink format (DF) du premier octet correspond à 17
+                    on décode les octets restant du message brut */
                     if (RawMessage.size(computeFirstByte()) == RawMessage.LENGTH) {
-                        for(int i = 1; i < message.length; ++i) {
-                            byte b = 0;
-                            int index = i * Byte.SIZE;
-                            for (int j = 0; j < Byte.SIZE; ++j) {
-                                if (decodeBits(index)) {
-                                    b |= (1 << (7 - j));
-                                }
-                                ++index;
-                            }
-                            message[i] = b;
-                        }
+                        computeRemainingBytes();
                         RawMessage rawMessage = RawMessage.of((window.position() * TIME_STAMP_NS_CONST), message);
+                        /* Si le CRC du message est égal à 0 (donc un message valide),
+                        on le retourne et on avance la fenêtre d'échantillons de puissance de 1199 + 1
+                        (à l'aide de la boucle). */
                         if(rawMessage != null) {
                             window.advanceBy(WINDOW_SIZE - 1);
                             return rawMessage;
@@ -142,5 +137,22 @@ public final class AdsbDemodulator {
         }
         message[0] = byte0;
         return byte0;
+    }
+
+    /**
+     * Méthode calculant les 13 octets restant du message brut.
+     */
+    private void computeRemainingBytes() {
+        for(int i = 1; i < message.length; ++i) {
+            byte b = 0;
+            int index = i * Byte.SIZE;
+            for (int j = 0; j < Byte.SIZE; ++j) {
+                if (decodeBits(index)) {
+                    b |= (1 << (7 - j));
+                }
+                ++index;
+            }
+            message[i] = b;
+        }
     }
 }
