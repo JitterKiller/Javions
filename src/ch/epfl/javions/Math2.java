@@ -15,9 +15,8 @@ public final class Math2 {
      */
     private Math2(){}
 
-
     /**
-     * Méthode clamp qui limite la valeur v dans l'intervalle allant de min à max
+     * Méthode clamp qui limite la valeur v dans l'intervalle allant de min à max.
      * @param min
      *          valeur minimale.
      * @param v
@@ -44,7 +43,7 @@ public final class Math2 {
     }
 
     /**
-     * Méthode pour calculer le sinus hyperbolique d'une variable x
+     * Méthode pour calculer le sinus hyperbolique d'une variable x.
      * @param x
      *          argument x.
      * @return le sinus hyperbolique réciproque de son argument x.

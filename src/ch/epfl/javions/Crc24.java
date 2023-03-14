@@ -26,7 +26,7 @@ public final class Crc24 {
 
     /**
      * Constructeur public de la classe Crc24 (appelle la méthode buildTable() pour
-     * initialiser la table de 256 entrées
+     * initialiser la table de 256 entrées.
      * @param generator
      *          le générateur du Crc utilisé pour générer la table.
      */

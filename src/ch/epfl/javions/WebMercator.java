@@ -16,7 +16,7 @@ public class WebMercator {
     private WebMercator(){}
 
     /**
-     * Coordonnée x
+     * Coordonnée x.
      * @param zoomLevel
      *          le niveau de zoom.
      * @param longitude
@@ -29,7 +29,7 @@ public class WebMercator {
 
 
     /**
-     * Coordonnée y
+     * Coordonnée y.
      * @param zoomLevel
      *          le niveau de zoom.
      * @param latitude

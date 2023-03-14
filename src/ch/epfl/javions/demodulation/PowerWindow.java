@@ -29,7 +29,6 @@ public final class PowerWindow {
      * Constructeur public de la classe PowerWindow qui initialise la taille de la fenêtre,
      * l'instance de PowerComputer, cree nos deux tableaux d'échantillons de puissance et initialise
      * le tableau principal d'échantillons de puissance grâce à la méthode readBatch().
-     *
      * @param stream
      *          flot d'entrée.
      * @param windowSize
@@ -77,10 +76,9 @@ public final class PowerWindow {
 
     /**
      * Méthode qui permet de déterminer un échantillon de puissance à un index donné de la fenêtre.
-     *
      * @param i
      *          index d'un échantillon de puissance dans une fenêtre donnée.
-     * @return Retourne l'échantillon de puissance à l'index donné de la fenêtre.
+     * @return  Retourne l'échantillon de puissance à l'index donné de la fenêtre.
      * @throws IndexOutOfBoundsException
      *          si cet index n'est pas compris entre 0 (inclus) et la taille de la fenêtre (exclu).
      */
@@ -117,8 +115,8 @@ public final class PowerWindow {
     }
 
     /**
-     * Méthode qui permet de déplacer la fenêtre de puissance d'un nombre donné (offset) d'échantillon vers la droite.
-     *
+     * Méthode qui permet de déplacer la fenêtre de puissance d'un nombre donné (offset)
+     * d'échantillon vers la droite.
      * @throws IOException
      *          en cas d'erreur d'entrée/sortie lors de la lecture du flux de données.
      * @throws IllegalArgumentException

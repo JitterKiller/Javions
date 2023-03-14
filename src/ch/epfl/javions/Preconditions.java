@@ -17,7 +17,7 @@ public final class Preconditions {
     /**
      * L'unique méthode de la classe, vérifie si un argument entré en paramètre est vrai ou faux.
      * Cette méthode est utilisée pour lancer l'exception "IllegalArgumentException" lorsque le booléen
-     * entré en paramètre est faux
+     * entré en paramètre est faux.
      * @param shouldBeTrue
      *          booléen qui doit être vrai pour ne paas lancer d'exception.
      * @throws IllegalArgumentException

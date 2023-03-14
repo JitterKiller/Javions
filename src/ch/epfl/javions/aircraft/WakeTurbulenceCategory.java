@@ -15,7 +15,7 @@ public enum WakeTurbulenceCategory {
      * un de ces 4 types énumérés à l'instance en question de cette classe.
      * @param s
      *          une chaîne de caractères représentant une catégorie de turbulence.
-     * @return une instance de la classe WakeTurbulenceCategory.
+     * @return  une instance de la classe WakeTurbulenceCategory.
      */
     public static WakeTurbulenceCategory of(String s) {
         return switch (s) {

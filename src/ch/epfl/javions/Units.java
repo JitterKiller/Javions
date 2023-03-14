@@ -29,7 +29,7 @@ public final class Units {
      * @author Adam AIT BOUSSELHAM (356365)
      * @author Abdellah Janati Idrissi (362341)
      */
-    public final class Angle {
+    public static final class Angle {
 
         /**
          * Constructeur privé de la classe Angle (non instanciable).
@@ -53,7 +53,7 @@ public final class Units {
      * @author Abdellah Janati Idrissi (362341)
      */
 
-    public final class Length {
+    public static final class Length {
 
         /**
          * Constructeur privé de la classe Length (non instanciable).
@@ -79,7 +79,7 @@ public final class Units {
      * @author Abdellah Janati Idrissi (362341)
      */
 
-    public final class Time {
+    public static final class Time {
 
         /**
          * Constructeur privé de la classe Time (non instanciable).
@@ -102,7 +102,7 @@ public final class Units {
      * @author Adam AIT BOUSSELHAM (356365)
      * @author Abdellah JANATI IDRISSI (362341)
      */
-    public final class Speed {
+    public static final class Speed {
 
         /**
          * Constructeur privé de la classe Speed (non instanciable).
@@ -118,7 +118,7 @@ public final class Units {
 
     /**
      * Methode convert qui convertit la valeur donnée, exprimée dans l'unité
-     * fromUnit (l'unité de départ), en l'unité toUnit (l'unité d'arrivée)
+     * fromUnit (l'unité de départ), en l'unité toUnit (l'unité d'arrivée).
      * @param value
      *          la valeur de l'unité de départ.
      * @param fromUnit
@@ -132,7 +132,7 @@ public final class Units {
     }
 
     /**
-     * Méthode équivalente à convert lorsque l'unité d'arrivée (toUnit) est l'unité de base et vaut 1
+     * Méthode équivalente à convert lorsque l'unité d'arrivée (toUnit) est l'unité de base et vaut 1.
      * @param value
      *          la valeur de l'unité.
      * @param fromUnit
@@ -144,7 +144,7 @@ public final class Units {
     }
 
     /**
-     * Méthode équivalente à convert lorsque l'unité de départ (fromUnit) est l'unité de base et vaut 1
+     * Méthode équivalente à convert lorsque l'unité de départ (fromUnit) est l'unité de base et vaut 1.
      * @param value
      *          la valeur de l'unité.
      * @param toUnit
