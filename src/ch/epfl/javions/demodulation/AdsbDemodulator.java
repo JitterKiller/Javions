@@ -8,9 +8,11 @@ import java.io.InputStream;
 public final class AdsbDemodulator {
     private final PowerWindow window;
     private final byte[] message = new byte[14];
+    private final static int WINDOW_SIZE = 1200;
+    private final static int TIME_STAMP_NS_CONST = 100;
 
     public AdsbDemodulator(InputStream stream) throws IOException {
-        window = new PowerWindow(stream, 1200);
+        window = new PowerWindow(stream, WINDOW_SIZE);
     }
 
     public RawMessage nextMessage() throws IOException {
@@ -34,9 +36,9 @@ public final class AdsbDemodulator {
                             }
                             message[i] = b;
                         }
-                        RawMessage rawMessage = RawMessage.of((window.position() * 100), message);
+                        RawMessage rawMessage = RawMessage.of((window.position() * TIME_STAMP_NS_CONST), message);
                         if(rawMessage != null) {
-                            window.advanceBy(1199);
+                            window.advanceBy(WINDOW_SIZE - 1);
                             return rawMessage;
                         }
                     }
