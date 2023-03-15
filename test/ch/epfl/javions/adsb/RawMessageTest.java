@@ -12,6 +12,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class RawMessageTest {
 
     private static final long timeStampNs = 1L;
+    private final RawMessage message = new RawMessage(8096200,
+            ByteString.ofHexadecimalString("8D4B17E5F8210002004BB8B1F1AC"));
+
+
+    private final HexFormat hf = HexFormat.of().withUpperCase();
+    private final ByteString byteString = new ByteString(hf.parseHex("F8210002004BB8"));
 
     @Test
     void testConstructor() {
@@ -65,5 +71,140 @@ class RawMessageTest {
         var byteString = new ByteString(bytes);
         var RawMessage = new RawMessage(timeStampNs,byteString);
         assertEquals(31,RawMessage.typeCode());
+    }
+
+    @Test
+    void validIcaoAddressExtracted(){
+        assertEquals("4B17E5" ,message.icaoAddress().string());
+    }
+    @Test
+    void payloadIsValid(){
+        assertEquals(byteString.bytesInRange(0,7),message.payload());
+    }
+
+    @Test
+    void typeCodeIsValid(){
+        int validTypeCode = Byte.toUnsignedInt((byte)(message.payload() >> 51));
+        assertEquals(validTypeCode,message.typeCode());
+    }
+
+    @Test
+    void sizeTest(){
+        assertEquals(14, RawMessage.size((byte) 0x8D));
+    }
+    public static byte[] hexStringToBytes(String hexString) {
+        int length = hexString.length();
+        byte[] result = new byte[length / 2];
+
+        for (int i = 0; i < length; i += 2) {
+            result[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i+1), 16));
+        }
+
+        return result;
+    }
+
+    byte[] bytes = hexStringToBytes("8D4B17E5F8210002004BB8B1F1AC");
+
+    RawMessage adsb =new RawMessage(8096200,new ByteString(bytes));
+
+
+
+    @Test
+    void of() {
+    }
+
+    @Test
+    void size() {
+        System.out.println(Byte.toUnsignedInt(bytes[0]));
+        assertEquals(14,RawMessage.size(bytes[0]));
+    }
+
+    @Test
+    void typeCode() {
+    }
+
+    @Test
+    void downLinkFormat() {
+        assertEquals(0b10001,adsb.downLinkFormat());
+    }
+
+    @Test
+    void icaoAddress() {
+
+        assertEquals("4B17E5",adsb.icaoAddress().string());
+    }
+
+    @Test
+    void payload() {
+        assertEquals(69842078141533112L,adsb.payload());
+    }
+
+    @Test
+    void testTypeCodeBis() {
+        assertEquals(31,adsb.typeCode());
+    }
+
+    @Test
+    void timeStampNs() {
+    }
+
+    @Test
+    void bytes() {
+    }
+    private final static ByteString rawMessage1 = new ByteString(new byte[]{
+            (byte) 0x8D, (byte) 0x4B, (byte) 0x17, (byte) 0xE5,
+            (byte) 0xF8, (byte) 0x21, (byte) 0x00, (byte) 0x02,
+            (byte) 0x00, (byte) 0x4B, (byte) 0xB8, (byte) 0xB1,
+            (byte) 0xF1, (byte) 0xAC});
+
+    @Test
+    void rawMessageConstructorsThrowsOnNegativeTimestamp() {
+        assertThrows(IllegalArgumentException.class, () -> new RawMessage(-1, rawMessage1));
+    }
+
+    @Test
+    void rawMessageConstructorsThrowsOnInvalidMessageLength() {
+        assertThrows(IllegalArgumentException.class, () -> new RawMessage(8096200, new ByteString(new byte[0])));
+    }
+
+    @Test
+    void typecodeWithParameterReturnsTheCorrectValue() {
+        long payload = 0xF8210002004BB8L; // 1111_1000 _0010_0001 _0000_0000 _0000_0010 _0000_0000 _0100_1011 _1011_1000
+        int actual = RawMessage.typeCode(payload);
+        int expected = 31;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void downLinkFormatReturnsTheCorrectValue() {
+        RawMessage rawMessage = new RawMessage(8096200, rawMessage1);
+        int actual = rawMessage.downLinkFormat();
+        int expected = 17;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void icaoAddressWorksOnTrivialValues() {
+        RawMessage rawMessage = new RawMessage(8096200, rawMessage1);
+        IcaoAddress expected = new IcaoAddress("4B17E5");
+        IcaoAddress actual = rawMessage.icaoAddress();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void payloadWorksOnTrivialValues() {
+        RawMessage rawMessage = new RawMessage(8096200, rawMessage1);
+        long expected = 0xF8210002004BB8L;
+        long actual = rawMessage.payload();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void typeCodeWithoutParameterWorksOnTrivialValues() {
+        RawMessage rawMessage = new RawMessage(8096200, rawMessage1);
+        int expected = 31;
+        int actual = rawMessage.typeCode();
+        assertEquals(expected, actual);
     }
 }

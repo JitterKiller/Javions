@@ -84,7 +84,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return l'adresse ICAO du message.
      */
     public IcaoAddress icaoAddress() {
-        return new IcaoAddress(HexFormat.of().toHexDigits(bytes().bytesInRange(1,4),6).toUpperCase());
+        return new IcaoAddress(HexFormat.of().withUpperCase().toHexDigits(bytes().bytesInRange(1,4),6));
     }
 
     /**
