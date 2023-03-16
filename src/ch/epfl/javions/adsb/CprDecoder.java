@@ -6,77 +6,103 @@ import ch.epfl.javions.Units;
 
 public class CprDecoder {
 
-    private final static int latitudeZones_0 = 60;
-    private final static double zonesWidth_0 = 1 / latitudeZones_0;
-    private final static int latitudeZones_1 = 59;
-    private final static double zonesWidth_1 = 1 / latitudeZones_1;
+    final static int EVEN_LATITUDE_ZONES = 60;
+    final static double EVEN_LATITUDE_ZONES_WIDTH = 1.0 / EVEN_LATITUDE_ZONES;
+    final static int ODD_LATITUDE_ZONES = 59;
+    final static double ODD_LATITUDE_ZONES_WIDTH = 1.0 / ODD_LATITUDE_ZONES;
 
     private CprDecoder(){}
-
-    private static double coordinatesRefocusing(double coordinate) {
-        return coordinate >= 0.5 ? - coordinate : coordinate;
-    }
 
     public static GeoPos decodePosition(double x0, double y0, double x1, double y1, int mostRecent) {
         Preconditions.checkArgument(mostRecent == 0 || mostRecent == 1);
 
-        double z_phi = y0 * latitudeZones_1 - y1 * latitudeZones_0;
-        double z_phi_i;
-        double latitude = 0;
-        int latitudeT32 = (int) Math.rint(Units.convert(coordinatesRefocusing(latitude), Units.Angle.TURN, Units.Angle.T32));
-        double latitudeDegree = Units.convert(coordinatesRefocusing(latitude), Units.Angle.TURN, Units.Angle.DEGREE);
-        if (latitudeDegree <= -90 || latitudeDegree >= 90){return null;}
+        double evenLatitudeDegree;
+        double oddLatitudeDegree;
+        double evenLongitudeDegree = Units.convert(refocusingOf(x0), Units.Angle.TURN, Units.Angle.DEGREE);
+        double oddLongitudeDegree = Units.convert(refocusingOf(x1), Units.Angle.TURN, Units.Angle.DEGREE);
 
-        double longitude = 0;
-        int longitudeT32 = (int) Math.rint(Units.convert(coordinatesRefocusing(longitude), Units.Angle.TURN, Units.Angle.T32));
+        int latitudeZoneNumber = (int) Math.rint((y0 * ODD_LATITUDE_ZONES) - (y1 * EVEN_LATITUDE_ZONES));
+        int evenLatitudeZoneNumber;
+        int oddLatitudeZoneNumber;
+        if(latitudeZoneNumber < 0) {
+            evenLatitudeZoneNumber = latitudeZoneNumber + EVEN_LATITUDE_ZONES;
+            oddLatitudeZoneNumber = latitudeZoneNumber + ODD_LATITUDE_ZONES;
+        } else {
+            evenLatitudeZoneNumber = latitudeZoneNumber;
+            oddLatitudeZoneNumber = latitudeZoneNumber;
+        }
+        double evenLatitudeTurn = EVEN_LATITUDE_ZONES_WIDTH * (evenLatitudeZoneNumber + y0);
+        evenLatitudeTurn = refocusingOf(evenLatitudeTurn);
+        evenLatitudeDegree = Units.convert(evenLatitudeTurn, Units.Angle.TURN, Units.Angle.DEGREE);
 
-        int longitudeZones_0 = (int) Math.floor((2*Math.PI)/(Math.acos(1-(1-Math.cos(2*Math.PI*zonesWidth_0))/(Math.pow(Math.cos(latitude),2)))));
-        int longitudeZones_1 = longitudeZones_0 - 1;
+        double oddLatitudeTurn = ODD_LATITUDE_ZONES_WIDTH * (oddLatitudeZoneNumber + y1);
+        oddLatitudeTurn = refocusingOf(oddLatitudeTurn);
+        oddLatitudeDegree = Units.convert(oddLatitudeTurn, Units.Angle.TURN, Units.Angle.DEGREE);
 
-        double z_lambda = x0 * longitudeZones_1 - x1 * longitudeZones_0;
-        double z_lambda_i;
+        double A;
+        double AEven = (1 - Math.cos(2* Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.RADIAN)), 2);
+        double AOdd = (1 - Math.cos(2* Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.RADIAN)), 2);
 
-        if (mostRecent == 0) {
+        double evenLongitudeZoneValue = Math.floor((2 * Math.PI) / Math.acos(1 - AEven));
+        double oddLongitudeZoneValue = Math.floor((2 * Math.PI) / Math.acos(1 - AOdd));
+        int evenLongitudeZone;
 
-            if (z_phi < 0) {
-                z_phi_i = z_phi + latitudeZones_0;
-            } else {z_phi_i = z_phi;}
+        if(evenLongitudeZoneValue == oddLongitudeZoneValue) {
+            A = AEven;
 
-            latitude = zonesWidth_0 * (z_phi_i + y0);
-
-            if (longitudeZones_0 == 1) {
-
-                longitude = x0;
-
+            if(Double.isNaN(Math.acos(1 - A))) {
+                evenLongitudeZone = 1;
             } else {
-
-                if (z_lambda < 0) {
-                    z_lambda_i = z_lambda + longitudeZones_0;
-                } else {z_lambda_i = z_lambda;}
-
-                longitude = (1/longitudeZones_0) * (z_lambda_i + x0);
+                evenLongitudeZone = (int) evenLongitudeZoneValue;
             }
         } else {
-
-            if (z_phi < 0) {
-                z_phi_i = z_phi + latitudeZones_1;
-            } else {z_phi_i = z_phi;}
-
-            latitude = zonesWidth_1 * (z_phi_i + y1);
-
-            if (longitudeZones_0 == 1) {
-
-                longitude = x1;
-
-            } else {
-
-                if (z_lambda < 0) {
-                    z_lambda_i = z_lambda + longitudeZones_1;
-                } else {z_lambda_i = z_lambda;}
-
-                longitude = (1/longitudeZones_1) * (z_lambda_i + x1);
-            }
+            return null;
         }
-        return new GeoPos(longitudeT32, latitudeT32);
+
+        int oddLongitudeZone = evenLongitudeZone - 1;
+
+        int evenLongitudeZoneNumber;
+        int oddLongitudeZoneNumber;
+
+        double evenLongitudeTurn;
+        double oddLongitudeTurn;
+
+        if(evenLongitudeZone > 1) {
+
+            int longitudeZoneNumber = (int) Math.rint((x0 * oddLongitudeZone) - (x1 * evenLongitudeZone));
+
+            if(longitudeZoneNumber < 0) {
+                evenLongitudeZoneNumber = longitudeZoneNumber + evenLongitudeZone;
+                oddLongitudeZoneNumber = longitudeZoneNumber + oddLongitudeZone;
+            } else {
+                evenLongitudeZoneNumber = longitudeZoneNumber;
+                oddLongitudeZoneNumber = longitudeZoneNumber;
+            }
+
+            evenLongitudeTurn = (1.0 / evenLongitudeZone) * (evenLongitudeZoneNumber + x0);
+            evenLongitudeDegree = Units.convert(refocusingOf(evenLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
+
+            oddLongitudeTurn = (1.0 / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
+            oddLongitudeDegree = Units.convert(refocusingOf(oddLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
+
+        }
+        if(mostRecent == 0) {
+            return getGeoPos(evenLongitudeDegree, evenLatitudeDegree);
+        } else {
+            return getGeoPos(oddLongitudeDegree, oddLatitudeDegree);
+        }
     }
+
+    private static GeoPos getGeoPos(double longitudeDegree, double latitudeDegree) {
+        int longitudeT32;
+        int latitudeT32;
+        longitudeT32 = (int) Math.rint(Units.convert(longitudeDegree,Units.Angle.DEGREE, Units.Angle.T32));
+        latitudeT32 = (int) Math.rint(Units.convert(latitudeDegree,Units.Angle.DEGREE, Units.Angle.T32));
+        return (latitudeDegree <= 90.0) && (latitudeDegree >= -90.0) ? new GeoPos(longitudeT32, latitudeT32) : null;
+    }
+
+    private static double refocusingOf(double coordinate) {
+        return coordinate >= (Units.Angle.TURN * 0.5) ? - coordinate : coordinate;
+    }
+
 }

@@ -19,6 +19,7 @@ public final class Units {
     /**
      * Préfixes SI utiles au projet (constantes).
      */
+    public static final int BASE_UNIT = 1;
     public static final double CENTI = 1e-2;
     public static final double KILO = 1e3;
 
@@ -39,10 +40,10 @@ public final class Units {
         /**
          * Les unités d'angles en question (Radian, Tour, Degré, T32).
          */
-        public static final double RADIAN = 1;
-        public static final double TURN = 2 * Math.PI * RADIAN;
-        public static final double DEGREE = TURN/360;
-        public static final double T32 = TURN/(Math.pow(2,32));
+        public static final double RADIAN = BASE_UNIT;
+        public static final double TURN = 2.0 * Math.PI * RADIAN;
+        public static final double DEGREE = TURN / 360.0;
+        public static final double T32 = TURN / (Math.scalb(1.0,32));
 
     }
 
@@ -63,7 +64,7 @@ public final class Units {
         /**
          * Les unités de longeur en question (Mètre, Centimètre, Kilomètre, Pouce, Pied, Mile Nautique).
          */
-        public static final double METER = 1;
+        public static final double METER = BASE_UNIT;
         public static final double CENTIMETER = CENTI * METER;
         public static final double KILOMETER = KILO * METER;
         public static final double INCH = 2.54 * CENTIMETER;
@@ -90,7 +91,7 @@ public final class Units {
         /**
          * Les unités de temps en question (Seconde, Minute, Heure).
          */
-        public static final double SECOND = 1;
+        public static final double SECOND = BASE_UNIT;
         public static final double MINUTE = 60 * SECOND;
         public static final double HOUR = 60 * MINUTE;
     }
