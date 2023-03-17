@@ -10,6 +10,9 @@ import java.io.InputStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AircraftIdentificationMessageTest {
+    private static boolean isTypeCodeValid(int typeCode) {
+        return (typeCode >= 1) && (typeCode <= 4);
+    }
 
     @Test
     void testAircraftIdentificationMessageWithSamplesDOTBin() throws IOException {
@@ -20,10 +23,14 @@ class AircraftIdentificationMessageTest {
             RawMessage m;
             int numberOfMessages = 0;
             while ((m = d.nextMessage()) != null) {
-                if(AircraftIdentificationMessage.of(m) != null) {
+                if(AircraftIdentificationMessage.of(m) != null && isTypeCodeValid(m.typeCode())) {
                     System.out.println(AircraftIdentificationMessage.of(m));
                     ++numberOfMessages;
                 }
+//                if(!isTypeCodeValid(m.typeCode())) {
+//                    System.out.println(m.typeCode());
+//                    numberOfMessages++;
+//                }
             }
             System.out.println(numberOfMessages);
         }

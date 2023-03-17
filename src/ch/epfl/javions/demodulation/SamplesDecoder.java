@@ -16,8 +16,13 @@ import java.util.Objects;
  */
 public final class SamplesDecoder {
 
+    /* Instance de InputStream pour lire les octets du flot d'entrée */
     private final InputStream stream;
+
+    /* La taille d'un lot d'octets */
     private final int batchSize;
+
+    /* Tableau d'échantillons lus par le flot d'entrée */
     private final byte[] bytesBuffer;
 
     /* Biais de 2048 */

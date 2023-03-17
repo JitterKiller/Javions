@@ -16,12 +16,25 @@ import java.util.Objects;
 
 public final class PowerWindow {
 
+    /* Taille de la fenêtre */
     private final int windowSize;
+
+    /* Constante de la taille du Batch (2^16) */
     private final static int BATCH_SIZE = 1<<16;
+
+    /* Instance de PowerComputer */
     private final PowerComputer powerComputer;
+
+    /* Premier tableau d'échantillons de puissances */
     private int[] powerSamples;
+
+    /* Deuxième tableau d'échantillons de puissances */
     private int[] powerSamplesBis;
+
+    /* Position dans un des deux tableaux d'échantillons de puissances */
     private long position;
+
+    /* Nombres d'échantillons lus */
     private int powerSamplesRead;
 
 

@@ -23,7 +23,11 @@ import static ch.epfl.javions.Crc24.GENERATOR;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record RawMessage(long timeStampNs, ByteString bytes) {
+
+    /* La longueur en octets des messages ADS-B */
     public static final int LENGTH = 14;
+
+    /* Instance de Crc24 pour calculer le Crc des messages ADS-B */
     private static final Crc24 Crc24 = new Crc24(GENERATOR);
 
     /**
