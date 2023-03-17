@@ -6,10 +6,10 @@ import ch.epfl.javions.Units;
 
 public class CprDecoder {
 
-    final static int EVEN_LATITUDE_ZONES = 60;
-    final static double EVEN_LATITUDE_ZONES_WIDTH = 1.0 / EVEN_LATITUDE_ZONES;
-    final static int ODD_LATITUDE_ZONES = 59;
-    final static double ODD_LATITUDE_ZONES_WIDTH = 1.0 / ODD_LATITUDE_ZONES;
+    private final static int EVEN_LATITUDE_ZONES = 60;
+    private final static double EVEN_LATITUDE_ZONES_WIDTH = 1.0 / EVEN_LATITUDE_ZONES;
+    private final static int ODD_LATITUDE_ZONES = 59;
+    private final static double ODD_LATITUDE_ZONES_WIDTH = 1.0 / ODD_LATITUDE_ZONES;
 
     private CprDecoder(){}
 
