@@ -10,7 +10,7 @@ import java.util.Objects;
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity, double x, double y) implements Message {
 
     /* Index de Q dans l'attribut ME du message brut */
-    private final static int Q_INDEX = 41;
+    private final static int Q_INDEX = 4;
 
     /* Taille des bits de l'altitude dans l'attribut ME du message brut */
     private final static int ALTITUDE_SIZE = 12;
@@ -39,10 +39,11 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
         double altitude;
 
-        if(Bits.testBit(rawMessage.payload(),Q_INDEX)) {
-            byte mask = ~(1 << 4);
-            double altitudeValue = (inputAltitude & mask);
-            altitude = (altitudeValue * Units.Length.FOOT * 25) - BASE_ALTITUDE_Q_0;
+        if(Bits.testBit(inputAltitude,Q_INDEX)) {
+            byte mask = (byte) ~(1 << 4);
+            int altitudeValue = (inputAltitude & mask) >>> 1;
+            int altitudeValueBis = (Bits.extractUInt(rawMessage.payload(),42,7) << 4)| Bits.extractUInt(rawMessage.payload(),36,4);
+            altitude = (altitudeValueBis * Units.Length.FOOT * 25) - BASE_ALTITUDE_Q_0;
         } else {
 
             int d = ((inputAltitude & 0x1) << 9) | ((inputAltitude & 0x4) << 8) | ((inputAltitude & 0x10) << 7);
@@ -69,7 +70,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
             altitude = (multipleOf500Feet * Units.Length.FOOT * 500) + (multipleOf100Feet * Units.Length.FOOT * 100) - BASE_ALTITUDE_Q_1;
         }
-        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), signedToUnsignedDouble(altitude), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
+        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), signedToUnsignedDouble(Units.convertFrom(altitude,Units.Length.FOOT)), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
     }
 
     public static int grayToBinary(int grayCode) {
