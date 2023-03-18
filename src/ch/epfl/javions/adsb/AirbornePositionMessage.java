@@ -9,11 +9,11 @@ import java.util.Objects;
 
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity, double x, double y) implements Message {
 
-    /* Index de Q dans l'attribut ME du message brut */
-    private final static int Q_INDEX = 4;
-
     /* Taille des bits de l'altitude dans l'attribut ME du message brut */
     private final static int ALTITUDE_SIZE = 12;
+
+    /* Index de Q dans les bits de l'altitude du message brut */
+    private final static int Q_INDEX = 5;
 
     /* Altitude de base lorsque Q = 0 */
     private final static int BASE_ALTITUDE_Q_0 = 1000;
