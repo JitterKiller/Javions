@@ -71,7 +71,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude,Units.Length.FOOT), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
     }
 
-    public static int grayToBinary(int grayCode) {
+    private static int grayToBinary(int grayCode) {
         int binary = grayCode;
         int mask;
         for (mask = binary >> 1; mask != 0; mask = mask >> 1) {
