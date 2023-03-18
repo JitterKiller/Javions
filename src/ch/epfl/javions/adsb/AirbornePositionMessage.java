@@ -13,13 +13,13 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     private final static int ALTITUDE_SIZE = 12;
 
     /* Index de Q dans les bits de l'altitude du message brut */
-    private final static int Q_INDEX = 5;
-
-    /* Altitude de base lorsque Q = 0 */
-    private final static int BASE_ALTITUDE_Q_0 = 1000;
+    private final static int Q_INDEX = 4;
 
     /* Altitude de base lorsque Q = 1 */
-    private final static int BASE_ALTITUDE_Q_1 = 1300;
+    private final static int BASE_ALTITUDE_Q_1 = 1000;
+
+    /* Altitude de base lorsque Q = 0 */
+    private final static int BASE_ALTITUDE_Q_0 = 1300;
 
     public AirbornePositionMessage {
         Objects.requireNonNull(icaoAddress);
@@ -40,10 +40,8 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         double altitude;
 
         if(Bits.testBit(inputAltitude,Q_INDEX)) {
-            byte mask = (byte) ~(1 << 4);
-            int altitudeValue = (inputAltitude & mask) >>> 1;
-            int altitudeValueBis = (Bits.extractUInt(rawMessage.payload(),42,7) << 4)| Bits.extractUInt(rawMessage.payload(),36,4);
-            altitude = (altitudeValueBis * Units.Length.FOOT * 25) - BASE_ALTITUDE_Q_0;
+            int altitudeValue = (Bits.extractUInt(rawMessage.payload(),41,7) << 4) | Bits.extractUInt(rawMessage.payload(),36,4);
+            altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
         } else {
 
             int d = ((inputAltitude & 0x1) << 9) | ((inputAltitude & 0x4) << 8) | ((inputAltitude & 0x10) << 7);
@@ -68,9 +66,9 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
                 multipleOf100Feet = (6 - multipleOf100Feet);
             }
 
-            altitude = (multipleOf500Feet * Units.Length.FOOT * 500) + (multipleOf100Feet * Units.Length.FOOT * 100) - BASE_ALTITUDE_Q_1;
+            altitude = (multipleOf500Feet * 500) + (multipleOf100Feet* 100) - BASE_ALTITUDE_Q_0;
         }
-        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), signedToUnsignedDouble(Units.convertFrom(altitude,Units.Length.FOOT)), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
+        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude,Units.Length.FOOT), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
     }
 
     public static int grayToBinary(int grayCode) {
@@ -80,17 +78,6 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
             binary = binary ^ mask;
         }
         return binary;
-    }
-
-    public static double signedToUnsignedDouble(double signedDouble) {
-        long signedBits = Double.doubleToLongBits(signedDouble);
-        long unsignedBits;
-        if (signedDouble >= 0) {
-            unsignedBits = signedBits;
-        } else {
-            unsignedBits = ~signedBits + 1;
-        }
-        return Double.longBitsToDouble(unsignedBits);
     }
 
     private static boolean isLSBValid(int LSB) {
