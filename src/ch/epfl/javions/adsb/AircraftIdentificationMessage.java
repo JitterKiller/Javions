@@ -8,6 +8,7 @@ import java.util.Objects;
 
 public record AircraftIdentificationMessage (long timeStampNs, IcaoAddress icaoAddress, int category, CallSign callSign) implements Message {
 
+    /* Constante ASCII pour le CallSign*/
     private static final int ASCII_LETTER = 64;
 
     public AircraftIdentificationMessage {
