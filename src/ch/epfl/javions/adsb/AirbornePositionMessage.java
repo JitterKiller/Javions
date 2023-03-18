@@ -40,20 +40,20 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         double altitude;
 
         if(Bits.testBit(rawMessage.payload(),Q_INDEX)) {
-            byte mask = (byte) ~(1 << 4);
-            byte altitudeValue = (byte) (inputAltitude & mask);
-            altitude = (Byte.toUnsignedInt(altitudeValue) * Units.Length.FOOT * 25) - BASE_ALTITUDE_Q_0;
+            byte mask = ~(1 << 4);
+            double altitudeValue = (inputAltitude & mask);
+            altitude = (altitudeValue * Units.Length.FOOT * 25) - BASE_ALTITUDE_Q_0;
         } else {
 
-            int d = ((inputAltitude & 0b00000001) << 7) | ((inputAltitude & 0b00000010) << 5) | ((inputAltitude & 0b00000100) << 3);
-            int a = ((inputAltitude & 0b00001000) >> 3) | ((inputAltitude & 0b00010000) >> 1) | ((inputAltitude & 0b00100000) >> 3);
-            int b = ((inputAltitude & 0b01000000) >> 1) | ((inputAltitude & 0b10000000) >> 3) | ((inputAltitude & 0b000001000000) << 3);
-            int multipleOf100Feet = ((inputAltitude & 0b000010000000) << 1) | ((inputAltitude & 0b000100000000) >> 1) | ((inputAltitude & 0b001000000000) << 1);
+            int d = ((inputAltitude & 0x1) << 9) | ((inputAltitude & 0x4) << 8) | ((inputAltitude & 0x10) << 7);
+            int a = (inputAltitude & 0x40) | ((inputAltitude & 0x100) >>> 1) | ((inputAltitude & 0x400) >>> 2);
+            int b = ((inputAltitude & 0x2) << 2) | ((inputAltitude & 0x8) << 1) | (inputAltitude & 0x20);
+            int multipleOf100Feet = ((inputAltitude & 0x80) >>> 7) | ((inputAltitude & 0x200) >>> 8) | ((inputAltitude & 0x800) >>> 9);
 
-            int multipleOf500Feet = d | a | b;
+            int multipleOf500Feet = (d | a | b) >>> 3;
 
-            decodeGrayCodeLSB(multipleOf100Feet);
-            decodeGrayCodeMSB(multipleOf500Feet);
+            multipleOf100Feet = grayToBinary(multipleOf100Feet);
+            multipleOf500Feet = grayToBinary(multipleOf500Feet);
 
             if(!isLSBValid(multipleOf100Feet)) {
                 return null;
@@ -69,19 +69,27 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
             altitude = (multipleOf500Feet * Units.Length.FOOT * 500) + (multipleOf100Feet * Units.Length.FOOT * 100) - BASE_ALTITUDE_Q_1;
         }
-        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), altitude, parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
+        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), signedToUnsignedDouble(altitude), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
     }
 
-    private static void decodeGrayCodeLSB(int encodedByte) {
-        for(int i = 0; i < 3; ++i) {
-            encodedByte ^= encodedByte >> i;
+    public static int grayToBinary(int grayCode) {
+        int binary = grayCode;
+        int mask;
+        for (mask = binary >> 1; mask != 0; mask = mask >> 1) {
+            binary = binary ^ mask;
         }
+        return binary;
     }
 
-    private static void decodeGrayCodeMSB(int encodedByte) {
-        for(int i = 0; i < 9; ++i) {
-            encodedByte ^= encodedByte >> i;
+    public static double signedToUnsignedDouble(double signedDouble) {
+        long signedBits = Double.doubleToLongBits(signedDouble);
+        long unsignedBits;
+        if (signedDouble >= 0) {
+            unsignedBits = signedBits;
+        } else {
+            unsignedBits = ~signedBits + 1;
         }
+        return Double.longBitsToDouble(unsignedBits);
     }
 
     private static boolean isLSBValid(int LSB) {
