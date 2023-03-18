@@ -54,7 +54,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
             multipleOf100Feet = grayToBinary(multipleOf100Feet);
             multipleOf500Feet = grayToBinary(multipleOf500Feet);
 
-            if(!isLSBValid(multipleOf100Feet)) {
+            if(isLSBNotValid(multipleOf100Feet)) {
                 return null;
             }
 
@@ -80,7 +80,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         return binary;
     }
 
-    private static boolean isLSBValid(int LSB) {
+    private static boolean isLSBNotValid(int LSB) {
         return (LSB == 0) || (LSB == 5) || (LSB == 6);
     }
 }

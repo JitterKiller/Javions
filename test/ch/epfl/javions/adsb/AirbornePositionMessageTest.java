@@ -26,7 +26,7 @@ class AirbornePositionMessageTest {
             RawMessage m;
             int numberOfMessages = 0;
             while ((m = d.nextMessage()) != null) {
-                if(AirbornePositionMessage.of(m) != null && isTypeCodeValid(m.typeCode())) {
+                if(AirbornePositionMessage.of(m) != null) {
                     System.out.println(AirbornePositionMessage.of(m));
                     ++numberOfMessages;
                 }
@@ -37,9 +37,14 @@ class AirbornePositionMessageTest {
 
     @Test
     void testAirbornePositionMessageWithQ0() {
-        var bytes = HexFormat.of().parseHex("8DAE02C85864A5F5DD4975A1A3F5");
+        var bytes = HexFormat.of().parseHex("8D39203559B225F07550ADBE328F");
         var byteString = new ByteString(bytes);
         var RawMessage = new RawMessage(1L,byteString);
-        System.out.println(AirbornePositionMessage.of(RawMessage));
+        assertEquals(3474.7200000000003,AirbornePositionMessage.of(RawMessage).altitude());
+
+        var bytes2 = HexFormat.of().parseHex("8DAE02C85864A5F5DD4975A1A3F5");
+        var byteString2 = new ByteString(bytes2);
+        var RawMessage2 = new RawMessage(1L, byteString2);
+        assertEquals(7315.2000000000003,AirbornePositionMessage.of(RawMessage2).altitude());
     }
 }
