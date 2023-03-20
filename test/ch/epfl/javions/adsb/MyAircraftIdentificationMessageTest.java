@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-class myAircraftIdentificationMessageTest {
+class MyAircraftIdentificationMessageTest {
     private static boolean isTypeCodeValid(int typeCode) {
         return (typeCode >= 1) && (typeCode <= 4);
     }

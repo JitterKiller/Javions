@@ -11,7 +11,7 @@ import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class myAirbornePositionMessageTest {
+class MyAirbornePositionMessageTest {
     private static boolean isTypeCodeValid(int typeCode) {
         return ((typeCode >= 9) && (typeCode <= 18)) || ((typeCode >= 20) && (typeCode <= 22));
     }

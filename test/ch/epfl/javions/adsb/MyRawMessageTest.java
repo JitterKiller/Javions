@@ -8,7 +8,7 @@ import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class myRawMessageTest {
+class MyRawMessageTest {
 
     private static final long timeStampNs = 1L;
     private final RawMessage message = new RawMessage(8096200,
