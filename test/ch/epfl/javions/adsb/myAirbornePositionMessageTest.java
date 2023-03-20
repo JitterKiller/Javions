@@ -1,7 +1,6 @@
 package ch.epfl.javions.adsb;
 
 import ch.epfl.javions.ByteString;
-import ch.epfl.javions.Units;
 import ch.epfl.javions.demodulation.AdsbDemodulator;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AirbornePositionMessageTest {
+class myAirbornePositionMessageTest {
     private static boolean isTypeCodeValid(int typeCode) {
         return ((typeCode >= 9) && (typeCode <= 18)) || ((typeCode >= 20) && (typeCode <= 22));
     }
@@ -21,7 +20,7 @@ class AirbornePositionMessageTest {
     void testAirbornePositionMessageWithSamplesDOTBin() throws IOException {
         var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
         var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
-        try (InputStream s = new FileInputStream(samplesResourceMac)) {
+        try (InputStream s = new FileInputStream(samplesResourceWindows)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             int numberOfMessages = 0;

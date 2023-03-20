@@ -1,6 +1,7 @@
 package ch.epfl.javions;
 
 import java.util.Arrays;
+import java.util.HexFormat;
 import java.util.Objects;
 
 /**
@@ -20,7 +21,7 @@ public final class ByteString {
      *          tableau de bytes.
      */
     public ByteString(byte[] bytes) {
-        this.bytes = Arrays.copyOf(bytes, bytes.length);
+        this.bytes = bytes.clone();
     }
 
     /**
@@ -36,19 +37,16 @@ public final class ByteString {
     public static ByteString ofHexadecimalString(String hexString) {
 
         if(hexString.length() % 2 != 0) {
-            throw new NumberFormatException("La chaîne donnée n'est pas de longeur paire");
+            throw new NumberFormatException("Hexadecimal string length must be even");
         }
 
-        byte[] bytes = new byte[hexString.length() / 2];
-        for (int i = 0; i < hexString.length(); i += 2) {
-            try {
-                String byteString = hexString.substring(i, i + 2);
-                bytes[i / 2] = (byte) Integer.parseInt(byteString, 16);
-            } catch (NumberFormatException e) {
-                throw new NumberFormatException("Caractère hexadécimal invalide");
-            }
+        HexFormat hf = HexFormat.of().withUpperCase();
+
+        try {
+            return new ByteString(hf.parseHex(hexString));
+        } catch (IllegalArgumentException e) {
+            throw new NumberFormatException("Invalid hexadecimal string: " + hexString);
         }
-        return new ByteString(bytes);
     }
 
     /**
