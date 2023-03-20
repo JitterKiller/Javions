@@ -29,16 +29,14 @@ public final class ByteString {
      * @param hexString
      *          Représentation hexadécimale de la chaîne d'octets.
      * @return la chaîne d'octets à partir de la représentation hexadécimale de la chaine d'octets.
-     * @throws NumberFormatException
+     * @throws IllegalArgumentException
      *          si la chaîne donnée n'est pas de longueur paire.
      * @throws NumberFormatException
      *          si la chaîne contient un caractère qui n'est pas un chiffre hexadécimal.
      */
     public static ByteString ofHexadecimalString(String hexString) {
 
-        if(hexString.length() % 2 != 0) {
-            throw new NumberFormatException("Hexadecimal string length must be even");
-        }
+        Preconditions.checkArgument(hexString.length() % 2 == 0);
 
         HexFormat hf = HexFormat.of().withUpperCase();
 
