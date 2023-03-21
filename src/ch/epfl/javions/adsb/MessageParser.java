@@ -1,25 +1,24 @@
 package ch.epfl.javions.adsb;
 
-public final class MessageParser {
+public class MessageParser {
 
-    private MessageParser(){};
+    private MessageParser(){}
 
     public static Message parse(RawMessage rawMessage) {
-        int typeCode = rawMessage.typeCode();
 
-        if (messageType == null) {
-            // Le code de type de message est invalide
-            return null;
+        if (rawMessage.typeCode() >= 1 && rawMessage.typeCode() <= 4) {
+            return AircraftIdentificationMessage.of(rawMessage);
         }
 
-        return switch (messageType) {
-            case AIRCRAFT_IDENTIFICATION -> new AircraftIdentificationMessage(rawMessage);
-            case AIRBORNE_POSITION -> new AirbornePositionMessage(rawMessage);
-            case AIRBORNE_VELOCITY -> new AirborneVelocityMessage(rawMessage);
-            default ->
-                // Le code de type de message n'est pas supporté
-                    null;
-        };
+        else if ((rawMessage.typeCode() >= 9 && rawMessage.typeCode() <= 18) ||
+                (rawMessage.typeCode() >= 20 && rawMessage.typeCode() <= 22) ) {
+            return AirbornePositionMessage.of(rawMessage);
+        }
+
+        else if (rawMessage.typeCode() == 19) {
+            return AirborneVelocityMessage.of(rawMessage);
+        }
+
+        else return null;
     }
-}
 }
