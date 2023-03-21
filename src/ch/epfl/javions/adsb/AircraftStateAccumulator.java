@@ -30,8 +30,9 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
             }
             case AirbornePositionMessage apm -> {
                 stateSetter.setAltitude(apm.altitude());
-                Optional<GeoPos> position = apm.positionIfReasonable(lastOddMessage, lastEvenMessage);
-                position.ifPresent(stateSetter::setPosition);
+                if((message.timeStampNs() - apm.timeStampNs()) <= 10) {
+                    stateSetter.setPosition(new GeoPos((int) apm.x(),(int) apm.y()));
+                }
             }
             case AirborneVelocityMessage avm -> {
                 stateSetter.setVelocity(avm.speed());
