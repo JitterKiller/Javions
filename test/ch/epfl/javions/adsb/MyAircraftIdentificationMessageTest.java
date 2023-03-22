@@ -21,7 +21,7 @@ class MyAircraftIdentificationMessageTest {
             RawMessage m;
             int numberOfMessages = 0;
             while ((m = d.nextMessage()) != null) {
-                if(AircraftIdentificationMessage.of(m) != null /* && isTypeCodeValid(m.typeCode())*/) {
+                if(AircraftIdentificationMessage.of(m) != null && isTypeCodeValid(m.typeCode())) {
                     System.out.println(AircraftIdentificationMessage.of(m));
                     ++numberOfMessages;
                 }

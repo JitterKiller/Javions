@@ -25,7 +25,7 @@ class MyAirbornePositionMessageTest {
             RawMessage m;
             int numberOfMessages = 0;
             while ((m = d.nextMessage()) != null) {
-                if(AirbornePositionMessage.of(m) != null) {
+                if(AirbornePositionMessage.of(m) != null && isTypeCodeValid(m.typeCode())) {
                     System.out.println(AirbornePositionMessage.of(m));
                     ++numberOfMessages;
                 }
