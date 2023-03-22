@@ -7,6 +7,26 @@ import ch.epfl.javions.aircraft.IcaoAddress;
 
 import java.util.Objects;
 
+/**
+ * L'enregistrement AirbornePositionMessage représente un message ADS-B de positionnement en vol.
+ * @param timeStampNs
+ *          L'horodatage du message, en nanosecondes.
+ * @param icaoAddress
+ *          L'adresse ICAO de l'expéditeur du message.
+ * @param altitude
+ *          L'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres.
+ * @param parity
+ *          La parité du message (0 s'il est pair, 1 s'il est impair).
+ * @param x
+ *          La longitude locale et normalisée (comprise entre 0 et 1)
+ *          à laquelle se trouvait l'aéronef au moment de l'envoi du message.
+ * @param y
+ *          La latitude locale et normalisée (comprise entre 0 et 1)
+ *          à laquelle se trouvait l'aéronef au moment de l'envoi du message.
+ *
+ * @author Adam AIT BOUSSELHAM (356365)
+ * @author Abdellah JANATI IDRISSI (362341)
+ */
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity, double x, double y) implements Message {
 
     /* Taille des bits de l'altitude dans l'attribut ME du message brut */
@@ -21,6 +41,17 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     /* Altitude de base lorsque Q = 0 */
     private final static int BASE_ALTITUDE_Q_0 = 1300;
 
+    /**
+     * Constructeur compact de AirbornePositionMessage
+     * @throws NullPointerException
+     *          Si l'adresse ICAO est nulle.
+     * @throws IllegalArgumentException
+     *          si l'horodatage du message est strictement inférieur à 0.
+     * @throws IllegalArgumentException
+     *          si l'argument parity est différent de 0 ou 1.
+     * @throws IllegalArgumentException
+     *          si la latitude ou la longitude locale ne sont pas comprises entre 0 (inclus) et 1 (exclus).
+     */
     public AirbornePositionMessage {
         Objects.requireNonNull(icaoAddress);
         Preconditions.checkArgument(timeStampNs >= 0);
@@ -29,6 +60,13 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         Preconditions.checkArgument(0 <= y && y < 1);
     }
 
+    /**
+     * Méthode statique qui retourne un message de positionnement en vol.
+     * @param rawMessage
+     *          Le message brut donné.
+     * @return  le message de positionnement en vol correspondant au message brut donné
+     *          ou null si l'altitude est invalide
+     */
     public static AirbornePositionMessage of(RawMessage rawMessage) {
 
         int inputAltitude = Bits.extractUInt(rawMessage.payload(),36,ALTITUDE_SIZE);
@@ -71,6 +109,12 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude,Units.Length.FOOT), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
     }
 
+    /**
+     * Méthode qui convertit un code de Gray en binaire.
+     * @param grayCode
+     *          le code de Gray à convertir
+     * @return l'équivalent du code de Gray en binaire.
+     */
     private static int grayToBinary(int grayCode) {
         int binary = grayCode;
         int mask;
@@ -80,6 +124,13 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         return binary;
     }
 
+    /**
+     * Méthode qui vérifie si le groupe des bits faibles est valide (égal
+     * à 0, 5 ou 6) lorsque le bit d'index Q est égal à 0.
+     * @param LSB
+     *          Le groupe des bits faibles en question.
+     * @return  Vrai s'il est valide, sinon faux.
+     */
     private static boolean isLSBNotValid(int LSB) {
         return (LSB == 0) || (LSB == 5) || (LSB == 6);
     }
