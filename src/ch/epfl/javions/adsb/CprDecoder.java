@@ -77,18 +77,16 @@ public class CprDecoder {
         /* On détermine ensuite la latitude à laquelle l'aéronef se trouvait au moment de l'envoi de chacun des deux messages
         *  Les latitudes des deux messages sont exprimés en tours, puis en degrés. */
         double evenLatitudeTurn = EVEN_LATITUDE_ZONES_WIDTH * (evenLatitudeZoneNumber + y0);
-        evenLatitudeTurn = refocusingOf(evenLatitudeTurn);
-        evenLatitudeDegree = Units.convert(evenLatitudeTurn, Units.Angle.TURN, Units.Angle.DEGREE);
+        evenLatitudeDegree = Units.convert(refocusingOf(evenLatitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
         double oddLatitudeTurn = ODD_LATITUDE_ZONES_WIDTH * (oddLatitudeZoneNumber + y1);
-        oddLatitudeTurn = refocusingOf(oddLatitudeTurn);
-        oddLatitudeDegree = Units.convert(oddLatitudeTurn, Units.Angle.TURN, Units.Angle.DEGREE);
+        oddLatitudeDegree = Units.convert(refocusingOf(oddLatitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
 
         /* On calcule ensuite le nombre de zones de longitude dans le découpage pair avec les deux latitudes (paire et impaire). */
         double A;
-        double AEven = (1 - Math.cos(2* Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.RADIAN)), 2);
-        double AOdd = (1 - Math.cos(2* Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.RADIAN)), 2);
+        double AEven = (1 - Math.cos(2* Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
+        double AOdd = (1 - Math.cos(2* Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
 
         double evenLongitudeZoneValue = Math.floor((2 * Math.PI) / Math.acos(1 - AEven));
         double oddLongitudeZoneValue = Math.floor((2 * Math.PI) / Math.acos(1 - AOdd));
