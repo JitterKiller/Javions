@@ -10,6 +10,8 @@ import java.util.Objects;
 public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress, double speed,
                                       double trackOrHeading) implements Message {
 
+    private final static int MESSAGE_START = 21;
+
     public AirborneVelocityMessage {
         Objects.requireNonNull(icaoAddress);
         Preconditions.checkArgument(timeStampNs >= 0 && speed >= 0 && trackOrHeading >= 0);
@@ -17,62 +19,81 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
 
 
     public static AirborneVelocityMessage of(RawMessage rawMessage) {
+        int ST = Bits.extractUInt(rawMessage.payload(), 48, 3);
 
-        int subType = Bits.extractUInt(rawMessage.payload(), 48, 3);
-        if (!(subType >= 1 && subType <= 4)) {
-            return null;
-        }
+        double speed;
+        double trackOrHeading = 0;
 
-        double angle;
-        double velocity;
+        if (isSTGroundSpeed(ST)) {
 
+            int Dew = Bits.extractUInt(rawMessage.payload(), 21 + MESSAGE_START, 1);
+            int Dns = Bits.extractUInt(rawMessage.payload(), 10 + MESSAGE_START, 1);
+            int Vew = Bits.extractUInt(rawMessage.payload(), 11 + MESSAGE_START, 10);
+            int Vns = Bits.extractUInt(rawMessage.payload(), MESSAGE_START, 10);
 
-        if (subType == 1 || subType == 2) {
-
-            int Dew = Bits.extractUInt(rawMessage.payload(), 21, 1);
-            int Vew = Bits.extractUInt(rawMessage.payload(), 11, 10);
-            int Dns = Bits.extractUInt(rawMessage.payload(), 10, 1);
-            int Vns = Bits.extractUInt(rawMessage.payload(), 0, 10);
-
-            if (Vns == 0 || Vew == 0) {
+            if(Vns == 0 || Vew == 0) {
                 return null;
             }
 
-            velocity = Math.hypot(Vew - 1, Vns - 1);
-            double defaultAngle = Math.atan2(Vns, Vew);
-
-            if (Dew == 0) {
-                if (Dns == 0) {
-                    angle = Math.PI / 2.0 - defaultAngle;
-                } else {
-                    angle = Math.PI / 2.0 + defaultAngle;
+            speed = Math.hypot(Vew - 1, Vns - 1);
+            switch (Dns) {
+                case 0 -> {
+                    switch (Dew) {
+                        case 0 -> trackOrHeading = Math.atan2(Vew - 1,Vns - 1);
+                        case 1 -> trackOrHeading = Math.atan2(-(Vew - 1),Vns - 1);
+                    }
                 }
-            } else {
-                if (Dns == 0) {
-                    angle = Math.PI * 1.5 + defaultAngle;
-                } else {
-                    angle = Math.PI * 1.5 - defaultAngle;
+                case 1 -> {
+                    switch (Dew) {
+                        case 0 -> trackOrHeading = Math.atan2(Vew - 1,-(Vns - 1));
+                        case 1 -> trackOrHeading = Math.atan2(-(Vew - 1),-(Vns - 1));
+                    }
                 }
             }
 
-        } else {
-
-            int SH = Bits.extractUInt(rawMessage.payload(), 21, 1);
-            if (SH == 1) {
-                byte HDG = (byte) Bits.extractUInt(rawMessage.payload(), 11, 10);
-                angle = Units.convertFrom(Math.scalb(Byte.toUnsignedInt(HDG), -10), Units.Angle.TURN);
-                velocity = Bits.extractUInt(rawMessage.payload(), 0, 10);
+            if(ST == 1) {
+                speed = Units.convert(speed, Units.Speed.KNOT, Units.Speed.METER_PER_SECOND);
             } else {
+                speed = Units.convert(speed, Units.Speed.KNOT * 4, Units.Speed.METER_PER_SECOND);
+            }
+            return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, refocusTrackOrHeading(trackOrHeading));
+        }
+
+        if (isSTAirSpeed(ST)) {
+
+            int SH = Bits.extractUInt(rawMessage.payload(), 21 + MESSAGE_START, 1);
+
+            if (SH != 1) {
                 return null;
             }
+
+            byte HDG = (byte) Bits.extractUInt(rawMessage.payload(), 11 + MESSAGE_START, 10);
+            int AS = Bits.extractUInt(rawMessage.payload(), MESSAGE_START, 10);
+
+            trackOrHeading = Units.convertFrom(Math.scalb(Byte.toUnsignedInt(HDG), -10),Units.Angle.TURN);
+
+            if(ST == 3) {
+                speed = Units.convert(AS, Units.Speed.KNOT, Units.Speed.METER_PER_SECOND);
+            } else {
+                speed = Units.convert(AS, Units.Speed.KNOT * 4, Units.Speed.METER_PER_SECOND);
+            }
+            
+            return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, refocusTrackOrHeading(trackOrHeading));
         }
 
-        if (subType == 1 || subType == 3) {
-            angle = Units.convert(angle, Units.Speed.KNOT, (Units.Time.HOUR / Units.KILO) * Units.Speed.KILOMETER_PER_HOUR);
-        } else {
-            angle = Units.convert(angle, 4 * Units.Speed.KNOT, (Units.Time.HOUR / Units.KILO) * Units.Speed.KILOMETER_PER_HOUR);
-        }
-
-        return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), velocity, angle);
+        return null;
     }
+
+    private static boolean isSTGroundSpeed(int ST) {
+        return ST == 1 || ST == 2;
+    }
+
+    private static boolean isSTAirSpeed(int ST) {
+        return ST == 3 || ST == 4;
+    }
+
+    private static double refocusTrackOrHeading(double trackOrHeading) {
+        return trackOrHeading < 0 ? trackOrHeading + (2 * Math.PI) : trackOrHeading;
+    }
+
 }
