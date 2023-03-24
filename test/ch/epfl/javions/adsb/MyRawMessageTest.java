@@ -115,7 +115,6 @@ class MyRawMessageTest {
 
     @Test
     void size() {
-        System.out.println(Byte.toUnsignedInt(bytes[0]));
         assertEquals(14,RawMessage.size(bytes[0]));
     }
 
