@@ -50,8 +50,8 @@ public class CprDecoder {
         double oddLatitudeDegree;
 
         /* On définit déjà les longitudes des messages pairs et impairs.
-         *  De ce fait, le cas où le nombre de zones de longitude est égal à 1 est déjà traité.
-         *  Ces longitudes seront redéfinies dans le cas ou le nombre de zones de longitude n'est pas égal à 1.*/
+         * De ce fait, le cas où le nombre de zones de longitude est égal à 1 est déjà traité.
+         * Ces longitudes seront redéfinies dans le cas ou le nombre de zones de longitude n'est pas égal à 1.*/
         double evenLongitudeDegree = Units.convert(refocusingOf(x0), Units.Angle.TURN, Units.Angle.DEGREE);
         double oddLongitudeDegree = Units.convert(refocusingOf(x1), Units.Angle.TURN, Units.Angle.DEGREE);
 
@@ -71,7 +71,7 @@ public class CprDecoder {
         }
 
         /* On détermine ensuite la latitude à laquelle l'aéronef se trouvait au moment de l'envoi de chacun des deux messages
-         *  Les latitudes des deux messages sont exprimés en tours, puis en degrés. */
+         * Les latitudes des deux messages sont exprimés en tours, puis en degrés. */
         double evenLatitudeTurn = EVEN_LATITUDE_ZONES_WIDTH * (evenLatitudeZoneNumber + y0);
         evenLatitudeDegree = Units.convert(refocusingOf(evenLatitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
@@ -112,9 +112,9 @@ public class CprDecoder {
         double oddLongitudeTurn;
 
         /* Enfin, on calcule le numéro de la zone de longitude dans lequel l'aéronef se trouve dans chacun des deux découpages.
-         *  S'il est égal à 1, les deux longitudes ont déjà été calculées plus haut dans la méthode,
-         *  S'il est supérieur à 1, on procède comme pour le calcul des numéros de numéros de la zone de latitude
-         *  pour le découpage pair et impair.*/
+         * S'il est égal à 1, les deux longitudes ont déjà été calculées plus haut dans la méthode,
+         * S'il est supérieur à 1, on procède comme pour le calcul des numéros de numéros de la zone de latitude
+         * pour le découpage pair et impair.*/
         if (evenLongitudeZone > 1) {
 
             int longitudeZoneNumber = (int) Math.rint((x0 * oddLongitudeZone) - (x1 * evenLongitudeZone));
@@ -136,8 +136,8 @@ public class CprDecoder {
         }
 
         /* Renvoie un objet GeoPos selon le dernier message (s'il est pair, on utilise la méthode
-         *  statique geoPosOf() avec les longitudes et latitudes des messages pairs, sinon ceux des
-         *  messages impairs. */
+         * statique geoPosOf() avec les longitudes et latitudes des messages pairs, sinon ceux des
+         * messages impairs. */
         if (mostRecent == 0) {
             return geoPosOf(evenLongitudeDegree, evenLatitudeDegree);
         } else {
