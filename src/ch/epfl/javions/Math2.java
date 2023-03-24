@@ -13,30 +13,27 @@ public final class Math2 {
     /**
      * Constructeur privé de la classe Time (non instanciable).
      */
-    private Math2(){}
+    private Math2() {
+    }
 
     /**
      * Méthode clamp qui limite la valeur v dans l'intervalle allant de min à max.
-     * @param min
-     *          valeur minimale.
-     * @param v
-     *          valeur v.
-     * @param max
-     *          valeur maximale.
-     * @return
-     *          min si v est inférieure à min.
-     *          max si v est supérieur à max.
-     *          v sinon.
-     * @throws IllegalArgumentException
-     *          si min est strictement supérieur à max grâce
-     *          à la méthode checkArgument() de la classe
-     *          Preconditions.
+     *
+     * @param min valeur minimale.
+     * @param v   valeur v.
+     * @param max valeur maximale.
+     * @return min si v est inférieure à min.
+     * max si v est supérieur à max.
+     * v sinon.
+     * @throws IllegalArgumentException si min est strictement supérieur à max grâce
+     *                                  à la méthode checkArgument() de la classe
+     *                                  Preconditions.
      */
-    public static int clamp(int min, int v, int max){
+    public static int clamp(int min, int v, int max) {
 
         Preconditions.checkArgument(min <= max);
 
-        if(v < min) {
+        if (v < min) {
             return min;
         } else return Math.min(v, max);
 
@@ -44,11 +41,11 @@ public final class Math2 {
 
     /**
      * Méthode pour calculer le sinus hyperbolique d'une variable x.
-     * @param x
-     *          argument x.
+     *
+     * @param x argument x.
      * @return le sinus hyperbolique réciproque de son argument x.
      */
-    public static double asinh(double x){
-        return Math.log(x+Math.sqrt(1+Math.pow(x,2)));
+    public static double asinh(double x) {
+        return Math.log(x + Math.sqrt(1 + Math.pow(x, 2)));
     }
 }

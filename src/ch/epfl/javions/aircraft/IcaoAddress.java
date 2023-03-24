@@ -1,4 +1,5 @@
 package ch.epfl.javions.aircraft;
+
 import ch.epfl.javions.Preconditions;
 
 import java.util.regex.Pattern;
@@ -9,7 +10,6 @@ import java.util.regex.Pattern;
  * représente l'adresse ICAO d'un véhicule aérien.
  *
  * @param string la chaîne contenant la représentation textuelle de l'adresse ICAO.
- *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
@@ -21,12 +21,11 @@ public record IcaoAddress(String string) {
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
      * "IllegalArgumentException" si elle ne représente pas une adresse ICAO valide.
-     * @throws IllegalArgumentException
-     *              Si une chaîne n'est pas conforme à une expression régulière
-     *              (pour verifier cela on utilise certaines méthodes des classes Pattern
-     *              et Matcher ainsi que la méthode checkArgument()).
-     * @throws IllegalArgumentException
-     *              Si cette chaine est vide.
+     *
+     * @throws IllegalArgumentException Si une chaîne n'est pas conforme à une expression régulière
+     *                                  (pour verifier cela on utilise certaines méthodes des classes Pattern
+     *                                  et Matcher ainsi que la méthode checkArgument()).
+     * @throws IllegalArgumentException Si cette chaine est vide.
      */
     public IcaoAddress {
         Preconditions.checkArgument(pattern.matcher(string).matches());

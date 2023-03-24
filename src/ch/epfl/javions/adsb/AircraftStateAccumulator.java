@@ -1,17 +1,12 @@
 package ch.epfl.javions.adsb;
 
-import ch.epfl.javions.GeoPos;
-import ch.epfl.javions.Units;
-
-import javax.swing.text.Position;
 import java.util.Objects;
-import java.util.Optional;
 
 public class AircraftStateAccumulator<T extends AircraftStateSetter> {
+    private final static long TIME_STAMP_CONST_MULTIPLIER = 10000000000L;
     private final T stateSetter;
     private AirbornePositionMessage lastEvenMessage;
     private AirbornePositionMessage lastOddMessage;
-    private final static long TIME_STAMP_CONST_MULTIPLIER = 10000000000L;
 
     public AircraftStateAccumulator(T stateSetter) {
         Objects.requireNonNull(stateSetter);
@@ -35,12 +30,12 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 stateSetter.setAltitude(apm.altitude());
                 switch (apm.parity()) {
                     case 0 -> {
-                        if(lastOddMessage != null && (apm.timeStampNs() - lastOddMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER)) {
+                        if (lastOddMessage != null && (apm.timeStampNs() - lastOddMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER)) {
                             stateSetter.setPosition(CprDecoder.decodePosition(apm.x(), apm.y(), lastOddMessage.x(), lastOddMessage.y(), 0));
                         }
                     }
                     case 1 -> {
-                        if(lastEvenMessage != null && (apm.timeStampNs() - lastEvenMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER)) {
+                        if (lastEvenMessage != null && (apm.timeStampNs() - lastEvenMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER)) {
                             stateSetter.setPosition(CprDecoder.decodePosition(lastEvenMessage.x(), lastEvenMessage.y(), apm.x(), apm.y(), 1));
                         }
                     }
@@ -50,16 +45,15 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 stateSetter.setVelocity(avm.speed());
                 stateSetter.setTrackOrHeading(avm.trackOrHeading());
             }
-            default ->
-                throw new Error("Unexpected value: " + message);
+            default -> throw new Error("Unexpected value: " + message);
         }
-   }
+    }
 
-   private void setParityMessage(AirbornePositionMessage apm) {
-        if(apm.parity() == 0) {
+    private void setParityMessage(AirbornePositionMessage apm) {
+        if (apm.parity() == 0) {
             lastEvenMessage = apm;
         } else {
             lastOddMessage = apm;
         }
-   }
+    }
 }

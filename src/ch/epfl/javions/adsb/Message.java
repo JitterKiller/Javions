@@ -12,12 +12,14 @@ public interface Message {
 
     /**
      * Retourne le timestamp en nanosecondes du message.
-     * @return  le timestamp en nanosecondes du message.
+     *
+     * @return le timestamp en nanosecondes du message.
      */
     long timeStampNs();
 
     /**
      * Retourne l'adresse ICAO de l'aéronef émetteur du message.
+     *
      * @return l'adresse ICAO de l'aéronef.
      */
     IcaoAddress icaoAddress();

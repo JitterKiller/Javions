@@ -51,7 +51,7 @@ class MyAircraftStateAccumulatorTest implements AircraftStateSetter {
         var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
         var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
         IcaoAddress expectedAddress = new IcaoAddress("4D2228");
-        try (InputStream s = new FileInputStream(samplesResourceMac)) {
+        try (InputStream s = new FileInputStream(samplesResourceWindows)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             AircraftStateAccumulator<MyAircraftStateAccumulatorTest> a =

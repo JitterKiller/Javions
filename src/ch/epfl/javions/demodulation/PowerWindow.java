@@ -16,12 +16,10 @@ import java.util.Objects;
 
 public final class PowerWindow {
 
+    /* Constante de la taille du Batch (2^16) */
+    private final static int BATCH_SIZE = 1 << 16;
     /* Taille de la fenêtre */
     private final int windowSize;
-
-    /* Constante de la taille du Batch (2^16) */
-    private final static int BATCH_SIZE = 1<<16;
-
     /* Instance de PowerComputer */
     private final PowerComputer powerComputer;
 
@@ -42,14 +40,11 @@ public final class PowerWindow {
      * Constructeur public de la classe PowerWindow qui initialise la taille de la fenêtre,
      * l'instance de PowerComputer, cree nos deux tableaux d'échantillons de puissance et initialise
      * le tableau principal d'échantillons de puissance grâce à la méthode readBatch().
-     * @param stream
-     *          flot d'entrée.
-     * @param windowSize
-     *          Taille de la fenêtre de puissance.
-     * @throws IOException
-     *          si une erreur se produit lors de la lecture du flux d'entrée.
-     * @throws IllegalArgumentException
-     *          si la taille de la fenêtre est négative, nulle ou dépasse 2^16.
+     *
+     * @param stream     flot d'entrée.
+     * @param windowSize Taille de la fenêtre de puissance.
+     * @throws IOException              si une erreur se produit lors de la lecture du flux d'entrée.
+     * @throws IllegalArgumentException si la taille de la fenêtre est négative, nulle ou dépasse 2^16.
      */
     public PowerWindow(InputStream stream, int windowSize) throws IOException {
 
@@ -65,6 +60,7 @@ public final class PowerWindow {
 
     /**
      * Méthode qui retourne la taille de la fenêtre.
+     *
      * @return la taille de la fenêtre.
      */
     public int size() {
@@ -73,6 +69,7 @@ public final class PowerWindow {
 
     /**
      * Méthode qui retourne la position actuelle de la fenêtre par rapport au début du flux de valeurs de puissance.
+     *
      * @return la position actuelle de la fenêtre par rapport au début du flux de valeurs de puissance.
      */
     public long position() {
@@ -81,6 +78,7 @@ public final class PowerWindow {
 
     /**
      * Méthode qui retourne vrai si la fenêtre est pleine, sinon retourne faux.
+     *
      * @return vrai si la fenêtre est pleine, sinon faux.
      */
     public boolean isFull() {
@@ -89,11 +87,10 @@ public final class PowerWindow {
 
     /**
      * Méthode qui permet de déterminer un échantillon de puissance à un index donné de la fenêtre.
-     * @param i
-     *          index d'un échantillon de puissance dans une fenêtre donnée.
-     * @return  Retourne l'échantillon de puissance à l'index donné de la fenêtre.
-     * @throws IndexOutOfBoundsException
-     *          si cet index n'est pas compris entre 0 (inclus) et la taille de la fenêtre (exclu).
+     *
+     * @param i index d'un échantillon de puissance dans une fenêtre donnée.
+     * @return Retourne l'échantillon de puissance à l'index donné de la fenêtre.
+     * @throws IndexOutOfBoundsException si cet index n'est pas compris entre 0 (inclus) et la taille de la fenêtre (exclu).
      */
     public int get(int i) {
 
@@ -108,8 +105,8 @@ public final class PowerWindow {
 
     /**
      * Méthode qui permet de déplacer la fenêtre de puissance d'un seul échantillon vers la droite.
-     * @throws IOException
-     *          en cas d'erreur d'entrée/sortie lors de la lecture du flux de données.
+     *
+     * @throws IOException en cas d'erreur d'entrée/sortie lors de la lecture du flux de données.
      */
     public void advance() throws IOException {
 
@@ -130,10 +127,9 @@ public final class PowerWindow {
     /**
      * Méthode qui permet de déplacer la fenêtre de puissance d'un nombre donné (offset)
      * d'échantillon vers la droite.
-     * @throws IOException
-     *          en cas d'erreur d'entrée/sortie lors de la lecture du flux de données.
-     * @throws IllegalArgumentException
-     *          si le nombre donné d'échantillon par lequel on déplace la fenêtre est nul.
+     *
+     * @throws IOException              en cas d'erreur d'entrée/sortie lors de la lecture du flux de données.
+     * @throws IllegalArgumentException si le nombre donné d'échantillon par lequel on déplace la fenêtre est nul.
      */
     public void advanceBy(int offset) throws IOException {
 

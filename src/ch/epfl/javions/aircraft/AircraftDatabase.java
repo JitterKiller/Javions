@@ -14,7 +14,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
- *
  */
 public final class AircraftDatabase {
 
@@ -25,10 +24,9 @@ public final class AircraftDatabase {
 
     /**
      * Construit une base de données d'aéronefs à partir du nom de fichier spécifié.
-     * @param fileName
-     *          le nom du fichier ZIP contenant la base de données.
-     * @throws NullPointerException
-     *          si le nom de fichier est nul.
+     *
+     * @param fileName le nom du fichier ZIP contenant la base de données.
+     * @throws NullPointerException si le nom de fichier est nul.
      */
     public AircraftDatabase(String fileName) {
         this.fileName = Objects.requireNonNull(fileName, "Le fichier ne peut pas être nul");
@@ -37,15 +35,12 @@ public final class AircraftDatabase {
     /**
      * Récupère les informations d'un aéronef à partir de son adresse ICAO.
      *
-     * @param address
-     *          l'adresse ICAO de l'aéronef à rechercher.
-     * @return  les informations de l'aéronef (AircraftData) associées à l'adresse ICAO spécifiée, null si aucune
-     *          information n'a été trouvée.
-     * @throws IOException
-     *          si une erreur se produit lors de l'accès au fichier ZIP ou à un des fichiers
-     *          CSV de la base de données.
-     * @throws NullPointerException
-     *          si l'adresse ICAO est nulle.
+     * @param address l'adresse ICAO de l'aéronef à rechercher.
+     * @return les informations de l'aéronef (AircraftData) associées à l'adresse ICAO spécifiée, null si aucune
+     * information n'a été trouvée.
+     * @throws IOException          si une erreur se produit lors de l'accès au fichier ZIP ou à un des fichiers
+     *                              CSV de la base de données.
+     * @throws NullPointerException si l'adresse ICAO est nulle.
      */
 
     public AircraftData get(IcaoAddress address) throws IOException {
@@ -53,7 +48,7 @@ public final class AircraftDatabase {
 
         try (ZipFile zipFile = new ZipFile(fileName)) {
 
-            String entry = address.string().substring(address.string().length()-2) + ".csv";
+            String entry = address.string().substring(address.string().length() - 2) + ".csv";
             /* Ouvre le fichier CSV correspondant à l'adresse courante dans le fichier ZIP */
             try (InputStream inputStream = zipFile.getInputStream(zipFile.getEntry(entry));
                  Reader reader = new InputStreamReader(inputStream, UTF_8);
@@ -80,8 +75,8 @@ public final class AircraftDatabase {
                         break;
                     }
                 }
-            } catch (IOException e){
-                throw new IOException("Erreur lors de la lecture du fichier "+ entry);
+            } catch (IOException e) {
+                throw new IOException("Erreur lors de la lecture du fichier " + entry);
             }
         } catch (IOException e) {
             throw new IOException("Erreur lors de l'ouverture du fichier ZIP", e);

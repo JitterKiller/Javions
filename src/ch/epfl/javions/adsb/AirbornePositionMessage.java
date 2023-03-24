@@ -9,25 +9,20 @@ import java.util.Objects;
 
 /**
  * L'enregistrement AirbornePositionMessage représente un message ADS-B de positionnement en vol.
- * @param timeStampNs
- *          L'horodatage du message, en nanosecondes.
- * @param icaoAddress
- *          L'adresse ICAO de l'expéditeur du message.
- * @param altitude
- *          L'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres.
- * @param parity
- *          La parité du message (0 s'il est pair, 1 s'il est impair).
- * @param x
- *          La longitude locale et normalisée (comprise entre 0 et 1)
- *          à laquelle se trouvait l'aéronef au moment de l'envoi du message.
- * @param y
- *          La latitude locale et normalisée (comprise entre 0 et 1)
- *          à laquelle se trouvait l'aéronef au moment de l'envoi du message.
  *
+ * @param timeStampNs L'horodatage du message, en nanosecondes.
+ * @param icaoAddress L'adresse ICAO de l'expéditeur du message.
+ * @param altitude    L'altitude à laquelle se trouvait l'aéronef au moment de l'envoi du message, en mètres.
+ * @param parity      La parité du message (0 s'il est pair, 1 s'il est impair).
+ * @param x           La longitude locale et normalisée (comprise entre 0 et 1)
+ *                    à laquelle se trouvait l'aéronef au moment de l'envoi du message.
+ * @param y           La latitude locale et normalisée (comprise entre 0 et 1)
+ *                    à laquelle se trouvait l'aéronef au moment de l'envoi du message.
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity, double x, double y) implements Message {
+public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity, double x,
+                                      double y) implements Message {
 
     /* Taille des bits de l'altitude dans l'attribut ME du message brut */
     private final static int ALTITUDE_SIZE = 12;
@@ -43,14 +38,11 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     /**
      * Constructeur compact de AirbornePositionMessage
-     * @throws NullPointerException
-     *          Si l'adresse ICAO est nulle.
-     * @throws IllegalArgumentException
-     *          si l'horodatage du message est strictement inférieur à 0.
-     * @throws IllegalArgumentException
-     *          si l'argument parity est différent de 0 ou 1.
-     * @throws IllegalArgumentException
-     *          si la latitude ou la longitude locale ne sont pas comprises entre 0 (inclus) et 1 (exclus).
+     *
+     * @throws NullPointerException     Si l'adresse ICAO est nulle.
+     * @throws IllegalArgumentException si l'horodatage du message est strictement inférieur à 0.
+     * @throws IllegalArgumentException si l'argument parity est différent de 0 ou 1.
+     * @throws IllegalArgumentException si la latitude ou la longitude locale ne sont pas comprises entre 0 (inclus) et 1 (exclus).
      */
     public AirbornePositionMessage {
         Objects.requireNonNull(icaoAddress);
@@ -62,23 +54,23 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     /**
      * Méthode statique qui retourne un message de positionnement en vol.
-     * @param rawMessage
-     *          Le message brut donné.
-     * @return  le message de positionnement en vol correspondant au message brut donné
-     *          ou null si l'altitude est invalide
+     *
+     * @param rawMessage Le message brut donné.
+     * @return le message de positionnement en vol correspondant au message brut donné
+     * ou null si l'altitude est invalide
      */
     public static AirbornePositionMessage of(RawMessage rawMessage) {
 
-        int inputAltitude = Bits.extractUInt(rawMessage.payload(),36,ALTITUDE_SIZE);
+        int inputAltitude = Bits.extractUInt(rawMessage.payload(), 36, ALTITUDE_SIZE);
 
-        int parity = Bits.extractUInt(rawMessage.payload(),34,1);
-        double latitude = Bits.extractUInt(rawMessage.payload(),17,17);
-        double longitude = Bits.extractUInt(rawMessage.payload(), 0,17);
+        int parity = Bits.extractUInt(rawMessage.payload(), 34, 1);
+        double latitude = Bits.extractUInt(rawMessage.payload(), 17, 17);
+        double longitude = Bits.extractUInt(rawMessage.payload(), 0, 17);
 
         double altitude;
 
-        if(Bits.testBit(inputAltitude,Q_INDEX)) {
-            int altitudeValue = (Bits.extractUInt(rawMessage.payload(),41,7) << 4) | Bits.extractUInt(rawMessage.payload(),36,4);
+        if (Bits.testBit(inputAltitude, Q_INDEX)) {
+            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), 41, 7) << 4) | Bits.extractUInt(rawMessage.payload(), 36, 4);
             altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
         } else {
 
@@ -92,27 +84,27 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
             multipleOf100Feet = grayToBinary(multipleOf100Feet);
             multipleOf500Feet = grayToBinary(multipleOf500Feet);
 
-            if(isLSBNotValid(multipleOf100Feet)) {
+            if (isLSBNotValid(multipleOf100Feet)) {
                 return null;
             }
 
-            if(multipleOf100Feet == 7) {
+            if (multipleOf100Feet == 7) {
                 multipleOf100Feet = 5;
             }
 
-            if(multipleOf500Feet % 2 == 1) {
+            if (multipleOf500Feet % 2 == 1) {
                 multipleOf100Feet = (6 - multipleOf100Feet);
             }
 
-            altitude = (multipleOf500Feet * 500) + (multipleOf100Feet* 100) - BASE_ALTITUDE_Q_0;
+            altitude = (multipleOf500Feet * 500) + (multipleOf100Feet * 100) - BASE_ALTITUDE_Q_0;
         }
-        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude,Units.Length.FOOT), parity, Math.scalb(longitude,-17), Math.scalb(latitude,-17));
+        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude, Units.Length.FOOT), parity, Math.scalb(longitude, -17), Math.scalb(latitude, -17));
     }
 
     /**
      * Méthode qui convertit un code de Gray en binaire.
-     * @param grayCode
-     *          le code de Gray à convertir
+     *
+     * @param grayCode le code de Gray à convertir
      * @return l'équivalent du code de Gray en binaire.
      */
     private static int grayToBinary(int grayCode) {
@@ -127,9 +119,9 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     /**
      * Méthode qui vérifie si le groupe des bits faibles est valide (égal
      * à 0, 5 ou 6) lorsque le bit d'index Q est égal à 0.
-     * @param LSB
-     *          Le groupe des bits faibles en question.
-     * @return  Vrai s'il est valide, sinon faux.
+     *
+     * @param LSB Le groupe des bits faibles en question.
+     * @return Vrai s'il est valide, sinon faux.
      */
     private static boolean isLSBNotValid(int LSB) {
         return (LSB == 0) || (LSB == 5) || (LSB == 6);

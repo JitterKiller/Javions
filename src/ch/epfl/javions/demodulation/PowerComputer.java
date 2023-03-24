@@ -26,12 +26,10 @@ public final class PowerComputer {
      * une taille de lot (batchSize), et un tableau où sont stockés tous les échantillons produit par l'instance
      * de SamplesDecoder (powerBuffer) ainsi qu'un tableau circulaire où sont stockés les 8 derniers échantillons décodés
      * grâce à l'instance SamplesDecoder (circularBuffer) pour calculer les nouveaux échantillons de puissance.
-     * @param stream
-     *          le flux d'entrée qui fournit les données à démoduler.
-     * @param batchSize
-     *          la taille de lot, c'est-à-dire le nombre d'échantillons à démoduler à la fois.
-     * @throws IllegalArgumentException
-     *          si la taille des lots n'est un multiple de 8 strictement positif.
+     *
+     * @param stream    le flux d'entrée qui fournit les données à démoduler.
+     * @param batchSize la taille de lot, c'est-à-dire le nombre d'échantillons à démoduler à la fois.
+     * @throws IllegalArgumentException si la taille des lots n'est un multiple de 8 strictement positif.
      */
     public PowerComputer(InputStream stream, int batchSize) {
 
@@ -49,15 +47,13 @@ public final class PowerComputer {
      * tableau passé en argument.
      * La méthode stocke également les huits derniers échantillons de SamplesDecoder dans un tableau circulaire
      * pour pouvoir calculer les nouveaux échantillons de puissance.
-     * @param batch
-     *          le tableau d'échantillons de puissances qui doit être rempli.
-     * @return  le nombre d'échantillons de puissances convertis dans le tableau fourni (batch).
-     * @throws IOException
-     *          si une erreur se produit lors de la lecture des échantillons
-     *          de SamplesDecoder à partir du flux d'entrée.
-     * @throws IllegalArgumentException
-     *          si la taille du tableau passé en argument n'est pas égale à la taille d'un lot
-     *          (on utilise la méthode checkArgument()).
+     *
+     * @param batch le tableau d'échantillons de puissances qui doit être rempli.
+     * @return le nombre d'échantillons de puissances convertis dans le tableau fourni (batch).
+     * @throws IOException              si une erreur se produit lors de la lecture des échantillons
+     *                                  de SamplesDecoder à partir du flux d'entrée.
+     * @throws IllegalArgumentException si la taille du tableau passé en argument n'est pas égale à la taille d'un lot
+     *                                  (on utilise la méthode checkArgument()).
      */
     public int readBatch(int[] batch) throws IOException {
 
@@ -66,12 +62,12 @@ public final class PowerComputer {
         int samplesRead = decoder.readBatch(powerBuffer);
 
         int bufferIndex = 0;
-        for (int i = 0; i < samplesRead; i+=2) {
+        for (int i = 0; i < samplesRead; i += 2) {
             circularBuffer[bufferIndex % 8] = powerBuffer[i];
-            circularBuffer[(bufferIndex+1) % 8] = powerBuffer[i+1];
-            bufferIndex +=2;
-            double power = Math.pow(circularBuffer[0] - circularBuffer [2] + circularBuffer [4] - circularBuffer [6], 2) + Math.pow(circularBuffer[1] - circularBuffer [3] + circularBuffer [5] - circularBuffer [7], 2);
-            batch[i/2] = (int) power;
+            circularBuffer[(bufferIndex + 1) % 8] = powerBuffer[i + 1];
+            bufferIndex += 2;
+            double power = Math.pow(circularBuffer[0] - circularBuffer[2] + circularBuffer[4] - circularBuffer[6], 2) + Math.pow(circularBuffer[1] - circularBuffer[3] + circularBuffer[5] - circularBuffer[7], 2);
+            batch[i / 2] = (int) power;
         }
 
         return samplesRead / 2;
