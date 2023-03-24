@@ -42,15 +42,15 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
 
             if (Dew == 0) {
                 if (Dns == 0) {
-                    angle = Math.PI/2 - defaultAngle;
+                    angle = Math.PI/2.0 - defaultAngle;
                 } else {
-                    angle = Math.PI/2 + defaultAngle;
+                    angle = Math.PI/2.0 + defaultAngle;
                 }
             } else {
                 if (Dns == 0) {
-                    angle = Math.PI * (3/2) + defaultAngle;
+                    angle = Math.PI * 1.5 + defaultAngle;
                 } else {
-                    angle = Math.PI * (3/2) - defaultAngle;
+                    angle = Math.PI * 1.5 - defaultAngle;
                 }
             }
 
