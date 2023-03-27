@@ -66,15 +66,19 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
                 return null;
             }
 
-            byte HDG = (byte) Bits.extractUInt(rawMessage.payload(), 11 + MESSAGE_START, 10);
+            int HDG = Bits.extractUInt(rawMessage.payload(), 11 + MESSAGE_START, 10);
             int AS = Bits.extractUInt(rawMessage.payload(), MESSAGE_START, 10);
 
-            trackOrHeading = Units.convertFrom(Math.scalb(Byte.toUnsignedInt(HDG), -10), Units.Angle.TURN);
+            if(AS == 0) {
+                return null;
+            }
+
+            trackOrHeading = Units.convertFrom(Math.scalb(HDG, -10),Units.Angle.TURN);
 
             if (ST == 3) {
-                speed = Units.convert(AS, Units.Speed.KNOT, Units.Speed.METER_PER_SECOND);
+                speed = Units.convert(AS - 1, Units.Speed.KNOT, Units.Speed.METER_PER_SECOND);
             } else {
-                speed = Units.convert(AS, Units.Speed.KNOT * 4, Units.Speed.METER_PER_SECOND);
+                speed = Units.convert(AS - 1, Units.Speed.KNOT * 4, Units.Speed.METER_PER_SECOND);
             }
 
             return new AirborneVelocityMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), speed, refocusTrackOrHeading(trackOrHeading));

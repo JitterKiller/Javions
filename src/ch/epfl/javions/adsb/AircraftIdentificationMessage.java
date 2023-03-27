@@ -44,7 +44,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     public static AircraftIdentificationMessage of(RawMessage rawMessage) {
 
-        byte category = (byte) (((RawMessage.LENGTH - rawMessage.typeCode()) << 4) | Bits.extractUInt(rawMessage.payload(), 48, 3));
+        int category = ((RawMessage.LENGTH - rawMessage.typeCode()) << 4) | Bits.extractUInt(rawMessage.payload(), 48, 3);
 
         StringBuilder callSignID = new StringBuilder();
 
@@ -61,6 +61,6 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
             }
         }
 
-        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Byte.toUnsignedInt(category), new CallSign(callSignID.toString().stripTrailing()));
+        return new AircraftIdentificationMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), category, new CallSign(callSignID.toString().stripTrailing()));
     }
 }
