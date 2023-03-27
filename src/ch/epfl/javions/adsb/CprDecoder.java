@@ -88,8 +88,9 @@ public class CprDecoder {
         int evenLongitudeZone;
 
         /* Si on obtient ainsi deux valeurs différentes, cela signifie qu'entre les deux messages,
-         * l'aéronef a changé de "bande d'altitude", et il n'est donc pas possible de déterminer sa position */
-        if ((evenLongitudeZoneValue == oddLongitudeZoneValue) || areLongitudeZoneValuesNaN(AEven, AOdd)) {
+         * l'aéronef a changé de "bande d'altitude", et il n'est donc pas possible de déterminer sa position
+         * La méthode Double.compare() retourne 0 si les deux valeurs sont égales (même si c'est deux NaN).*/
+        if (Double.compare(evenLongitudeZoneValue, oddLongitudeZoneValue) == 0) {
             /* Si le résultat de la formule n'est pas défini, par définition le nombre dde zones de longitude vaut 1.*/
             if (areLongitudeZoneValuesNaN(AEven, AOdd)) {
                 evenLongitudeZone = 1;
