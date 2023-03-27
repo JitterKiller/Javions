@@ -48,8 +48,12 @@ public class CprDecoder {
 
         double evenLatitudeDegree;
         double oddLatitudeDegree;
-        double evenLongitudeDegree;
-        double oddLongitudeDegree;
+
+        /* On définit déjà les longitudes des messages pairs et impairs.
+         * De ce fait, le cas où le nombre de zones de longitude est égal à 1 est déjà traité.
+         * Ces longitudes seront redéfinies dans le cas ou le nombre de zones de longitude n'est pas égal à 1.*/
+        double evenLongitudeDegree = Units.convert(refocusingOf(x0), Units.Angle.TURN, Units.Angle.DEGREE);
+        double oddLongitudeDegree = Units.convert(refocusingOf(x1), Units.Angle.TURN, Units.Angle.DEGREE);
 
         /* On calcule le numéro de la zone de latitude dans lequel l'aéronef se trouve dans chacun des deux découpages */
         int latitudeZoneNumber = (int) Math.rint((y0 * ODD_LATITUDE_ZONES) - (y1 * EVEN_LATITUDE_ZONES));
@@ -76,7 +80,6 @@ public class CprDecoder {
 
 
         /* On calcule ensuite le nombre de zones de longitude dans le découpage pair avec les deux latitudes (paire et impaire). */
-        double A;
         double AEven = (1 - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
         double AOdd = (1 - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
 
@@ -86,11 +89,9 @@ public class CprDecoder {
 
         /* Si on obtient ainsi deux valeurs différentes, cela signifie qu'entre les deux messages,
          * l'aéronef a changé de "bande d'altitude", et il n'est donc pas possible de déterminer sa position */
-        if ((evenLongitudeZoneValue == oddLongitudeZoneValue) || ((Double.isNaN(Math.acos(1 - AEven))) && (Double.isNaN(Math.acos(1 - AOdd))))) {
-            A = AEven;
-
+        if ((evenLongitudeZoneValue == oddLongitudeZoneValue) || areLongitudeZoneValuesNaN(AEven, AOdd)) {
             /* Si le résultat de la formule n'est pas défini, par définition le nombre dde zones de longitude vaut 1.*/
-            if (Double.isNaN(Math.acos(1 - A))) {
+            if (areLongitudeZoneValuesNaN(AEven, AOdd)) {
                 evenLongitudeZone = 1;
             } else {
                 evenLongitudeZone = (int) evenLongitudeZoneValue;
@@ -129,14 +130,11 @@ public class CprDecoder {
             oddLongitudeTurn = (1.0 / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
             oddLongitudeDegree = Units.convert(refocusingOf(oddLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
-        } else {
-            evenLongitudeDegree = Units.convert(refocusingOf(x0), Units.Angle.TURN, Units.Angle.DEGREE);
-            oddLongitudeDegree = Units.convert(refocusingOf(x1), Units.Angle.TURN, Units.Angle.DEGREE);
         }
 
         /* Renvoie un objet GeoPos selon le dernier message (s'il est pair, on utilise la méthode
          * statique geoPosOf() avec les longitudes et latitudes des messages pairs, sinon ceux des
-         * messages impairs. */
+         * messages impairs.) */
         if (mostRecent == 0) {
             return geoPosOf(evenLongitudeDegree, evenLatitudeDegree);
         } else {
@@ -173,4 +171,16 @@ public class CprDecoder {
         return coordinate >= 0.5 ? (coordinate - 1) : coordinate;
     }
 
+    /**
+     * Méthode statique qui permet de savoir si le nombre de zones de longitude dans le découpage
+     * pair avec les deux latitudes (paire et impaire) sont tous les deux des NaN (Not a Number)
+     *
+     * @param AEven La constante A calculée avec la latitude paire.
+     * @param AOdd  La constante A calculée avec la latitude impaire
+     * @return Vrai si les deux nombres de zones de longitudes dans le découpage
+     * pair avec les deux latitudes (paire et impaire) sont tous les deux des NaN, faux sinon.
+     */
+    private static boolean areLongitudeZoneValuesNaN(double AEven, double AOdd) {
+        return Double.isNaN(Math.acos(1 - AEven)) && Double.isNaN(Math.acos(1 - AOdd));
+    }
 }
