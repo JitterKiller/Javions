@@ -4,6 +4,7 @@ import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.Units;
 import org.junit.jupiter.api.Test;
 
+import static java.lang.Math.scalb;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MyCprDecoderTest {
