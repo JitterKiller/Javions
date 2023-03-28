@@ -20,7 +20,7 @@ class MyAirbornePositionMessageTest {
     void testAirbornePositionMessageWithSamplesDOTBin() throws IOException {
         var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
         var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
-        try (InputStream s = new FileInputStream(samplesResourceWindows)) {
+        try (InputStream s = new FileInputStream(samplesResourceMac)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             int numberOfMessages = 0;
@@ -31,6 +31,7 @@ class MyAirbornePositionMessageTest {
                 }
             }
             System.out.println(numberOfMessages);
+            assertEquals(137,numberOfMessages);
         }
     }
 

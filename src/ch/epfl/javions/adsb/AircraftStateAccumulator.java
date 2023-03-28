@@ -30,12 +30,12 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 stateSetter.setAltitude(apm.altitude());
                 switch (apm.parity()) {
                     case 0 -> {
-                        if (lastOddMessage != null && (apm.timeStampNs() - lastOddMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER)) {
+                        if (canPositionBeDetermined(lastOddMessage,apm)) {
                             stateSetter.setPosition(CprDecoder.decodePosition(apm.x(), apm.y(), lastOddMessage.x(), lastOddMessage.y(), 0));
                         }
                     }
                     case 1 -> {
-                        if (lastEvenMessage != null && (apm.timeStampNs() - lastEvenMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER)) {
+                        if (canPositionBeDetermined(lastEvenMessage,apm)) {
                             stateSetter.setPosition(CprDecoder.decodePosition(lastEvenMessage.x(), lastEvenMessage.y(), apm.x(), apm.y(), 1));
                         }
                     }
@@ -55,5 +55,9 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
         } else {
             lastOddMessage = apm;
         }
+    }
+
+    private boolean canPositionBeDetermined(AirbornePositionMessage lastMessage, AirbornePositionMessage currentMessage) {
+        return (lastMessage != null) && (currentMessage.timeStampNs() - lastMessage.timeStampNs() <= TIME_STAMP_CONST_MULTIPLIER);
     }
 }
