@@ -19,8 +19,10 @@ public final class PowerWindow {
 
     /* Constante de la taille du Batch (2^16) */
     private final static int BATCH_SIZE = 1 << 16;
+
     /* Taille de la fenêtre */
     private final int windowSize;
+
     /* Instance de PowerComputer */
     private final PowerComputer powerComputer;
 

@@ -23,8 +23,8 @@ public final class Math2 {
      * @param v   valeur v.
      * @param max valeur maximale.
      * @return min si v est inférieure à min.
-     * max si v est supérieur à max.
-     * v sinon.
+     *         max si v est supérieur à max.
+     *         v sinon.
      * @throws IllegalArgumentException si min est strictement supérieur à max grâce
      *                                  à la méthode checkArgument() de la classe
      *                                  Preconditions.

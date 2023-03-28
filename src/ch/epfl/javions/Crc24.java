@@ -17,10 +17,12 @@ public final class Crc24 {
 
     /* L'octet le plus fort du CRC24 */
     private static final int TOP_BYTE = CRC_WIDTH - 8;
+
+    /* La table de 256 entrées correspondant à un générateur */
+    private static final int[] table = new int[256];
+
     /* Générateur utilisé pour calculer le CRC24 des messages ADS-B */
     public static int GENERATOR = 0xFFF409;
-    /* La table de 256 entrées correspondant à un générateur */
-    private static int[] table;
 
     /**
      * Constructeur public de la classe Crc24 (appelle la méthode buildTable() pour
@@ -65,11 +67,9 @@ public final class Crc24 {
      * @param generator le générateur du Crc utilisé pour générer la table.
      */
     private static void buildTable(int generator) {
-        int[] table = new int[256];
         for (int i = 0; i < 256; i++) {
             table[i] = crc_bitwise(generator, new byte[]{(byte) i});
         }
-        Crc24.table = table;
     }
 
     /**

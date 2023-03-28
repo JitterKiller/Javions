@@ -15,15 +15,22 @@ import java.io.InputStream;
  */
 public final class PowerComputer {
 
+    /* Instance de SamplesDecoder */
     private final SamplesDecoder decoder;
+
+    /* Tableau circulaire où sont stockés les 8 derniers échantillons décodés*/
     private final short[] circularBuffer = new short[8];
+
+    /* Tableau où sont stockés tous les échantillons produits par SamplesDecoder*/
     private final short[] powerBuffer;
+
+    /* Taille du lot */
     private final int batchSize;
 
     /**
      * Le constructeur de la classe initialise un flot d'entrée (grâce au stream entré en argument),
      * une instance de la classe SamplesDecoder (qui utilise le flot d'entrée passé en argument),
-     * une taille de lot (batchSize), et un tableau où sont stockés tous les échantillons produit par l'instance
+     * une taille de lot (batchSize), et un tableau où sont stockés tous les échantillons produits par l'instance
      * de SamplesDecoder (powerBuffer) ainsi qu'un tableau circulaire où sont stockés les 8 derniers échantillons décodés
      * grâce à l'instance SamplesDecoder (circularBuffer) pour calculer les nouveaux échantillons de puissance.
      *

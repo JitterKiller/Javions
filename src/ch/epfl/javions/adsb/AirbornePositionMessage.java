@@ -21,11 +21,18 @@ import java.util.Objects;
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity, double x,
+public record AirbornePositionMessage(long timeStampNs,
+                                      IcaoAddress icaoAddress,
+                                      double altitude,
+                                      int parity,
+                                      double x,
                                       double y) implements Message {
 
+    /* Index où commence l'altitude dans l'attribut ME du message brut */
+    private final static int ALT_START = 36;
+
     /* Taille des bits de l'altitude dans l'attribut ME du message brut */
-    private final static int ALTITUDE_SIZE = 12;
+    private final static int ALT_SIZE = 12;
 
     /* Index de Q dans les bits de l'altitude du message brut */
     private final static int Q_INDEX = 4;
@@ -35,6 +42,27 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
     /* Altitude de base lorsque Q = 0 */
     private final static int BASE_ALTITUDE_Q_0 = 1300;
+
+    /* Taille des bits de longitude et de latitude (bits) */
+    private static final int CPR_BITS = 17;
+
+    /* Index où la longitude commence */
+    private static final int LON_CPR_START = 0;
+
+    /* Taille de la longitude (bits) */
+    private static final int LON_CPR_SIZE = CPR_BITS;
+
+    /* Index où la latitude commence*/
+    private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE;
+
+    /* Taille de la latitude (bits) */
+    private static final int LAT_CPR_SIZE = CPR_BITS;
+
+    /* Index où commence la parité du message */
+    private static final int FORMAT_START = 34;
+
+    /* Taille de la parité du message (bits) */
+    private static final int FORMAT_SIZE = 1;
 
     /**
      * Constructeur compact de AirbornePositionMessage
@@ -61,16 +89,16 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      */
     public static AirbornePositionMessage of(RawMessage rawMessage) {
 
-        int inputAltitude = Bits.extractUInt(rawMessage.payload(), 36, ALTITUDE_SIZE);
+        int inputAltitude = Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE);
 
-        int parity = Bits.extractUInt(rawMessage.payload(), 34, 1);
-        double latitude = Bits.extractUInt(rawMessage.payload(), 17, 17);
-        double longitude = Bits.extractUInt(rawMessage.payload(), 0, 17);
+        int parity = Bits.extractUInt(rawMessage.payload(), FORMAT_START, FORMAT_SIZE);
+        double latitude = Bits.extractUInt(rawMessage.payload(), LAT_CPR_START, LAT_CPR_SIZE);
+        double longitude = Bits.extractUInt(rawMessage.payload(), LON_CPR_START, LON_CPR_SIZE);
 
         double altitude;
 
         if (Bits.testBit(inputAltitude, Q_INDEX)) {
-            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), 41, 7) << 4) | Bits.extractUInt(rawMessage.payload(), 36, 4);
+            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), ALT_START + 5, ALT_SIZE - 5) << 4) | Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE - 8);
             altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
         } else {
 
