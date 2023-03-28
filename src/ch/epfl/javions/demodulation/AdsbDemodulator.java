@@ -22,6 +22,12 @@ public final class AdsbDemodulator {
     private final PowerWindow window;
     /* Tableau pour stocker les octets des messages bruts */
     private final byte[] message = new byte[14];
+    /* Somme des pics de puissance de porteuse actuelle */
+    private int sumCarrierPeak;
+    /* Somme des pics de puissance de porteuse précédente */
+    private int previousSumCarrierPeak;
+    /* Somme des pics de puissance de porteuse suivantes */
+    private int nextSumCarrierPeak;
 
     /**
      * Constructeur d'AdsbDemodulator qui prend en entrée un InputStream
@@ -43,18 +49,14 @@ public final class AdsbDemodulator {
      */
     public RawMessage nextMessage() throws IOException {
 
-        /* Somme des pics de puissance de porteuse actuelle et précédente */
-        int sumCarrierPeak;
-        int previousSumCarrierPeak = 0;
-
         /* Parcours de la fenêtre de puissance pour détecter les messages */
         for (; window.isFull(); window.advance()) {
-            /* Calcul de la somme des pics de puissance de porteuse actuelle */
-            sumCarrierPeak = computeCarrierSum();
+            /* Calcul de la somme des pics de puissance de porteuse suivante */
+            nextSumCarrierPeak = computeNextCarrierSum();
             /* Si un nouveau pic de puissance de porteuse est détecté et que
             la puissance est suffisante, on décode le message brut */
             if (isPeakDetected(sumCarrierPeak, previousSumCarrierPeak)) {
-                if (computeCarrierSum() >= computeTwiceBottomOutSums()) {
+                if (sumCarrierPeak >= computeTwiceBottomOutSums()) {
                     /* Si le downlink format (DF) du premier octet correspond à 17
                     on décode les octets restant du message brut */
                     if (RawMessage.size(computeFirstByte()) == RawMessage.LENGTH) {
@@ -70,8 +72,9 @@ public final class AdsbDemodulator {
                     }
                 }
             }
-            /* On met à jour la somme des pics de puissance de porteuse précédente */
+            /* On met à jour la somme des pics de puissance de porteuse précédente et actuelle*/
             previousSumCarrierPeak = sumCarrierPeak;
+            sumCarrierPeak = nextSumCarrierPeak;
         }
         /* On retourne null lorsqu'il n'y a plus de messages à démoduler */
         return null;
@@ -96,7 +99,6 @@ public final class AdsbDemodulator {
      */
     private boolean isPeakDetected(int sumCarrierPeak, int previousSumCarrierPeak) {
         if (sumCarrierPeak > previousSumCarrierPeak) {
-            int nextSumCarrierPeak = window.get(1) + window.get(11) + window.get(36) + window.get(46);
             return sumCarrierPeak > nextSumCarrierPeak;
         }
         return false;
@@ -107,8 +109,8 @@ public final class AdsbDemodulator {
      *
      * @return La somme des pics de porteuse.
      */
-    private int computeCarrierSum() {
-        return (window.get(0) + window.get(10) + window.get(35) + window.get(45));
+    private int computeNextCarrierSum() {
+        return (window.get(1) + window.get(11) + window.get(36) + window.get(46));
     }
 
     /**

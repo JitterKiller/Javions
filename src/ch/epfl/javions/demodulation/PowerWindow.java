@@ -4,6 +4,7 @@ import ch.epfl.javions.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -24,13 +25,13 @@ public final class PowerWindow {
     private final PowerComputer powerComputer;
 
     /* Premier tableau d'échantillons de puissances */
-    private int[] powerSamples;
+    private int[] powerSamples = new int[BATCH_SIZE];;
 
     /* Deuxième tableau d'échantillons de puissances */
-    private int[] powerSamplesBis;
+    private int[] powerSamplesBis = new int[BATCH_SIZE];;
 
     /* Position dans un des deux tableaux d'échantillons de puissances */
-    private long position;
+    private long position = 0;
 
     /* Nombres d'échantillons lus */
     private int powerSamplesRead;
@@ -52,10 +53,7 @@ public final class PowerWindow {
 
         this.windowSize = windowSize;
         this.powerComputer = new PowerComputer(stream, BATCH_SIZE);
-        this.powerSamples = new int[BATCH_SIZE];
-        this.powerSamplesBis = new int[BATCH_SIZE];
         powerSamplesRead = powerComputer.readBatch(powerSamples);
-        position = 0;
     }
 
     /**
@@ -96,10 +94,10 @@ public final class PowerWindow {
 
         Objects.checkIndex(i, size());
 
-        if ((position() + i) % BATCH_SIZE < i) {
-            return powerSamplesBis[(int) ((position() + i) % BATCH_SIZE)];
+        if ((position + i) % BATCH_SIZE < i) {
+            return powerSamplesBis[(int) ((position + i) % BATCH_SIZE)];
         } else {
-            return powerSamples[(int) ((position() + i) % BATCH_SIZE)];
+            return powerSamples[(int) ((position + i) % BATCH_SIZE)];
         }
     }
 
@@ -110,8 +108,8 @@ public final class PowerWindow {
      */
     public void advance() throws IOException {
 
-        if (position() % powerSamples.length < BATCH_SIZE - 1) {
-            if ((position() + size()) % BATCH_SIZE >= BATCH_SIZE - 1) {
+        if (position % BATCH_SIZE < BATCH_SIZE - 1) {
+            if ((position + windowSize) % BATCH_SIZE >= BATCH_SIZE - 1) {
                 powerSamplesRead += powerComputer.readBatch(powerSamplesBis);
             }
         } else {
