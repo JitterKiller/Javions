@@ -22,6 +22,9 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
     /* Constante ASCII pour le CallSign*/
     private static final int ASCII_LETTER = 64;
 
+    /* Taille de l'indicatif CallSign */
+    private static final int CALL_SIGN_SIZE = 6;
+
     /**
      * Constructeur compact de AircraftIdentificationMessage
      *
@@ -50,7 +53,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
 
         for (int i = 42; i >= 0; i -= 6) {
 
-            int callSignExtractedInt = Bits.extractUInt(rawMessage.payload(), i, 6);
+            int callSignExtractedInt = Bits.extractUInt(rawMessage.payload(), i, CALL_SIGN_SIZE);
 
             if (callSignExtractedInt >= 1 && callSignExtractedInt <= 26) {
                 callSignID.append((char) (callSignExtractedInt + ASCII_LETTER));

@@ -31,12 +31,20 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 switch (apm.parity()) {
                     case 0 -> {
                         if (canPositionBeDetermined(lastOddMessage,apm)) {
-                            stateSetter.setPosition(CprDecoder.decodePosition(apm.x(), apm.y(), lastOddMessage.x(), lastOddMessage.y(), 0));
+                            stateSetter.setPosition(CprDecoder.decodePosition(apm.x(),
+                                                                              apm.y(),
+                                                                               lastOddMessage.x(),
+                                                                               lastOddMessage.y(),
+                                                                               0));
                         }
                     }
                     case 1 -> {
                         if (canPositionBeDetermined(lastEvenMessage,apm)) {
-                            stateSetter.setPosition(CprDecoder.decodePosition(lastEvenMessage.x(), lastEvenMessage.y(), apm.x(), apm.y(), 1));
+                            stateSetter.setPosition(CprDecoder.decodePosition(lastEvenMessage.x(),
+                                                                              lastEvenMessage.y(),
+                                                                              apm.x(),
+                                                                              apm.y(),
+                                                                              1));
                         }
                     }
                 }

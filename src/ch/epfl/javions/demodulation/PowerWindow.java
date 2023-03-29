@@ -82,7 +82,7 @@ public final class PowerWindow {
      * @return vrai si la fenêtre est pleine, sinon faux.
      */
     public boolean isFull() {
-        return size() <= powerSamplesRead;
+        return windowSize <= powerSamplesRead;
     }
 
     /**
@@ -94,7 +94,7 @@ public final class PowerWindow {
      */
     public int get(int i) {
 
-        Objects.checkIndex(i, size());
+        Objects.checkIndex(i, windowSize);
 
         if ((position + i) % BATCH_SIZE < i) {
             return powerSamplesBis[(int) ((position + i) % BATCH_SIZE)];

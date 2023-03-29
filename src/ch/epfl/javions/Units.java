@@ -72,7 +72,7 @@ public final class Units {
         public static final double RADIAN = BASE_UNIT;
         public static final double TURN = 2.0 * Math.PI * RADIAN;
         public static final double DEGREE = TURN / 360.0;
-        public static final double T32 = TURN / (Math.scalb(1.0, 32));
+        public static final double T32 = Math.scalb(TURN, -32);
         /**
          * Constructeur privé de la classe Angle (non instanciable).
          */

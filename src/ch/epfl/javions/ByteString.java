@@ -84,12 +84,12 @@ public final class ByteString {
     public long bytesInRange(int fromIndex, int toIndex) {
 
         Objects.checkFromIndexSize(fromIndex, toIndex - fromIndex, bytes.length);
-        Preconditions.checkArgument(toIndex - fromIndex <= 8);
+        Preconditions.checkArgument(toIndex - fromIndex <= Long.BYTES);
 
         long result = 0;
 
         for (int i = fromIndex; i < toIndex; i++) {
-            result = (result << 8) | Byte.toUnsignedLong(bytes[i]);
+            result = (result << Long.BYTES) | Byte.toUnsignedLong(bytes[i]);
         }
 
         return result;

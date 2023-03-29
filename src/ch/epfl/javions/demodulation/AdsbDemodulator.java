@@ -111,9 +111,9 @@ public final class AdsbDemodulator {
     }
 
     /**
-     * Méthode calculant la somme des pics de porteuse.
+     * Méthode calculant la somme des pics de porteuse suivante.
      *
-     * @return La somme des pics de porteuse.
+     * @return La somme des pics de porteuse suivante.
      */
     private int computeNextCarrierSum() {
         return (window.get(1) + window.get(11) + window.get(36) + window.get(46));

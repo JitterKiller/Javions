@@ -10,13 +10,16 @@ package ch.epfl.javions;
 public final class Crc24 {
 
     /* La taille du Crc de 24 bits, constante */
-    private static final int CRC_WIDTH = 24;
+    private static final int CRC_SIZE = 24;
+
+    /* Index où l'on extrait le CRC24 */
+    public static final int CRC_START = 0;
 
     /* Le bit le plus fort du CRC24 */
-    private static final int TOP_BIT = CRC_WIDTH - 1;
+    private static final int TOP_BIT = CRC_SIZE - Byte.BYTES;
 
     /* L'octet le plus fort du CRC24 */
-    private static final int TOP_BYTE = CRC_WIDTH - 8;
+    private static final int TOP_BYTE = CRC_SIZE - Byte.SIZE;
 
     /* La table de 256 entrées correspondant à un générateur */
     private static final int[] table = new int[256];
@@ -49,16 +52,16 @@ public final class Crc24 {
         /* Première boucle traitant les bits du message */
         for (byte b : bytes) {
             for (int i = 0; i < 8; ++i) {
-                crc = ((crc << 1) | Byte.toUnsignedInt(b) >> (7 - i)) ^ table[Bits.extractUInt(crc, TOP_BIT, 1)];
+                crc = ((crc << 1) | Byte.toUnsignedInt(b) >> (7 - i)) ^ table[Bits.extractUInt(crc, TOP_BIT, Byte.BYTES)];
             }
         }
 
         /* Seconde boucle traitant les 24 bits ajoutés */
         for (int i = 0; i < 24; ++i) {
-            crc = ((crc << 1)) ^ table[Bits.extractUInt(crc, TOP_BIT, 1)];
+            crc = ((crc << 1)) ^ table[Bits.extractUInt(crc, TOP_BIT, Byte.BYTES)];
         }
 
-        return Bits.extractUInt(crc, 0, CRC_WIDTH);
+        return Bits.extractUInt(crc, CRC_START, CRC_SIZE);
     }
 
     /**
@@ -83,13 +86,13 @@ public final class Crc24 {
 
         /* Première boucle traitant les octets du message */
         for (byte b : bytes) {
-            crc = ((crc << 8) | Byte.toUnsignedInt(b)) ^ table[Bits.extractUInt(crc, TOP_BYTE, 8)];
+            crc = ((crc << Byte.SIZE) | Byte.toUnsignedInt(b)) ^ table[Bits.extractUInt(crc, TOP_BYTE, Byte.SIZE)];
         }
 
         /* Seconde boucle traitant les 3 octets ajoutés */
         for (int i = 0; i < 3; ++i) {
-            crc = ((crc << 8)) ^ table[Bits.extractUInt(crc, TOP_BYTE, 8)];
+            crc = ((crc << Byte.SIZE)) ^ table[Bits.extractUInt(crc, TOP_BYTE, Byte.SIZE)];
         }
-        return Bits.extractUInt(crc, 0, CRC_WIDTH);
+        return Bits.extractUInt(crc, CRC_START, CRC_SIZE);
     }
 }
