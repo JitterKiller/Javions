@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
  * @author Abdellah Janati Idrissi (362341)
  */
 public record CallSign(String string) {
-
-    /* Déclaration d'une expression régulière associée au CallSign. */
     private static final Pattern pattern = Pattern.compile("[A-Z0-9 ]{0,8}");
 
     /**

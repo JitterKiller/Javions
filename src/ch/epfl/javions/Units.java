@@ -70,8 +70,8 @@ public final class Units {
          * Les unités d'angles en question (Radian, Tour, Degré, T32).
          */
         public static final double RADIAN = BASE_UNIT;
-        public static final double TURN = 2.0 * Math.PI * RADIAN;
-        public static final double DEGREE = TURN / 360.0;
+        public static final double TURN = 2d * Math.PI * RADIAN;
+        public static final double DEGREE = TURN / 360d;
         public static final double T32 = Math.scalb(TURN, -32);
         /**
          * Constructeur privé de la classe Angle (non instanciable).
@@ -95,10 +95,10 @@ public final class Units {
          */
         public static final double METER = BASE_UNIT;
         public static final double CENTIMETER = CENTI * METER;
-        public static final double INCH = 2.54 * CENTIMETER;
-        public static final double FOOT = 12 * INCH;
+        public static final double INCH = 2.54d * CENTIMETER;
+        public static final double FOOT = 12d * INCH;
         public static final double KILOMETER = KILO * METER;
-        public static final double NAUTICAL_MILE = 1852 * METER;
+        public static final double NAUTICAL_MILE = 1852d * METER;
         /**
          * Constructeur privé de la classe Length (non instanciable).
          */
@@ -120,8 +120,8 @@ public final class Units {
          * Les unités de temps en question (Seconde, Minute, Heure).
          */
         public static final double SECOND = BASE_UNIT;
-        public static final double MINUTE = 60 * SECOND;
-        public static final double HOUR = 60 * MINUTE;
+        public static final double MINUTE = 60d * SECOND;
+        public static final double HOUR = 60d * MINUTE;
         /**
          * Constructeur privé de la classe Time (non instanciable).
          */

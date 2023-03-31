@@ -22,12 +22,8 @@ import java.util.Objects;
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public record AirbornePositionMessage(long timeStampNs,
-                                      IcaoAddress icaoAddress,
-                                      double altitude,
-                                      int parity,
-                                      double x,
-                                      double y) implements Message {
+public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity,
+                                      double x, double y) implements Message {
     private final static int ALT_START = 36;
     private final static int ALT_SIZE = 12;
     private final static int Q_INDEX = 4;

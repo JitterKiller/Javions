@@ -6,6 +6,7 @@ package ch.epfl.javions;
  *
  * @param latitudeT32  la valeur de l'unité de la latitude.
  * @param longitudeT32 la valeur de l'unité de la latitude.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */

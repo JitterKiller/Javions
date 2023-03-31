@@ -17,12 +17,10 @@ import java.util.Objects;
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public record AircraftIdentificationMessage(long timeStampNs,
-                                            IcaoAddress icaoAddress,
-                                            int category,
-                                            CallSign callSign) implements Message {
+public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAddress,
+                                            int category, CallSign callSign) implements Message {
 
-    private static final int ASCII_LETTER = 64;
+    private static final int ASCII_LETTER_OFFSET = 64;
     private static final int CALL_SIGN_SIZE = 6;
 
     /**
@@ -56,7 +54,7 @@ public record AircraftIdentificationMessage(long timeStampNs,
             int callSignExtractedInt = Bits.extractUInt(rawMessage.payload(), i, CALL_SIGN_SIZE);
 
             if (callSignExtractedInt >= 1 && callSignExtractedInt <= 26) {
-                callSignID.append((char) (callSignExtractedInt + ASCII_LETTER));
+                callSignID.append((char) (callSignExtractedInt + ASCII_LETTER_OFFSET));
             } else if ((callSignExtractedInt >= 48 && callSignExtractedInt <= 57) || callSignExtractedInt == 32) {
                 callSignID.append((char) callSignExtractedInt);
             } else {

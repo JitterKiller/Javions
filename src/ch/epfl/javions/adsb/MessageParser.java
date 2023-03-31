@@ -15,12 +15,14 @@ public class MessageParser {
     /**
      * Méthode statique publique retourne l'instance de AircraftIdentificationMessage,
      * de AirbornePositionMessage ou de AirborneVelocityMessage correspondant au message brut donné,
-     * ou null si le code de type de ce dernier ne correspond à aucun de ces trois types de messages, ou s'il est invalide.
+     * ou null si le code de type de ce dernier ne correspond à aucun de ces trois types de messages,
+     * ou s'il est invalide.
      *
      * @param rawMessage Le message brut à transformer.
-     * @return Une instance de AircraftIdentificationMessage si le typeCode du message brut est compris entre 1 et 4 (inclus).
-     *         Une instance de AirbornePositionMessage si le typeCode du message brut est compris entre 9 et 18 (inclus),
-     *         ou 20 et 22 (inclus).
+     * @return Une instance de AircraftIdentificationMessage si le typeCode du message brut
+     *         est compris entre 1 et 4 (inclus).
+     *         Une instance de AirbornePositionMessage si le typeCode du message brut
+     *         est compris entre 9 et 18 (inclus), ou 20 et 22 (inclus).
      *         Une instance de AirborneVelocityMessage si le typeCode du message brut vaut 19.
      *         Null si le typeCode ne correspond à aucun de ces trois types de messages (donc invalide).
      */

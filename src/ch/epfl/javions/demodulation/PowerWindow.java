@@ -4,7 +4,6 @@ import ch.epfl.javions.Preconditions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -23,7 +22,6 @@ public final class PowerWindow {
     private int[] powerSamplesBis = new int[BATCH_SIZE];
     private long position = 0;
     private int powerSamplesRead;
-
 
     /**
      * Constructeur public de la classe PowerWindow qui initialise la taille de la fenêtre,

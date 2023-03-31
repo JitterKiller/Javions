@@ -18,10 +18,8 @@ import java.util.Objects;
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public record AirborneVelocityMessage(long timeStampNs,
-                                      IcaoAddress icaoAddress,
-                                      double speed,
-                                      double trackOrHeading) implements Message {
+public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
+                                      double speed, double trackOrHeading) implements Message {
 
     private final static int MESSAGE_START = 21;
     private final static int ST_START = 48;

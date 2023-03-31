@@ -31,7 +31,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     private static final int TYPE_CODE_START = 51;
     private static final int TYPE_CODE_SIZE = 5;
 
-    /* La longueur en octets des messages ADS-B */
+    /** La longueur en octets des messages ADS-B */
     public static final int LENGTH = 14;
 
     /**

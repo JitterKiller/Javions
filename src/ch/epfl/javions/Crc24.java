@@ -14,8 +14,8 @@ public final class Crc24 {
     private static final int TOP_BYTE = CRC_SIZE - Byte.SIZE;
     private static final int[] table = new int[256];
 
-    /* Générateur utilisé pour calculer le CRC24 des messages ADS-B */
-    public static int GENERATOR = 0xFFF409;
+    /** Générateur utilisé pour calculer le CRC24 des messages ADS-B */
+    public static final int GENERATOR = 0xFFF409;
 
     /**
      * Constructeur public de la classe Crc24 (appelle la méthode buildTable() pour
