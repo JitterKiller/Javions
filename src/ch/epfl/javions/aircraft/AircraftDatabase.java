@@ -17,9 +17,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class AircraftDatabase {
 
-    /**
-     * Le nom du fichier ZIP contenant la base de données.
-     */
     private final String fileName;
 
     /**

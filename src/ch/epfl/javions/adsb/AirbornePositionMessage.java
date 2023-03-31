@@ -18,6 +18,7 @@ import java.util.Objects;
  *                    à laquelle se trouvait l'aéronef au moment de l'envoi du message.
  * @param y           La latitude locale et normalisée (comprise entre 0 et 1)
  *                    à laquelle se trouvait l'aéronef au moment de l'envoi du message.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
@@ -27,50 +28,26 @@ public record AirbornePositionMessage(long timeStampNs,
                                       int parity,
                                       double x,
                                       double y) implements Message {
-
-    /* Index où commence l'altitude dans l'attribut ME du message brut */
     private final static int ALT_START = 36;
-
-    /* Taille des bits de l'altitude dans l'attribut ME du message brut */
     private final static int ALT_SIZE = 12;
-
-    /* Index de Q dans les bits de l'altitude du message brut */
     private final static int Q_INDEX = 4;
-
-    /* Altitude de base lorsque Q = 1 */
     private final static int BASE_ALTITUDE_Q_1 = 1000;
-
-    /* Altitude de base lorsque Q = 0 */
     private final static int BASE_ALTITUDE_Q_0 = 1300;
-
-    /* Taille des bits de longitude et de latitude (bits) */
     private static final int CPR_BITS = 17;
-
-    /* Index où la longitude commence */
     private static final int LON_CPR_START = 0;
-
-    /* Taille de la longitude (bits) */
     private static final int LON_CPR_SIZE = CPR_BITS;
-
-    /* Index où la latitude commence*/
     private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE;
-
-    /* Taille de la latitude (bits) */
     private static final int LAT_CPR_SIZE = CPR_BITS;
-
-    /* Index où commence la parité du message */
     private static final int FORMAT_START = 34;
-
-    /* Taille de la parité du message (bits) */
     private static final int FORMAT_SIZE = 1;
 
     /**
      * Constructeur compact de AirbornePositionMessage
      *
      * @throws NullPointerException     Si l'adresse ICAO est nulle.
-     * @throws IllegalArgumentException si l'horodatage du message est strictement inférieur à 0.
-     * @throws IllegalArgumentException si l'argument parity est différent de 0 ou 1.
-     * @throws IllegalArgumentException si la latitude ou la longitude locale ne sont pas comprises entre 0 (inclus) et 1 (exclus).
+     * @throws IllegalArgumentException Si l'horodatage du message est strictement inférieur à 0.
+     * @throws IllegalArgumentException Si l'argument parity est différent de 0 ou 1.
+     * @throws IllegalArgumentException Si la latitude ou la longitude locale ne sont pas comprises entre 0 (inclus) et 1 (exclus).
      */
     public AirbornePositionMessage {
         Objects.requireNonNull(icaoAddress);
@@ -98,7 +75,8 @@ public record AirbornePositionMessage(long timeStampNs,
         double altitude;
 
         if (Bits.testBit(inputAltitude, Q_INDEX)) {
-            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), ALT_START + 5, ALT_SIZE - 5) << 4) | Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE - 8);
+            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), ALT_START + 5, ALT_SIZE - 5) << 4) |
+                                 Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE - 8);
             altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
         } else {
 
@@ -126,7 +104,12 @@ public record AirbornePositionMessage(long timeStampNs,
 
             altitude = (multipleOf500Feet * 500) + (multipleOf100Feet * 100) - BASE_ALTITUDE_Q_0;
         }
-        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(), Units.convertFrom(altitude, Units.Length.FOOT), parity, Math.scalb(longitude, -17), Math.scalb(latitude, -17));
+        return new AirbornePositionMessage(rawMessage.timeStampNs(),
+                                           rawMessage.icaoAddress(),
+                                           Units.convertFrom(altitude, Units.Length.FOOT),
+                                           parity,
+                                           Math.scalb(longitude, -17),
+                                           Math.scalb(latitude, -17));
     }
 
     /**

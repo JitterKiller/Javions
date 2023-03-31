@@ -8,20 +8,10 @@ package ch.epfl.javions;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class Crc24 {
-
-    /* La taille du Crc de 24 bits, constante */
     private static final int CRC_SIZE = 24;
-
-    /* Index où l'on extrait le CRC24 */
     public static final int CRC_START = 0;
-
-    /* Le bit le plus fort du CRC24 */
     private static final int TOP_BIT = CRC_SIZE - Byte.BYTES;
-
-    /* L'octet le plus fort du CRC24 */
     private static final int TOP_BYTE = CRC_SIZE - Byte.SIZE;
-
-    /* La table de 256 entrées correspondant à un générateur */
     private static final int[] table = new int[256];
 
     /* Générateur utilisé pour calculer le CRC24 des messages ADS-B */

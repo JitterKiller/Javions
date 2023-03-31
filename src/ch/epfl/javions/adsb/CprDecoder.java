@@ -11,17 +11,9 @@ import ch.epfl.javions.Units;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public class CprDecoder {
-
-    /* Constante représentant le nombre de zones de latitudes utilisé pour le découpage pair (index 0) */
     private final static int EVEN_LATITUDE_ZONES = 60;
-
-    /* Constante représentant la largeur des zones de latitudes paires, exprimées en tours */
     private final static double EVEN_LATITUDE_ZONES_WIDTH = 1.0 / EVEN_LATITUDE_ZONES;
-
-    /* Constante représentant le nombre de zones de latitudes utilisé pour le découpage impair (index 1) */
     private final static int ODD_LATITUDE_ZONES = 59;
-
-    /* Constante représentant la largeur des zones de latitudes impaires, exprimées en tours */
     private final static double ODD_LATITUDE_ZONES_WIDTH = 1.0 / ODD_LATITUDE_ZONES;
 
     /**

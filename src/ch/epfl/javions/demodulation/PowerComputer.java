@@ -14,17 +14,9 @@ import java.io.InputStream;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class PowerComputer {
-
-    /* Instance de SamplesDecoder */
     private final SamplesDecoder decoder;
-
-    /* Tableau circulaire où sont stockés les 8 derniers échantillons décodés*/
     private final short[] circularBuffer = new short[8];
-
-    /* Tableau où sont stockés tous les échantillons produits par SamplesDecoder*/
     private final short[] powerBuffer;
-
-    /* Taille du lot */
     private final int batchSize;
 
     /**

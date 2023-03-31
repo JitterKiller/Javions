@@ -14,8 +14,6 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record IcaoAddress(String string) {
-
-    /* Déclaration d'une expression régulière associée a IcaoAddress */
     private static final Pattern pattern = Pattern.compile("[0-9A-F]{6}");
 
     /**

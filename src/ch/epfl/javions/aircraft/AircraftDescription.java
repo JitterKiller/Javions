@@ -13,8 +13,6 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record AircraftDescription(String string) {
-
-    /* Déclaration d'une expression régulière associée à AircraftDescription. */
     private static final Pattern pattern = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
 
 

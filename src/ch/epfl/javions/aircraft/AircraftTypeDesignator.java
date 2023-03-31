@@ -12,8 +12,6 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record AircraftTypeDesignator(String string) {
-
-    /* Déclaration d'une expression régulière associée à AircraftTypeDesignator. */
     private static final Pattern pattern = Pattern.compile("[A-Z0-9]{2,4}");
 
     /**

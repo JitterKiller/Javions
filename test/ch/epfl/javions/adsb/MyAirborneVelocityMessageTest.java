@@ -20,7 +20,7 @@ public class MyAirborneVelocityMessageTest {
     void testAirborneVelocityMessageWithSamplesDOTBin() throws IOException {
         var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
         var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
-        try (InputStream s = new FileInputStream(samplesResourceMac)) {
+        try (InputStream s = new FileInputStream(samplesResourceWindows)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             int numberOfMessages = 0;

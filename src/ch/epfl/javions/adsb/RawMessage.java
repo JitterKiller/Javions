@@ -16,16 +16,23 @@ import static ch.epfl.javions.Crc24.GENERATOR;
  *
  * @param timeStampNs Le temps d'arrivée (en nanosecondes) du message.
  * @param bytes       Les octets du message.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record RawMessage(long timeStampNs, ByteString bytes) {
+    private static final Crc24 Crc24 = new Crc24(GENERATOR);
+    private static final int VALID_DF = 17;
+    private static final int ME_START = 4;
+    private static final int ME_END = 10 + 1;
+    private static final int ICAO_START = 1;
+    private static final int ICAO_END = 3 +1;
+    private static final int ICAO_SIZE = 6;
+    private static final int TYPE_CODE_START = 51;
+    private static final int TYPE_CODE_SIZE = 5;
 
     /* La longueur en octets des messages ADS-B */
     public static final int LENGTH = 14;
-
-    /* Instance de Crc24 pour calculer le Crc des messages ADS-B */
-    private static final Crc24 Crc24 = new Crc24(GENERATOR);
 
     /**
      * Constructeur compact de l'enregistrement RawMessage.
@@ -57,7 +64,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return La longueur du message (14) si le downlink format (DF) du message est 17, 0 sinon.
      */
     public static int size(byte byte0) {
-        return Byte.toUnsignedInt(byte0) >>> 3 == 17 ? LENGTH : 0;
+        return Byte.toUnsignedInt(byte0) >>> 3 == VALID_DF ? LENGTH : 0;
     }
 
     /**
@@ -67,7 +74,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le code de type (typecode) du message.
      */
     public static int typeCode(long payload) {
-        return Bits.extractUInt(payload, 51, 5);
+        return Bits.extractUInt(payload, TYPE_CODE_START, TYPE_CODE_SIZE);
     }
 
     /**
@@ -85,16 +92,16 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return l'adresse ICAO du message.
      */
     public IcaoAddress icaoAddress() {
-        return new IcaoAddress(HexFormat.of().withUpperCase().toHexDigits(bytes().bytesInRange(1, 4), 6));
+        return new IcaoAddress(HexFormat.of().withUpperCase().toHexDigits(bytes().bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
     }
 
     /**
-     * Retourne la charge utile du message.
+     * Retourne la charge utile du message (ME).
      *
-     * @return la charge utile du message.
+     * @return la charge utile du message (ME).
      */
     public long payload() {
-        return bytes().bytesInRange(4, 11);
+        return bytes().bytesInRange(ME_START, ME_END);
     }
 
     /**

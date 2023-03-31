@@ -12,7 +12,7 @@ public final class Units {
 
 
     /**
-     * Préfixes SI utiles au projet (constantes).
+     * Préfixes SI utiles au projet (Unité de base (1), Centième d'unité (0.01), Millième d'unité (1000)).
      */
     public static final int BASE_UNIT = 1;
     public static final double CENTI = 1e-2;
@@ -138,10 +138,10 @@ public final class Units {
     public static final class Speed {
 
         /**
-         * Les unités de vitesses en question (Nœud, Kilomètre par heur).
+         * Les unités de vitesses en question (Nœud, Mètre par secondes, Kilomètre par heure).
          */
-        public static final double METER_PER_SECOND = Length.METER / Time.SECOND;
         public static final double KNOT = Length.NAUTICAL_MILE / Time.HOUR;
+        public static final double METER_PER_SECOND = Length.METER / Time.SECOND;
         public static final double KILOMETER_PER_HOUR = Length.KILOMETER / Time.HOUR;
         /**
          * Constructeur privé de la classe Speed (non instanciable).

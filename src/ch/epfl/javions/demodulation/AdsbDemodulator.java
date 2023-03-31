@@ -13,26 +13,12 @@ import java.io.InputStream;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class AdsbDemodulator {
-
-    /* Constante représentant la taille de fenêtre d'échantillons de puissance */
     private final static int WINDOW_SIZE = 1200;
-
-    /* Constante représentant le temps entre deux échantillons de puissance en nanosecondes */
     private final static int TIME_STAMP_NS_CONST = 100;
-
-    /* Fenêtre de puissance pour la démodulation ADS-B */
     private final PowerWindow window;
-
-    /* Tableau pour stocker les octets des messages bruts */
     private final byte[] message = new byte[14];
-
-    /* Somme des pics de puissance de porteuse actuelle */
     private int sumCarrierPeak;
-
-    /* Somme des pics de puissance de porteuse précédente */
     private int previousSumCarrierPeak;
-
-    /* Somme des pics de puissance de porteuse suivantes */
     private int nextSumCarrierPeak;
 
     /**

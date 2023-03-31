@@ -11,7 +11,7 @@ package ch.epfl.javions;
 public final class Math2 {
 
     /**
-     * Constructeur privé de la classe Time (non instanciable).
+     * Constructeur privé de la classe Math2 (non instanciable).
      */
     private Math2() {
     }

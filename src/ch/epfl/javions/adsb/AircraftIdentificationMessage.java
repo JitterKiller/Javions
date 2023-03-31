@@ -13,16 +13,16 @@ import java.util.Objects;
  * @param icaoAddress L'adresse ICAO de l'expéditeur du message.
  * @param category    La catégorie d'aéronef de l'expéditeur.
  * @param callSign    L'indicatif de l'expéditeur.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAddress, int category,
+public record AircraftIdentificationMessage(long timeStampNs,
+                                            IcaoAddress icaoAddress,
+                                            int category,
                                             CallSign callSign) implements Message {
 
-    /* Constante ASCII pour le CallSign*/
     private static final int ASCII_LETTER = 64;
-
-    /* Taille de l'indicatif CallSign */
     private static final int CALL_SIGN_SIZE = 6;
 
     /**
@@ -30,7 +30,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      *
      * @throws NullPointerException     Si l'adresse ICAO est nulle.
      * @throws NullPointerException     Si l'indicatif callSign est null.
-     * @throws IllegalArgumentException si l'horodatage du message est strictement inférieur à 0.
+     * @throws IllegalArgumentException Si l'horodatage du message est strictement inférieur à 0.
      */
     public AircraftIdentificationMessage {
         Objects.requireNonNull(icaoAddress);
@@ -47,7 +47,7 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     public static AircraftIdentificationMessage of(RawMessage rawMessage) {
 
-        int category = ((RawMessage.LENGTH - rawMessage.typeCode()) << 4) | Bits.extractUInt(rawMessage.payload(), 48, 3);
+        int category = (RawMessage.LENGTH - rawMessage.typeCode()) << 4 | Bits.extractUInt(rawMessage.payload(), 48, 3);
 
         StringBuilder callSignID = new StringBuilder();
 
