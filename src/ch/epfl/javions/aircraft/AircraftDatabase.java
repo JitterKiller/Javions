@@ -26,7 +26,7 @@ public final class AircraftDatabase {
      * @throws NullPointerException si le nom de fichier est nul.
      */
     public AircraftDatabase(String fileName) {
-        this.fileName = Objects.requireNonNull(fileName, "Le fichier ne peut pas être nul");
+        this.fileName = Objects.requireNonNull(fileName);
     }
 
     /**
@@ -41,7 +41,7 @@ public final class AircraftDatabase {
      */
 
     public AircraftData get(IcaoAddress address) throws IOException {
-        Objects.requireNonNull(address, "L'adresse ICAO ne peut pas être nulle");
+        Objects.requireNonNull(address);
 
         try (ZipFile zipFile = new ZipFile(fileName)) {
 
@@ -72,11 +72,7 @@ public final class AircraftDatabase {
                         break;
                     }
                 }
-            } catch (IOException e) {
-                throw new IOException("Erreur lors de la lecture du fichier " + entry);
             }
-        } catch (IOException e) {
-            throw new IOException("Erreur lors de l'ouverture du fichier ZIP", e);
         }
         return null;
     }

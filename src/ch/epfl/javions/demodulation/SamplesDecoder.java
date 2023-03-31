@@ -32,8 +32,7 @@ public final class SamplesDecoder {
      */
     public SamplesDecoder(InputStream stream, int batchSize) {
         Preconditions.checkArgument(batchSize > 0);
-        Objects.requireNonNull(stream);
-        this.stream = stream;
+        this.stream = Objects.requireNonNull(stream);
         this.batchSize = batchSize;
         bytesBuffer = new byte[batchSize * 2];
     }

@@ -28,8 +28,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
      * @throws NullPointerException Si L'état modifiable passé en argument est null.
      */
     public AircraftStateAccumulator(T stateSetter) {
-        Objects.requireNonNull(stateSetter);
-        this.stateSetter = stateSetter;
+        this.stateSetter = Objects.requireNonNull(stateSetter);
     }
 
     /**

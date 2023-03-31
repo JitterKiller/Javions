@@ -12,9 +12,9 @@ import ch.epfl.javions.Units;
  */
 public class CprDecoder {
     private final static int EVEN_LATITUDE_ZONES = 60;
-    private final static double EVEN_LATITUDE_ZONES_WIDTH = 1.0 / EVEN_LATITUDE_ZONES;
+    private final static double EVEN_LATITUDE_ZONES_WIDTH = 1d / EVEN_LATITUDE_ZONES;
     private final static int ODD_LATITUDE_ZONES = 59;
-    private final static double ODD_LATITUDE_ZONES_WIDTH = 1.0 / ODD_LATITUDE_ZONES;
+    private final static double ODD_LATITUDE_ZONES_WIDTH = 1d / ODD_LATITUDE_ZONES;
 
     /**
      * Constructeur privé de la classe CprDecoder (non instanciable).
@@ -72,11 +72,11 @@ public class CprDecoder {
 
 
         /* On calcule ensuite le nombre de zones de longitude dans le découpage pair avec les deux latitudes (paire et impaire). */
-        double AEven = (1 - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
-        double AOdd = (1 - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
+        double AEven = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
+        double AOdd = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
 
-        double evenLongitudeZoneValue = Math.floor((2 * Math.PI) / Math.acos(1 - AEven));
-        double oddLongitudeZoneValue = Math.floor((2 * Math.PI) / Math.acos(1 - AOdd));
+        double evenLongitudeZoneValue = Math.floor((2d * Math.PI) / Math.acos(1 - AEven));
+        double oddLongitudeZoneValue = Math.floor((2d * Math.PI) / Math.acos(1 - AOdd));
         int evenLongitudeZone;
 
         /* Si on obtient ainsi deux valeurs différentes, cela signifie qu'entre les deux messages,
@@ -117,10 +117,10 @@ public class CprDecoder {
                 oddLongitudeZoneNumber = longitudeZoneNumber;
             }
 
-            evenLongitudeTurn = (1.0 / evenLongitudeZone) * (evenLongitudeZoneNumber + x0);
+            evenLongitudeTurn = (1d / evenLongitudeZone) * (evenLongitudeZoneNumber + x0);
             evenLongitudeDegree = Units.convert(refocusingOf(evenLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
-            oddLongitudeTurn = (1.0 / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
+            oddLongitudeTurn = (1d / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
             oddLongitudeDegree = Units.convert(refocusingOf(oddLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
         }
@@ -149,7 +149,7 @@ public class CprDecoder {
         int latitudeT32;
         longitudeT32 = (int) Math.rint(Units.convert(longitudeDegree, Units.Angle.DEGREE, Units.Angle.T32));
         latitudeT32 = (int) Math.rint(Units.convert(latitudeDegree, Units.Angle.DEGREE, Units.Angle.T32));
-        return (latitudeDegree <= 90.0) && (latitudeDegree >= -90.0) ? new GeoPos(longitudeT32, latitudeT32) : null;
+        return (latitudeDegree <= 90d) && (latitudeDegree >= -90d) ? new GeoPos(longitudeT32, latitudeT32) : null;
     }
 
     /**
@@ -161,15 +161,15 @@ public class CprDecoder {
      * (on soustrait 1 tour donc 360°), sinon on retourne uniquement la longitude/latitude normale.
      */
     private static double refocusingOf(double coordinate) {
-        return coordinate >= 0.5 ? (coordinate - 1) : coordinate;
+        return coordinate >= 0.5d ? (coordinate - 1d) : coordinate;
     }
 
     /**
      * Méthode statique qui permet de savoir si le nombre de zones de longitude dans le découpage
      * pair avec les deux latitudes (paire et impaire) sont tous les deux des NaN (Not a Number)
      *
-     * @param AEven La constante A calculée avec la latitude paire.
-     * @param AOdd  La constante A calculée avec la latitude impaire
+     * @param AEven La constante A calculé avec la latitude paire.
+     * @param AOdd  La constante A calculé avec la latitude impaire
      * @return Vrai si les deux nombres de zones de longitudes dans le découpage
      * pair avec les deux latitudes (paire et impaire) sont tous les deux des NaN, faux sinon.
      */

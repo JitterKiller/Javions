@@ -190,7 +190,7 @@ public record AirborneVelocityMessage(long timeStampNs,
      * @return L'angle recentré entre 0 et 2π s'il est négatif, sinon on retourne uniquement l'angle normal.
      */
     private static double refocusTrackOrHeading(double trackOrHeading) {
-        return trackOrHeading < 0 ? trackOrHeading + (2 * Math.PI) : trackOrHeading;
+        return trackOrHeading < 0 ? trackOrHeading + (2d * Math.PI) : trackOrHeading;
     }
 
 }
