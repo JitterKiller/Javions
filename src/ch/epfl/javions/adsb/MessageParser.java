@@ -3,6 +3,9 @@ package ch.epfl.javions.adsb;
 /**
  * La classe MessageParser publique et non instanciable, permet de transformer les messages ADS-B bruts
  * en messages d'un des trois types (AircraftIdentificationMessage, AirbornePositionMessage ou AirborneVelocityMessage).
+ *
+ * @author Adam AIT BOUSSELHAM (356365)
+ * @author Abdellah JANATI IDRISSI (362341)
  */
 public class MessageParser {
 

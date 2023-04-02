@@ -40,7 +40,7 @@ public final class Math2 {
     }
 
     /**
-     * Méthode pour calculer le sinus hyperbolique d'une variable x.
+     * Méthode pour calculer la réciproque du sinus hyperbolique d'une variable x.
      *
      * @param x argument x.
      * @return le sinus hyperbolique réciproque de son argument x.
