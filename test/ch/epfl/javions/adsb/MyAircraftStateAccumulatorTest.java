@@ -51,7 +51,7 @@ class MyAircraftStateAccumulatorTest implements AircraftStateSetter {
         var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
         var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
         IcaoAddress expectedAddress = new IcaoAddress("4D2228");
-        try (InputStream s = new FileInputStream(samplesResourceWindows)) {
+        try (InputStream s = new FileInputStream(samplesResourceMac)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             AircraftStateAccumulator<MyAircraftStateAccumulatorTest> a =
@@ -72,7 +72,7 @@ class MyAircraftStateAccumulatorTest implements AircraftStateSetter {
         String[] icaoAddresses = new String[]{"4B17E5", "495299", "39D300", "4241A9", "4B1A00", "4D2228", "440237", "4D029F",
                 "01024C", "3C6481", "4B2964", "4B1900", "4BCDE9", "4D0221", "4CA2BF", "4951CE", "39CEAA",
                 "A4F239", "394C13", "4B17E1", "3C6545", "4CAC87", "4BB279", "4B1A1E"};
-        try (InputStream s = new FileInputStream(samplesResourceWindows)) {
+        try (InputStream s = new FileInputStream(samplesResourceMac)) {
             AdsbDemodulator d = new AdsbDemodulator(s);
             RawMessage m;
             AircraftStateAccumulator<MyAircraftStateAccumulatorTest>[] aircraftStates = new AircraftStateAccumulator[icaoAddresses.length];

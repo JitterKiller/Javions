@@ -11,6 +11,7 @@ package ch.epfl.javions;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record GeoPos(int longitudeT32, int latitudeT32) {
+    private final static int MAX_LAT_VALUE = 1 << 30;
 
     /**
      * Constructeur compact de GeoPos.
@@ -32,7 +33,7 @@ public record GeoPos(int longitudeT32, int latitudeT32) {
      * et 2 puissance 30, sinon ça retourne faux.
      */
     public static boolean isValidLatitudeT32(int latitudeT32) {
-        return latitudeT32 <= (Math.scalb(1.0, 30)) && latitudeT32 >= (Math.scalb(-1.0, 30));
+        return latitudeT32 <= MAX_LAT_VALUE && latitudeT32 >= -MAX_LAT_VALUE;
     }
 
     /**
