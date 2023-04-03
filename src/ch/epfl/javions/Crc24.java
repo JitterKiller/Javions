@@ -8,8 +8,7 @@ package ch.epfl.javions;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class Crc24 {
-    private static final int CRC_SIZE = 24;
-    private static final int CRC_START = 0;
+    private static final int CRC_SIZE = 24, CRC_START = 0;
     private static final int TOP_BIT = CRC_SIZE - Byte.BYTES;
     private static final int TOP_BYTE = CRC_SIZE - Byte.SIZE;
     private static final int TABLE_SIZE = 256;

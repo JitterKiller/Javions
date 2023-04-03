@@ -45,7 +45,8 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
      */
     public static AircraftIdentificationMessage of(RawMessage rawMessage) {
 
-        int category = (RawMessage.LENGTH - rawMessage.typeCode()) << 4 | Bits.extractUInt(rawMessage.payload(), 48, 3);
+        int category = (RawMessage.LENGTH - rawMessage.typeCode()) << 4
+                | Bits.extractUInt(rawMessage.payload(), 48, 3);
 
         StringBuilder callSignID = new StringBuilder();
 
@@ -53,12 +54,17 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
 
             int callSignExtractedInt = Bits.extractUInt(rawMessage.payload(), i, CALL_SIGN_SIZE);
 
-            if (callSignExtractedInt >= 1 && callSignExtractedInt <= 26) {
-                callSignID.append((char) (callSignExtractedInt + ASCII_LETTER_OFFSET));
-            } else if ((callSignExtractedInt >= 48 && callSignExtractedInt <= 57) || callSignExtractedInt == 32) {
-                callSignID.append((char) callSignExtractedInt);
-            } else {
-                return null;
+            switch (callSignExtractedInt) {
+
+                case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
+                        -> callSignID.append((char) (callSignExtractedInt + ASCII_LETTER_OFFSET));
+
+                case 32, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57
+                        -> callSignID.append((char) callSignExtractedInt);
+
+                default -> {
+                    return null;
+                }
             }
         }
 

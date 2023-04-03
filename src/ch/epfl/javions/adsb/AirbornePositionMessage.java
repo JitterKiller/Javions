@@ -24,18 +24,13 @@ import java.util.Objects;
  */
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity,
                                       double x, double y) implements Message {
-    private static final int ALT_START = 36;
-    private static final int ALT_SIZE = 12;
+    private static final int ALT_START = 36, ALT_SIZE = 12;
     private static final int Q_INDEX = 4;
-    private static final int BASE_ALTITUDE_Q_1 = 1000;
-    private static final int BASE_ALTITUDE_Q_0 = 1300;
+    private static final int BASE_ALTITUDE_Q_1 = 1000, BASE_ALTITUDE_Q_0 = 1300;
     private static final int CPR_BITS = 17;
-    private static final int LON_CPR_START = 0;
-    private static final int LON_CPR_SIZE = CPR_BITS;
-    private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE;
-    private static final int LAT_CPR_SIZE = CPR_BITS;
-    private static final int FORMAT_START = 34;
-    private static final int FORMAT_SIZE = 1;
+    private static final int LON_CPR_START = 0, LON_CPR_SIZE = CPR_BITS;
+    private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE, LAT_CPR_SIZE = CPR_BITS;
+    private static final int FORMAT_START = 34, FORMAT_SIZE = 1;
 
     /**
      * Constructeur compact de AirbornePositionMessage
@@ -71,8 +66,8 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         double altitude;
 
         if (Bits.testBit(inputAltitude, Q_INDEX)) {
-            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), ALT_START + 5, ALT_SIZE - 5) << 4) |
-                                 Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE - 8);
+            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), ALT_START + 5, ALT_SIZE - 5) << 4)
+                              | Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE - 8);
             altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
         } else {
 

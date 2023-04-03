@@ -22,20 +22,12 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
                                       double speed, double trackOrHeading) implements Message {
 
     private static final int MESSAGE_START = 21;
-    private static final int ST_START = 48;
-    private static final int ST_SIZE = 3;
-    private static final int V_SIZE = 10;
-    private static final int D_SIZE = 1;
-    private static final int VNS_START = MESSAGE_START;
-    private static final int VEW_START = MESSAGE_START + V_SIZE + D_SIZE;
-    private static final int DNS_START = VNS_START + V_SIZE;
-    private static final int DEW_START = VEW_START + V_SIZE;
-    private static final int SH_SIZE = 1;
-    private static final int SH_START = MESSAGE_START + 21;
-    private static final int HDG_START = MESSAGE_START + 11;
-    private static final int HDG_SIZE = 10;
-    private static final int AS_START = MESSAGE_START;
-    private static final int AS_SIZE = 10;
+    private static final int ST_START = 48, ST_SIZE = 3, SH_SIZE = 1, SH_START = MESSAGE_START + 21;
+    private static final int V_SIZE = 10, D_SIZE = 1;
+    private static final int VNS_START = MESSAGE_START, VEW_START = MESSAGE_START + V_SIZE + D_SIZE;
+    private static final int DNS_START = VNS_START + V_SIZE, DEW_START = VEW_START + V_SIZE;
+    private static final int HDG_SIZE = 10, AS_SIZE = 10;
+    private static final int HDG_START = MESSAGE_START + 11, AS_START = MESSAGE_START;
 
     /**
      * Constructeur compact de AirborneVelocityMessage.

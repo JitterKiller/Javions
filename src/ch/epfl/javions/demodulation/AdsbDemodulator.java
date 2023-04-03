@@ -17,9 +17,7 @@ public final class AdsbDemodulator {
     private static final int TIME_STAMP_NS_CONST = 100;
     private final PowerWindow window;
     private final byte[] message = new byte[14];
-    private int sumCarrierPeak;
-    private int previousSumCarrierPeak;
-    private int nextSumCarrierPeak;
+    private int sumCarrierPeak, previousSumCarrierPeak, nextSumCarrierPeak;
 
     /**
      * Constructeur d'AdsbDemodulator qui prend en entrée un InputStream

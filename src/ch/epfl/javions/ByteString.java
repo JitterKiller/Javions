@@ -104,10 +104,7 @@ public final class ByteString {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ByteString that) {
-            return Arrays.equals(bytes, that.bytes);
-        }
-        return false;
+        return (obj instanceof ByteString that) && (Arrays.equals(bytes, that.bytes));
     }
 
     /**
@@ -128,11 +125,8 @@ public final class ByteString {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
+        HexFormat hf = HexFormat.of().withUpperCase();
+        return hf.formatHex(bytes);
     }
 }
 

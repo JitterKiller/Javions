@@ -15,8 +15,8 @@ public final class Units {
      * Préfixes SI utiles au projet (Unité de base (1), Centième d'unité (0.01), Millième d'unité (1000)).
      */
     public static final int BASE_UNIT = 1;
-    public static final double CENTI = 1e-2;
-    public static final double KILO = 1e3;
+    public static final double CENTI = 1e-2d;
+    public static final double KILO = 1e3d;
     /**
      * Constructeur privé de la classe Units (non instanciable).
      */
@@ -55,7 +55,7 @@ public final class Units {
      * @return la valeur convertie.
      */
     public static double convertTo(double value, double toUnit) {
-        return value * (1 / toUnit);
+        return value * (1d / toUnit);
     }
 
     /**

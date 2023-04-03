@@ -23,13 +23,9 @@ import static ch.epfl.javions.Crc24.GENERATOR;
 public record RawMessage(long timeStampNs, ByteString bytes) {
     private static final Crc24 Crc24 = new Crc24(GENERATOR);
     private static final int VALID_DF = 17;
-    private static final int ME_START = 4;
-    private static final int ME_END = 10 + 1;
-    private static final int ICAO_START = 1;
-    private static final int ICAO_END = 3 +1;
-    private static final int ICAO_SIZE = 6;
-    private static final int TYPE_CODE_START = 51;
-    private static final int TYPE_CODE_SIZE = 5;
+    private static final int ME_START = 4, ME_END = 10 + 1;
+    private static final int ICAO_START = 1, ICAO_END = 3 + 1, ICAO_SIZE = 6;
+    private static final int TYPE_CODE_START = 51, TYPE_CODE_SIZE = 5;
 
     /** La longueur en octets des messages ADS-B */
     public static final int LENGTH = 14;
