@@ -176,7 +176,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
     /**
      * Méthode qui permet de recentrer entre 0 et 2π les angles négatifs retournés par la méthode Math.atan2().
      *
-     * @param trackOrHeading L'angle à recentrer (en radians).
+     * @param trackOrHeading L'angle à recentré (en radians).
      * @return L'angle recentré entre 0 et 2π s'il est négatif, sinon on retourne uniquement l'angle normal.
      */
     private static double refocusTrackOrHeading(double trackOrHeading) {
