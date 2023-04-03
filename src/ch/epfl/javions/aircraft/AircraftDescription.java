@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 public record AircraftDescription(String string) {
     private static final Pattern pattern = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
 
-
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
      * "IllegalArgumentException" si elle ne représente pas une description de véhicule aérien valide.

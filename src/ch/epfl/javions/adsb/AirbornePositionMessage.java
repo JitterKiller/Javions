@@ -24,11 +24,11 @@ import java.util.Objects;
  */
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity,
                                       double x, double y) implements Message {
-    private final static int ALT_START = 36;
-    private final static int ALT_SIZE = 12;
-    private final static int Q_INDEX = 4;
-    private final static int BASE_ALTITUDE_Q_1 = 1000;
-    private final static int BASE_ALTITUDE_Q_0 = 1300;
+    private static final int ALT_START = 36;
+    private static final int ALT_SIZE = 12;
+    private static final int Q_INDEX = 4;
+    private static final int BASE_ALTITUDE_Q_1 = 1000;
+    private static final int BASE_ALTITUDE_Q_0 = 1300;
     private static final int CPR_BITS = 17;
     private static final int LON_CPR_START = 0;
     private static final int LON_CPR_SIZE = CPR_BITS;
@@ -83,8 +83,8 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
             int multipleOf500Feet = (d | a | b) >>> 3;
 
-            multipleOf100Feet = grayToBinary(multipleOf100Feet);
-            multipleOf500Feet = grayToBinary(multipleOf500Feet);
+            multipleOf100Feet = convertGrayToBinary(multipleOf100Feet);
+            multipleOf500Feet = convertGrayToBinary(multipleOf500Feet);
 
             if (isLSBNotValid(multipleOf100Feet)) {
                 return null;
@@ -114,7 +114,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      * @param grayCode le code de Gray à convertir
      * @return l'équivalent du code de Gray en binaire.
      */
-    private static int grayToBinary(int grayCode) {
+    private static int convertGrayToBinary(int grayCode) {
         int binary = grayCode;
         int mask;
         for (mask = binary >> 1; mask != 0; mask = mask >> 1) {

@@ -11,7 +11,7 @@ package ch.epfl.javions;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record GeoPos(int longitudeT32, int latitudeT32) {
-    private final static int MAX_LAT_VALUE = 1 << 30;
+    private static final int MAX_LAT_VALUE = 1 << 30;
 
     /**
      * Constructeur compact de GeoPos.

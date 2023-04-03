@@ -18,9 +18,9 @@ public final class PowerWindow {
     private final static int BATCH_SIZE = 1 << 16;
     private final int windowSize;
     private final PowerComputer powerComputer;
+    private long position = 0;
     private int[] powerSamples = new int[BATCH_SIZE];
     private int[] powerSamplesBis = new int[BATCH_SIZE];
-    private long position = 0;
     private int powerSamplesRead;
 
     /**

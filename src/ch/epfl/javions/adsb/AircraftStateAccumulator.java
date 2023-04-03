@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public class AircraftStateAccumulator<T extends AircraftStateSetter> {
-    private final static long TIME_STAMP_NS_TEN_SEC = 10000000000L;
+    private static final long TIME_STAMP_NS_TEN_SEC = 10000000000L;
     private final T stateSetter;
     private AirbornePositionMessage lastEvenMessage;
     private AirbornePositionMessage lastOddMessage;

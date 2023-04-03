@@ -11,10 +11,10 @@ import ch.epfl.javions.Units;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public class CprDecoder {
-    private final static int EVEN_LATITUDE_ZONES = 60;
-    private final static double EVEN_LATITUDE_ZONES_WIDTH = 1d / EVEN_LATITUDE_ZONES;
-    private final static int ODD_LATITUDE_ZONES = 59;
-    private final static double ODD_LATITUDE_ZONES_WIDTH = 1d / ODD_LATITUDE_ZONES;
+    private static final int EVEN_LATITUDE_ZONES = 60;
+    private static final double EVEN_LATITUDE_ZONES_WIDTH = 1d / EVEN_LATITUDE_ZONES;
+    private static final int ODD_LATITUDE_ZONES = 59;
+    private static final double ODD_LATITUDE_ZONES_WIDTH = 1d / ODD_LATITUDE_ZONES;
 
     /**
      * Constructeur privé de la classe CprDecoder (non instanciable).

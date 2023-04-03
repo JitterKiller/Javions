@@ -13,8 +13,8 @@ import java.io.InputStream;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class AdsbDemodulator {
-    private final static int WINDOW_SIZE = 1200;
-    private final static int TIME_STAMP_NS_CONST = 100;
+    private static final int WINDOW_SIZE = 1200;
+    private static final int TIME_STAMP_NS_CONST = 100;
     private final PowerWindow window;
     private final byte[] message = new byte[14];
     private int sumCarrierPeak;
