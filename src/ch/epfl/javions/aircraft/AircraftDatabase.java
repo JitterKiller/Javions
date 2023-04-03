@@ -58,7 +58,7 @@ public final class AircraftDatabase {
                     IcaoAddress currentAddress = new IcaoAddress(fields[0]);
 
                     /* Si l'adresse ICAO correspond, créer un objet AircraftData avec les informations de
-                    l'aéronef et le retourner */
+                     * l'aéronef et le retourner */
                     if (currentAddress.string().compareTo(address.string()) == 0) {
                         AircraftRegistration registration = new AircraftRegistration(fields[1]);
                         AircraftTypeDesignator typeDesignator = new AircraftTypeDesignator(fields[2]);

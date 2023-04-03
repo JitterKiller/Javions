@@ -62,7 +62,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                  * (lastEvenMessage si le message est pair, sinon lastOddMessage s'il est impair). */
                 setParityMessage(apm);
                 /* On vérifie la position de l'aéronef peut être déterminée grâce à
-                 *  la méthode privée canPositionBeDetermined(). */
+                 * la méthode privée canPositionBeDetermined(). */
                 switch (apm.parity()) {
                     case 0 -> {
                         if (canPositionBeDetermined(lastOddMessage, apm)) {

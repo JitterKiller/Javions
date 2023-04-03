@@ -70,8 +70,8 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             int velocityNorthSouth = Bits.extractUInt(rawMessage.payload(), VNS_START, V_SIZE);
 
             /* Si les attributs VNS ou VEW valent 0, on ne peut pas calculer la norme de la vitesse
-             *  (Puisque les attributs VNS et VEW indiquent la valeur absolue de la vitesse (+1).
-             *  On retourne donc null. */
+             * puisque les attributs VNS et VEW indiquent la valeur absolue de la vitesse (+1).
+             * On retourne donc null. */
             if (velocityNorthSouth == 0 || velocityEastWest == 0) {
                 return null;
             }
@@ -95,9 +95,9 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             }
 
             /* On convertit enfin la vitesse de Nœuds en mètres par secondes si le sous-type vaut 1
-             *  Sinon la vitesse est convertie d'une unité qui correspond à 4 nœuds en mètres par secondes.
-             *  L'angle passé en argument de AirborneVelocityMessage est enfin recentré entre 0 et 2π
-             *  grâce à la méthode statique refocusTrackOrHeading(). */
+             * Sinon la vitesse est convertie d'une unité qui correspond à 4 nœuds en mètres par secondes.
+             * L'angle passé en argument de AirborneVelocityMessage est enfin recentré entre 0 et 2π
+             * grâce à la méthode statique refocusTrackOrHeading(). */
             if (subType == 1) {
                 speed = Units.convert(speed, Units.Speed.KNOT, Units.Speed.METER_PER_SECOND);
             } else {
@@ -113,7 +113,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
         if (isSubTypeAirSpeed(subType)) {
 
             /* On extrait le bit SH, s'il vaut 0 alors le cap (heading) de l'aéronef est inconnu.
-             *  On retourne donc null */
+             * On retourne donc null */
             int statusHeading = Bits.extractUInt(rawMessage.payload(), SH_START, SH_SIZE);
             if (statusHeading != 1) {
                 return null;
@@ -123,7 +123,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             int airSpeed = Bits.extractUInt(rawMessage.payload(), AS_START, AS_SIZE);
 
             /* L'attribut AS correspond à la vitesse de l'aéronef (+1).
-             *  S'il vaut 0, on ne peut pas calculer la vitesse, on retourne donc null. */
+             * S'il vaut 0, on ne peut pas calculer la vitesse, on retourne donc null. */
             if (airSpeed == 0) {
                 return null;
             }
@@ -131,9 +131,9 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             trackOrHeading = Units.convertFrom(Math.scalb(heading, -10), Units.Angle.TURN);
 
             /* On convertit enfin la vitesse de Nœuds en mètres par secondes si le sous-type vaut 3
-             *  Sinon la vitesse est convertie d'une unité qui correspond à 4 nœuds en mètres par secondes.
-             *  L'angle passé en argument de AirborneVelocityMessage est enfin recentré entre 0 et 2π
-             *  grâce à la méthode statique refocusTrackOrHeading(). */
+             * Sinon la vitesse est convertie d'une unité qui correspond à 4 nœuds en mètres par secondes.
+             * L'angle passé en argument de AirborneVelocityMessage est enfin recentré entre 0 et 2π
+             * grâce à la méthode statique refocusTrackOrHeading(). */
             if (subType == 3) {
                 speed = Units.convert(airSpeed - 1, Units.Speed.KNOT, Units.Speed.METER_PER_SECOND);
             } else {
@@ -147,7 +147,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
         }
 
         /* Si l'attribut ST (sous-type) extrait du message ne correspond ni à un Ground Speed message,
-         *  ni à un Air Speed message, le sous-type est invalide, on retourne donc null. */
+         * ni à un Air Speed message, le sous-type est invalide, on retourne donc null. */
         return null;
     }
 

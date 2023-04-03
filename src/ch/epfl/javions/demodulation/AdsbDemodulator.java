@@ -44,17 +44,17 @@ public final class AdsbDemodulator {
             /* Calcul de la somme des pics de puissance de porteuse suivante */
             nextSumCarrierPeak = computeNextCarrierSum();
             /* Si un nouveau pic de puissance de porteuse est détecté et que
-            la puissance est suffisante, on décode le message brut */
+             * la puissance est suffisante, on décode le message brut */
             if (isPeakDetected(sumCarrierPeak, previousSumCarrierPeak)) {
                 if (sumCarrierPeak >= computeTwiceBottomOutSums()) {
                     /* Si le downlink format (DF) du premier octet correspond à 17
-                    on décode les octets restant du message brut */
+                     * on décode les octets restant du message brut */
                     if (RawMessage.size(computeFirstByte()) == RawMessage.LENGTH) {
                         computeRemainingBytes();
                         RawMessage rawMessage = RawMessage.of((window.position() * TIME_STAMP_NS_CONST), message);
                         /* Si le CRC du message est égal à 0 (donc un message valide),
-                        on le retourne et on avance la fenêtre d'échantillons de puissance de 1199 + 1
-                        (à l'aide de la boucle). */
+                         * on le retourne et on avance la fenêtre d'échantillons de puissance de 1199 + 1
+                         * (à l'aide de la boucle). */
                         if (rawMessage != null) {
                             window.advanceBy(WINDOW_SIZE - 1);
                             return rawMessage;
