@@ -17,6 +17,7 @@ public final class Units {
     public static final int BASE_UNIT = 1;
     public static final double CENTI = 1e-2d;
     public static final double KILO = 1e3d;
+
     /**
      * Constructeur privé de la classe Units (non instanciable).
      */
@@ -73,6 +74,7 @@ public final class Units {
         public static final double TURN = 2d * Math.PI * RADIAN;
         public static final double DEGREE = TURN / 360d;
         public static final double T32 = Math.scalb(TURN, -32);
+
         /**
          * Constructeur privé de la classe Angle (non instanciable).
          */
@@ -99,6 +101,7 @@ public final class Units {
         public static final double FOOT = 12d * INCH;
         public static final double KILOMETER = KILO * METER;
         public static final double NAUTICAL_MILE = 1852d * METER;
+
         /**
          * Constructeur privé de la classe Length (non instanciable).
          */
@@ -122,6 +125,7 @@ public final class Units {
         public static final double SECOND = BASE_UNIT;
         public static final double MINUTE = 60d * SECOND;
         public static final double HOUR = 60d * MINUTE;
+
         /**
          * Constructeur privé de la classe Time (non instanciable).
          */
@@ -143,6 +147,7 @@ public final class Units {
         public static final double KNOT = Length.NAUTICAL_MILE / Time.HOUR;
         public static final double METER_PER_SECOND = Length.METER / Time.SECOND;
         public static final double KILOMETER_PER_HOUR = Length.KILOMETER / Time.HOUR;
+
         /**
          * Constructeur privé de la classe Speed (non instanciable).
          */

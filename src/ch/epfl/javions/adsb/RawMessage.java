@@ -16,19 +16,21 @@ import static ch.epfl.javions.Crc24.GENERATOR;
  *
  * @param timeStampNs Le temps d'arrivée (en nanosecondes) du message.
  * @param bytes       Les octets du message.
- *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record RawMessage(long timeStampNs, ByteString bytes) {
+
+    /**
+     * La longueur en octets des messages ADS-B
+     */
+    public static final int LENGTH = 14;
+
     private static final Crc24 Crc24 = new Crc24(GENERATOR);
     private static final int VALID_DF = 17;
     private static final int ME_START = 4, ME_END = 10 + 1;
     private static final int ICAO_START = 1, ICAO_END = 3 + 1, ICAO_SIZE = 6;
     private static final int TYPE_CODE_START = 51, TYPE_CODE_SIZE = 5;
-
-    /** La longueur en octets des messages ADS-B */
-    public static final int LENGTH = 14;
 
     /**
      * Constructeur compact de l'enregistrement RawMessage.
@@ -88,7 +90,8 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return l'adresse ICAO du message.
      */
     public IcaoAddress icaoAddress() {
-        return new IcaoAddress(HexFormat.of().withUpperCase().toHexDigits(bytes().bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
+        return new IcaoAddress(HexFormat.of().withUpperCase()
+                    .toHexDigits(bytes().bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
     }
 
     /**

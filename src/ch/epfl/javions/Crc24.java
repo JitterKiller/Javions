@@ -8,14 +8,17 @@ package ch.epfl.javions;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class Crc24 {
+
+    /**
+     * Générateur utilisé pour calculer le CRC24 des messages ADS-B
+     */
+    public static final int GENERATOR = 0xFFF409;
+
     private static final int CRC_SIZE = 24, CRC_START = 0;
     private static final int TOP_BIT = CRC_SIZE - Byte.BYTES;
     private static final int TOP_BYTE = CRC_SIZE - Byte.SIZE;
     private static final int TABLE_SIZE = 256;
     private static final int[] TABLE = new int[TABLE_SIZE];
-
-    /** Générateur utilisé pour calculer le CRC24 des messages ADS-B */
-    public static final int GENERATOR = 0xFFF409;
 
     /**
      * Constructeur public de la classe Crc24 (appelle la méthode buildTable() pour

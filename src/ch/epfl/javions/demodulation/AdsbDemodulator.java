@@ -88,10 +88,7 @@ public final class AdsbDemodulator {
      * @return Vrai si un pic est détecté, sinon retourne faux.
      */
     private boolean isPeakDetected(int sumCarrierPeak, int previousSumCarrierPeak) {
-        if (sumCarrierPeak > previousSumCarrierPeak) {
-            return sumCarrierPeak > nextSumCarrierPeak;
-        }
-        return false;
+        return sumCarrierPeak > previousSumCarrierPeak && sumCarrierPeak > nextSumCarrierPeak;
     }
 
     /**

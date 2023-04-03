@@ -24,10 +24,12 @@ import java.util.Objects;
  */
 public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress, double altitude, int parity,
                                       double x, double y) implements Message {
-    private static final int ALT_START = 36, ALT_SIZE = 12;
     private static final int Q_INDEX = 4;
-    private static final int BASE_ALTITUDE_Q_1 = 1000, BASE_ALTITUDE_Q_0 = 1300;
     private static final int CPR_BITS = 17;
+    private static final int ALT_START = 36, ALT_SIZE = 12;
+    private static final int LEFT_ALT_START = ALT_START + 5, LEFT_ALT_SIZE = ALT_SIZE - 5;
+    private static final int RIGHT_ALT_START = ALT_START, RIGHT_ALT_SIZE = ALT_SIZE - 8;
+    private static final int BASE_ALTITUDE_Q_1 = 1000, BASE_ALTITUDE_Q_0 = 1300;
     private static final int LON_CPR_START = 0, LON_CPR_SIZE = CPR_BITS;
     private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE, LAT_CPR_SIZE = CPR_BITS;
     private static final int FORMAT_START = 34, FORMAT_SIZE = 1;
@@ -57,7 +59,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      */
     public static AirbornePositionMessage of(RawMessage rawMessage) {
 
-        int inputAltitude = Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE);
+        int inputALT = Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE);
 
         int parity = Bits.extractUInt(rawMessage.payload(), FORMAT_START, FORMAT_SIZE);
         double latitude = Bits.extractUInt(rawMessage.payload(), LAT_CPR_START, LAT_CPR_SIZE);
@@ -65,42 +67,35 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
 
         double altitude;
 
-        if (Bits.testBit(inputAltitude, Q_INDEX)) {
-            int altitudeValue = (Bits.extractUInt(rawMessage.payload(), ALT_START + 5, ALT_SIZE - 5) << 4)
-                              | Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE - 8);
+        /* Selon la valeur du bit d'index Q, on calcule l'altitude différemment. */
+        if (Bits.testBit(inputALT, Q_INDEX)) { /* Cas où Q = 1 */
+
+            int leftAltitudeBits = Bits.extractUInt(rawMessage.payload(), LEFT_ALT_START, LEFT_ALT_SIZE) << Q_INDEX;
+            int rightAltitudeBits = Bits.extractUInt(rawMessage.payload(), RIGHT_ALT_START, RIGHT_ALT_SIZE);
+            int altitudeValue = leftAltitudeBits | rightAltitudeBits;
+
             altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
-        } else {
 
-            int d = ((inputAltitude & 0x1) << 9) | ((inputAltitude & 0x4) << 8) | ((inputAltitude & 0x10) << 7);
-            int a = (inputAltitude & 0x40) | ((inputAltitude & 0x100) >>> 1) | ((inputAltitude & 0x400) >>> 2);
-            int b = ((inputAltitude & 0x2) << 2) | ((inputAltitude & 0x8) << 1) | (inputAltitude & 0x20);
-            int multipleOf100Feet = ((inputAltitude & 0x80) >>> 7) | ((inputAltitude & 0x200) >>> 8) | ((inputAltitude & 0x800) >>> 9);
+        } else { /* Cas où Q = 0 */
 
-            int multipleOf500Feet = (d | a | b) >>> 3;
+            int m100Feet = permutationOfM100FBits(inputALT);
+            int m500Feet = permutationOfM500FBits(inputALT) >>> 3;
 
-            multipleOf100Feet = convertGrayToBinary(multipleOf100Feet);
-            multipleOf500Feet = convertGrayToBinary(multipleOf500Feet);
+            m100Feet = convertGrayToBinary(m100Feet);
+            m500Feet = convertGrayToBinary(m500Feet);
 
-            if (isLSBNotValid(multipleOf100Feet)) {
+            if (areLSBSNotValid(m100Feet)) {
                 return null;
             }
 
-            if (multipleOf100Feet == 7) {
-                multipleOf100Feet = 5;
-            }
+            if (m100Feet == 7) m100Feet = 5;
+            if (m500Feet % 2 == 1) m100Feet = 6 - m100Feet;
 
-            if (multipleOf500Feet % 2 == 1) {
-                multipleOf100Feet = (6 - multipleOf100Feet);
-            }
-
-            altitude = (multipleOf500Feet * 500) + (multipleOf100Feet * 100) - BASE_ALTITUDE_Q_0;
+            altitude = (m500Feet * 500) + (m100Feet * 100) - BASE_ALTITUDE_Q_0;
         }
-        return new AirbornePositionMessage(rawMessage.timeStampNs(),
-                                           rawMessage.icaoAddress(),
-                                           Units.convertFrom(altitude, Units.Length.FOOT),
-                                           parity,
-                                           Math.scalb(longitude, -17),
-                                           Math.scalb(latitude, -17));
+        return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
+                Units.convertFrom(altitude, Units.Length.FOOT), parity,
+                Math.scalb(longitude, -17), Math.scalb(latitude, -17));
     }
 
     /**
@@ -125,7 +120,41 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      * @param LSB Le groupe des bits faibles en question.
      * @return Vrai s'il est valide, sinon faux.
      */
-    private static boolean isLSBNotValid(int LSB) {
+    private static boolean areLSBSNotValid(int LSB) {
         return (LSB == 0) || (LSB == 5) || (LSB == 6);
+    }
+
+    /**
+     * Méthode qui permute l'ordre des bits encodant les multiples de
+     * 500 pieds pour pouvoir les interprétés comme un code de Gray.
+     * Cette méthode est utilisée lorsque le bit d'index Q de l'altitude encodée vaut 0.
+     *
+     * @param inputALT L'altitude de base (encodée)
+     * @return Les bits encodant les multiples de 500 pieds.
+     */
+    private static int permutationOfM500FBits(int inputALT) {
+        int d = 0, a = 0, b = 0;
+        for (int i = 0; i < 3; ++i) {
+            d |= (inputALT & 1 << (i * 2)) << (9 - i);
+            a |= (inputALT & 64 << (i * 2)) >>> i;
+            b |= (inputALT & 2 << (i * 2)) << (2 - i);
+        }
+        return d | a | b;
+    }
+
+    /**
+     * Méthode qui permute l'ordre des bits encodant les multiples de
+     * 100 pieds pour pouvoir les interprétés comme un code de Gray.
+     * Cette méthode est utilisée lorsque le bit d'index Q de l'altitude encodée vaut 0.
+     *
+     * @param inputALT L'altitude de base (encodée)
+     * @return Les bits encodant les multiples de 100 pieds.
+     */
+    private static int permutationOfM100FBits(int inputALT) {
+        int c = 0;
+        for (int i = 0; i < 3; ++i) {
+            c |= (inputALT & 128 << (i * 2)) >> 7 + i;
+        }
+        return c;
     }
 }

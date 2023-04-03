@@ -66,7 +66,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 switch (apm.parity()) {
                     case 0 -> {
                         if (canPositionBeDetermined(lastOddMessage, apm)) {
-                            GeoPos pos = CprDecoder.decodePosition(apm.x(),apm.y(),
+                            GeoPos pos = CprDecoder.decodePosition(apm.x(), apm.y(),
                                     lastOddMessage.x(), lastOddMessage.y(), 0);
                             /* On met à jour la position uniquement si elle n'est pas nulle */
                             if (pos != null) stateSetter.setPosition(pos);
@@ -76,7 +76,7 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                         if (canPositionBeDetermined(lastEvenMessage, apm)) {
                             GeoPos pos = CprDecoder.decodePosition(lastEvenMessage.x(), lastEvenMessage.y(),
                                     apm.x(), apm.y(), 1);
-                            if(pos != null) stateSetter.setPosition(pos);
+                            if (pos != null) stateSetter.setPosition(pos);
                         }
                     }
                 }

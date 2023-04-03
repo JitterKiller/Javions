@@ -38,8 +38,7 @@ public class CprDecoder {
     public static GeoPos decodePosition(double x0, double y0, double x1, double y1, int mostRecent) {
         Preconditions.checkArgument(mostRecent == 0 || mostRecent == 1);
 
-        double evenLatitudeDegree;
-        double oddLatitudeDegree;
+        double evenLatitudeDegree, oddLatitudeDegree;
 
         /* On définit déjà les longitudes des messages pairs et impairs.
          * De ce fait, le cas où le nombre de zones de longitude est égal à 1 est déjà traité.
@@ -50,9 +49,7 @@ public class CprDecoder {
         /* On calcule le numéro de la zone de latitude dans lequel l'aéronef se trouve dans chacun des deux découpages */
         int latitudeZoneNumber = (int) Math.rint((y0 * ODD_LATITUDE_ZONES) - (y1 * EVEN_LATITUDE_ZONES));
 
-        int evenLatitudeZoneNumber;
-        int oddLatitudeZoneNumber;
-
+        int evenLatitudeZoneNumber, oddLatitudeZoneNumber;
         /* On calcule les numéros de la zone de latitude pour le découpage pair et impair selon "latitudeZoneNumber". */
         if (latitudeZoneNumber < 0) {
             evenLatitudeZoneNumber = latitudeZoneNumber + EVEN_LATITUDE_ZONES;
@@ -72,13 +69,15 @@ public class CprDecoder {
 
 
         /* On calcule ensuite le nombre de zones de longitude dans le découpage pair avec les deux latitudes (paire et impaire). */
-        double AEven = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
-        double AOdd = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH)) / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
+        double AEven = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH))
+                / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
+        double AOdd = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH))
+                / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
 
         double evenLongitudeZoneValue = Math.floor((2d * Math.PI) / Math.acos(1 - AEven));
         double oddLongitudeZoneValue = Math.floor((2d * Math.PI) / Math.acos(1 - AOdd));
-        int evenLongitudeZone;
 
+        int evenLongitudeZone;
         /* Si on obtient ainsi deux valeurs différentes, cela signifie qu'entre les deux messages,
          * l'aéronef a changé de "bande d'altitude", et il n'est donc pas possible de déterminer sa position
          * La méthode Double.compare() retourne 0 si les deux valeurs sont égales (même si c'est deux NaN).*/
@@ -95,12 +94,7 @@ public class CprDecoder {
 
         int oddLongitudeZone = evenLongitudeZone - 1;
 
-        int evenLongitudeZoneNumber;
-        int oddLongitudeZoneNumber;
-
-        double evenLongitudeTurn;
-        double oddLongitudeTurn;
-
+        int evenLongitudeZoneNumber, oddLongitudeZoneNumber;
         /* Enfin, on calcule le numéro de la zone de longitude dans lequel l'aéronef se trouve dans chacun des deux découpages.
          * S'il est égal à 1, les deux longitudes ont déjà été calculées plus haut dans la méthode,
          * S'il est supérieur à 1, on procède comme pour le calcul des numéros de numéros de la zone de latitude
@@ -117,10 +111,10 @@ public class CprDecoder {
                 oddLongitudeZoneNumber = longitudeZoneNumber;
             }
 
-            evenLongitudeTurn = (1d / evenLongitudeZone) * (evenLongitudeZoneNumber + x0);
+            double evenLongitudeTurn = (1d / evenLongitudeZone) * (evenLongitudeZoneNumber + x0);
             evenLongitudeDegree = Units.convert(refocusingOf(evenLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
-            oddLongitudeTurn = (1d / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
+            double oddLongitudeTurn = (1d / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
             oddLongitudeDegree = Units.convert(refocusingOf(oddLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
 
         }
@@ -145,8 +139,7 @@ public class CprDecoder {
      * ou null si la latitude en degrés n'est pas comprise entre -90° et 90° inclus.
      */
     private static GeoPos geoPosOf(double longitudeDegree, double latitudeDegree) {
-        int longitudeT32;
-        int latitudeT32;
+        int longitudeT32, latitudeT32;
         longitudeT32 = (int) Math.rint(Units.convert(longitudeDegree, Units.Angle.DEGREE, Units.Angle.T32));
         latitudeT32 = (int) Math.rint(Units.convert(latitudeDegree, Units.Angle.DEGREE, Units.Angle.T32));
         return (latitudeDegree <= 90d) && (latitudeDegree >= -90d) ? new GeoPos(longitudeT32, latitudeT32) : null;
