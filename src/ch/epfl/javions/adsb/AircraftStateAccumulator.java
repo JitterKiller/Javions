@@ -1,5 +1,7 @@
 package ch.epfl.javions.adsb;
 
+import ch.epfl.javions.GeoPos;
+
 import java.util.Objects;
 
 /**
@@ -14,7 +16,7 @@ import java.util.Objects;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public class AircraftStateAccumulator<T extends AircraftStateSetter> {
-    private static final long TIME_STAMP_NS_TEN_SEC = 10000000000L;
+    private static final long TIME_STAMP_NS_TEN_SEC = 10_000_000_000L;
     private final T stateSetter;
     private AirbornePositionMessage lastEvenMessage;
     private AirbornePositionMessage lastOddMessage;
@@ -65,20 +67,17 @@ public class AircraftStateAccumulator<T extends AircraftStateSetter> {
                 switch (apm.parity()) {
                     case 0 -> {
                         if (canPositionBeDetermined(lastOddMessage, apm)) {
-                            stateSetter.setPosition(CprDecoder.decodePosition(apm.x(),
-                                                                              apm.y(),
-                                                                              lastOddMessage.x(),
-                                                                              lastOddMessage.y(),
-                                                                              0));
+                            GeoPos pos = CprDecoder.decodePosition(apm.x(),apm.y(),
+                                    lastOddMessage.x(), lastOddMessage.y(), 0);
+                            /* On met à jour la position uniquement si elle n'est pas nulle */
+                            if (pos != null) stateSetter.setPosition(pos);
                         }
                     }
                     case 1 -> {
                         if (canPositionBeDetermined(lastEvenMessage, apm)) {
-                            stateSetter.setPosition(CprDecoder.decodePosition(lastEvenMessage.x(),
-                                                                              lastEvenMessage.y(),
-                                                                              apm.x(),
-                                                                              apm.y(),
-                                                                              1));
+                            GeoPos pos = CprDecoder.decodePosition(lastEvenMessage.x(), lastEvenMessage.y(),
+                                    apm.x(), apm.y(), 1);
+                            if(pos != null) stateSetter.setPosition(pos);
                         }
                     }
                 }
