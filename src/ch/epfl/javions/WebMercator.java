@@ -3,12 +3,12 @@ package ch.epfl.javions;
 import static ch.epfl.javions.Math2.asinh;
 
 /**
- * Classe Webmercator permettant la projection des coordonnées géographiques selon la projection WebMercator.
+ * Classe WebMercator permettant la projection des coordonnées géographiques selon la projection WebMercator.
  *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public class WebMercator {
+public final class WebMercator {
 
     /**
      * Constructeur privé de la classe (non instanciable).

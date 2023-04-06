@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * représente un identifiant de l'appareil.
  *
  * @param string une chaîne représentant un identifiant de l'appareil.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah Janati Idrissi (362341)
  */

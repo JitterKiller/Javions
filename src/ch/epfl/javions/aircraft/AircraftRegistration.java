@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  * représente l'immatriculation d'un véhicule aérien.
  *
  * @param string une chaîne représentant une immatriculation de véhicule aérien.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */

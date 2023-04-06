@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
  * L'enregistrement AircraftTypeDesignator, du sous-paquetage aircraft, public, représente un type de véhicule aérien.
  *
  * @param string une chaîne représentant un type de véhicule aérien.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */

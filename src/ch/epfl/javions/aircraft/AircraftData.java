@@ -10,6 +10,7 @@ import java.util.Objects;
  * @param model                  le modèle de l'aéronef
  * @param description            la description de l'aéronef
  * @param wakeTurbulenceCategory la catégorie de turbulence de l'aéronef
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */

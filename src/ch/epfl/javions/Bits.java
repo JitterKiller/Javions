@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public class Bits {
+public final class Bits {
 
     /**
      * Constructeur privé de la classe Bits (non instanciable).

@@ -7,7 +7,7 @@ package ch.epfl.javions.adsb;
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
-public class MessageParser {
+public final class MessageParser {
 
     /**
      * Constructeur privé de la classe (non instantiable).

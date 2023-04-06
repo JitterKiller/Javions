@@ -16,6 +16,7 @@ import static ch.epfl.javions.Crc24.GENERATOR;
  *
  * @param timeStampNs Le temps d'arrivée (en nanosecondes) du message.
  * @param bytes       Les octets du message.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */

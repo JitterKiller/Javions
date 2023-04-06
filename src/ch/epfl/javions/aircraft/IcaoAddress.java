@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
  * représente l'adresse ICAO d'un véhicule aérien.
  *
  * @param string la chaîne contenant la représentation textuelle de l'adresse ICAO.
+ *
  * @author Adam AIT BOUSSELHAM (356365)
  * @author Abdellah JANATI IDRISSI (362341)
  */
