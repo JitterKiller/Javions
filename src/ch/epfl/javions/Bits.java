@@ -46,7 +46,7 @@ public final class Bits {
      * @param value le vecteur de 64 bits.
      * @param index l'index où l'on veut voir si le bit vaut 1 ou 0.
      * @return Vrai (true) si le bit de "value" d'index donné vaut 1.
-     * Faux (false) si le bit de "value" d'index donné vaut 0.
+     *         Faux (false) si le bit de "value" d'index donné vaut 0.
      * @throws IndexOutOfBoundsException si le bit n'est pas compris entre 0 (inclus) et 64 (exclu),
      *                                   grâce à la méthode checkIndex() de la classe Objects.
      */
@@ -56,6 +56,20 @@ public final class Bits {
 
         long mask = 1L << index;
         return (value & mask) != 0;
+    }
+
+    /**
+     * Surcharge de la méthode statique Bits.testBit() qui prend en paramètre
+     * uniquement un attribut "value" de type long et qui retourne
+     * Bits.testBit(value,0).
+     * Méthode qui test donc si un bit vaut 1 ou 0.
+     *
+     * @param value le vecteur de 64 bits.
+     * @return Vrai (true) si le bit de "value" d'index donné vaut 1.
+     *         Faux (false) si le bit de "value" d'index donné vaut 0.
+     */
+    public static boolean testBit(long value) {
+        return testBit(value,0);
     }
 }
 

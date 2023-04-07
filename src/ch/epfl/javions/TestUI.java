@@ -38,12 +38,12 @@ public class TestUI {
                 long timeToWaitMs = (timeStampNs  / 1_000_000) - elapsedTimeMs;
                 Message pm = MessageParser.parse(new RawMessage(timeStampNs, new ByteString(bytes)));
                 if (pm != null) {
-                    Thread.sleep(Math.max(0,timeToWaitMs));
                     manager.updateWithMessage(pm);
                     ArrayList<ObservableAircraftState> states = new ArrayList<>(manager.states());
                     states.sort(new AddressComparator());
                     if (!states.isEmpty()) {
                         manager.purge();
+                        Thread.sleep(Math.max(0,timeToWaitMs));
                         printTable(states);
                     }
                 }

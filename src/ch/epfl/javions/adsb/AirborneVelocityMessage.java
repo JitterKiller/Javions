@@ -115,7 +115,7 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
             /* On extrait le bit SH, s'il vaut 0 alors le cap (heading) de l'aéronef est inconnu.
              * On retourne donc null */
             int statusHeading = Bits.extractUInt(rawMessage.payload(), SH_START, SH_SIZE);
-            if (statusHeading != 1) {
+            if (!Bits.testBit(statusHeading)) {
                 return null;
             }
 
