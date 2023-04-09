@@ -26,11 +26,11 @@ public final class AircraftStateManager {
     }
 
     public Set<ObservableAircraftState> knownAircraftPositionsStatesProperty() {
-        return unmodifiableKnownAircraftPositionStatesProperty;
+        return unmodifiableKnownAircraftPositionStatesProperty.get();
     }
 
     public Set<ObservableAircraftState> states() {
-        return unmodifiableKnownAircraftPositionStates;
+        return knownAircraftPositionsStatesProperty();
     }
 
     public void updateWithMessage(Message message) throws IOException {

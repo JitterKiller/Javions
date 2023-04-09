@@ -67,7 +67,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public long getLastMessageTimeStampNs() {
-        return lastMessageTimeStampNs.get();
+        return lastMessageTimeStampNsProperty().get();
     }
 
     @Override
@@ -76,7 +76,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public int getCategory() {
-        return category.get();
+        return categoryProperty().get();
     }
 
     @Override
@@ -85,7 +85,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public CallSign getCallSign() {
-        return callSign.get();
+        return callSignProperty().get();
     }
 
     @Override
@@ -94,7 +94,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public GeoPos getPosition() {
-        return position.get();
+        return positionProperty().get();
     }
 
     @Override
@@ -108,11 +108,11 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public List<Pair<AirbornePos, Double>> getTrajectory() {
-        return unmodifiableTrajectory.stream().toList();
+        return unmodifiableTrajectoryProperty.get();
     }
 
     public double getAltitude() {
-        return altitude.get();
+        return altitudeProperty().get();
     }
 
     @Override
@@ -125,7 +125,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public double getVelocity() {
-        return velocity.get();
+        return velocityProperty().get();
     }
 
     @Override
@@ -134,7 +134,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     public double getTrackOrHeading() {
-        return trackOrHeading.get();
+        return trackOrHeadingProperty().get();
     }
 
     @Override

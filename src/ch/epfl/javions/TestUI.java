@@ -6,56 +6,50 @@ import ch.epfl.javions.adsb.RawMessage;
 import ch.epfl.javions.aircraft.AircraftDatabase;
 import ch.epfl.javions.gui.AircraftStateManager;
 import ch.epfl.javions.gui.ObservableAircraftState;
+import javafx.util.Duration;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 public class TestUI {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        String CSI = "\u001B[";
-        String CLEAR_SCREEN = CSI + "2J";
+    public static void main(String[] args) throws IOException {
         var fileMac = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
         var databaseFileMac = "/Users/adam/Documents/CS-108/Javions/resources/aircraft.zip";
         try (DataInputStream s = new DataInputStream(new BufferedInputStream(
                 new FileInputStream(fileMac)))) {
-            long startTime = System.nanoTime();
             var database = new AircraftDatabase(databaseFileMac);
             var manager = new AircraftStateManager(database);
             var bytes = new byte[RawMessage.LENGTH];
-            System.out.println(CLEAR_SCREEN);
-
+            long startTime = System.nanoTime();
             while (true) {
                 long timeStampNs = s.readLong();
                 int bytesRead = s.readNBytes(bytes, 0, bytes.length);
                 assert bytesRead == RawMessage.LENGTH;
-                long elapsedTimeMs = (System.nanoTime() - startTime) / 1_000_000;
-                long timeToWaitMs = (timeStampNs  / 1_000_000) - elapsedTimeMs;
                 Message pm = MessageParser.parse(new RawMessage(timeStampNs, new ByteString(bytes)));
-                if (pm != null) {
-                    manager.updateWithMessage(pm);
-                    ArrayList<ObservableAircraftState> states = new ArrayList<>(manager.states());
-                    states.sort(new AddressComparator());
-                    if (!states.isEmpty()) {
-                        manager.purge();
-                        Thread.sleep(Math.max(0,timeToWaitMs));
-                        printTable(states);
-                    }
-                }
+                boolean bool;
+                do {
+                    Thread.sleep(1 / 1_000_000_000);
+                    bool = System.nanoTime() - startTime >= timeStampNs;
+                } while (!bool);
+                if(pm != null) manager.updateWithMessage(pm);
+                manager.purge();
+                ArrayList<ObservableAircraftState> states = new ArrayList<>(manager.states());
+                states.sort(new AddressComparator());
+                if(!states.isEmpty()) printTable(states);
             }
         }
+        catch (EOFException ignored) {}
+        catch (InterruptedException e) {throw new RuntimeException(e);}
     }
 
-    private static void printTable(ArrayList<ObservableAircraftState> states) {
-        final char[] directions = new char[]{'↑', '↗', '→', '↘', '↓', '↙', '←', '↖'};
-        System.out.println("\u001B[2J");
+    private static void printTable(ArrayList<ObservableAircraftState> states) throws InterruptedException {
+        System.out.print("\033[H\033[2J");
         System.out.printf("%-7s %-9s %-7s %-18s %-11s %-10s %-5s %-4s\n", "OACI", "Indicatif", "Immat.", "Modèle", "Longitude", "Latitude", "Alt.", "Vit.");
         System.out.printf("――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――%n");
+        final char[] directions = new char[]{'↑', '↗', '→', '↘', '↓', '↙', '←', '↖'};
         for (ObservableAircraftState state : states) {
             int directionIndex = getDirectionArrow(state.getTrackOrHeading());
             String model;
@@ -75,6 +69,7 @@ public class TestUI {
                     Double.isNaN(state.getVelocity()) ? Double.NaN : (int) Math.rint(Units.convertTo(state.getVelocity(), Units.Speed.KILOMETER_PER_HOUR)),
                     Array.getChar(directions, directionIndex));
         }
+        Thread.sleep(10);
     }
 
     private static int getDirectionArrow(double trackOrHeading) {
