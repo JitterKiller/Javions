@@ -15,6 +15,7 @@ import java.util.Comparator;
 public class TestUI {
 
     public static void main(String[] args) throws IOException {
+        System.out.println("\033[H\033[2J");
         var fileMac = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
         var databaseFileMac = "/Users/adam/Documents/CS-108/Javions/resources/aircraft.zip";
         var filePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
@@ -32,9 +33,8 @@ public class TestUI {
                 Message pm = MessageParser.parse(new RawMessage(timeStampNs, new ByteString(bytes)));
                 boolean bool;
                 do {
-                    long currentTime = System.nanoTime() - startTime;
-                    Thread.sleep(currentTime / 1_000_000);
-                    bool = currentTime >= timeStampNs;
+                    Thread.sleep(1);
+                    bool = System.nanoTime() - startTime >= timeStampNs;
                 } while (!bool);
                 if(pm != null) manager.updateWithMessage(pm);
                 manager.purge();
