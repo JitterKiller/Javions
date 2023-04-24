@@ -6,7 +6,6 @@ import ch.epfl.javions.adsb.RawMessage;
 import ch.epfl.javions.aircraft.AircraftDatabase;
 import ch.epfl.javions.gui.AircraftStateManager;
 import ch.epfl.javions.gui.ObservableAircraftState;
-import javafx.util.Duration;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -18,9 +17,11 @@ public class TestUI {
     public static void main(String[] args) throws IOException {
         var fileMac = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
         var databaseFileMac = "/Users/adam/Documents/CS-108/Javions/resources/aircraft.zip";
+        var filePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
+        var databaseFilePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\aircraft.zip";
         try (DataInputStream s = new DataInputStream(new BufferedInputStream(
-                new FileInputStream(fileMac)))) {
-            var database = new AircraftDatabase(databaseFileMac);
+                new FileInputStream(filePC)))) {
+            var database = new AircraftDatabase(databaseFilePC);
             var manager = new AircraftStateManager(database);
             var bytes = new byte[RawMessage.LENGTH];
             long startTime = System.nanoTime();
@@ -31,8 +32,9 @@ public class TestUI {
                 Message pm = MessageParser.parse(new RawMessage(timeStampNs, new ByteString(bytes)));
                 boolean bool;
                 do {
-                    Thread.sleep(1 / 1_000_000_000);
-                    bool = System.nanoTime() - startTime >= timeStampNs;
+                    long currentTime = System.nanoTime() - startTime;
+                    Thread.sleep(currentTime / 1_000_000);
+                    bool = currentTime >= timeStampNs;
                 } while (!bool);
                 if(pm != null) manager.updateWithMessage(pm);
                 manager.purge();
@@ -46,9 +48,10 @@ public class TestUI {
     }
 
     private static void printTable(ArrayList<ObservableAircraftState> states) throws InterruptedException {
-        System.out.print("\033[H\033[2J");
-        System.out.printf("%-7s %-9s %-7s %-18s %-11s %-10s %-5s %-4s\n", "OACI", "Indicatif", "Immat.", "Modèle", "Longitude", "Latitude", "Alt.", "Vit.");
-        System.out.printf("――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――%n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\033[H\033[2J");
+        sb.append(String.format("%-7s %-9s %-7s %-18s %-11s %-10s %-5s %-4s\n", "OACI", "Indicatif", "Immat.", "Modèle", "Longitude", "Latitude", "Alt.", "Vit."));
+        sb.append("――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n");
         final char[] directions = new char[]{'↑', '↗', '→', '↘', '↓', '↙', '←', '↖'};
         for (ObservableAircraftState state : states) {
             int directionIndex = getDirectionArrow(state.getTrackOrHeading());
@@ -57,8 +60,10 @@ public class TestUI {
                 model = state.getData().model().substring(0, 16) + "…";
             } else if (state.getData() != null) {
                 model = state.getData().model();
-            } else model = "";
-            System.out.printf("%-7s %-9s %-7s %-17.17s %10.5f %10.5f %6d %5.0f %1s\n",
+            } else {
+                model = "";
+            }
+            sb.append(String.format("%-7s %-9s %-7s %-17.17s %10.5f %10.5f %6d %5.0f %1s\n",
                     state.getAddress().string(),
                     state.getCallSign() == null ? "" : state.getCallSign().string(),
                     state.getData() == null ? "" : state.getData().registration().string(),
@@ -67,10 +72,12 @@ public class TestUI {
                     Units.convert(state.getTrajectory().get(state.getTrajectory().size() - 1).getKey().latitudeT32(), Units.Angle.T32, Units.Angle.DEGREE),
                     (int) Math.rint(state.getTrajectory().get(state.getTrajectory().size() - 1).getValue()),
                     Double.isNaN(state.getVelocity()) ? Double.NaN : (int) Math.rint(Units.convertTo(state.getVelocity(), Units.Speed.KILOMETER_PER_HOUR)),
-                    Array.getChar(directions, directionIndex));
+                    Array.getChar(directions, directionIndex)));
         }
         Thread.sleep(10);
+        System.out.print(sb);
     }
+
 
     private static int getDirectionArrow(double trackOrHeading) {
         double offset = Math.PI / 8;
