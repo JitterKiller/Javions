@@ -1,5 +1,6 @@
 package ch.epfl.javions.gui;
 
+import ch.epfl.javions.Math2;
 import ch.epfl.javions.Preconditions;
 import javafx.beans.property.*;
 
@@ -56,13 +57,13 @@ public final class MapParameters {
 
     public void changeZoomLevel(int zoomDiff) {
 
-        int newZoom = getZoom() + zoomDiff;
+        int newZoom = Math2.clamp(ZOOM_MIN,getZoom() + zoomDiff,19);;
 
         Preconditions.checkArgument(ZOOM_MIN <= newZoom && newZoom <= ZOOM_MAX);
 
         setZoom(newZoom);
 
-        double scaleFactor = Math.scalb(1, zoomDiff);
+        double scaleFactor = Math.scalb(1d, zoomDiff);
         setMinX(getMinX() * scaleFactor);
         setMinY(getMinY() * scaleFactor);
     }
