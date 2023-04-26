@@ -43,7 +43,7 @@ public final class TileManager {
     }
 
     private Image load(TileId id, Path potentialImageDirectory) throws IOException {
-        URL u = new URL(severName+"/"+id.zoom+"/"+id.X+"/"+id.Y+"/");
+        URL u = new URL("https://"+severName+"/"+id.zoom+"/"+id.X+"/"+id.Y+"/");
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");
         try (InputStream i = c.getInputStream();
