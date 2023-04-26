@@ -1,9 +1,9 @@
 package ch.epfl.javions.gui;
 
+import ch.epfl.javions.Preconditions;
 import javafx.scene.image.Image;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -13,40 +13,36 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class TileManager {
-    private final Path path;
+
+    private static final int MEMORY_CACHE_SIZE = 100;
+    private final Path diskCachePath;
     private final String severName;
+    private final Map<TileId, Image> memoryCache = new LinkedHashMap<>(MEMORY_CACHE_SIZE);
 
-    private final Map<TileId, Image> cacheMemoryMap = new LinkedHashMap<>(100);
-
-    public TileManager(Path path, String serverName) {
-        this.path = path;
+    public TileManager(Path diskCachePath, String serverName) {
+        this.diskCachePath = diskCachePath;
         this.severName = serverName;
     }
 
     public Image imageForTileAt(TileId id) throws IOException {
 
-        for(TileId idStored: cacheMemoryMap.keySet()) {
-            if(idStored.equals(id)) {
-                return cacheMemoryMap.get(idStored);
-            }
-        }
+        if(memoryCache.containsKey(id)) return memoryCache.get(id);
 
-        Path potentialImageDirectory = Path.of(String.valueOf(path),String.valueOf(id.zoom),
+        Path tilePath = Path.of(String.valueOf(diskCachePath),String.valueOf(id.zoom),
                 String.valueOf(id.X),String.valueOf(id.Y),".png");
 
-
-        if(Files.exists(potentialImageDirectory)) {
-            return new Image(potentialImageDirectory.toString());
+        if(Files.exists(tilePath)) {
+            return new Image(String.valueOf(tilePath.toUri()));
         } else {
-            if (!Files.isDirectory(potentialImageDirectory.getParent())) {
-                Files.createDirectory(potentialImageDirectory.getParent());
+            if (!Files.isDirectory(tilePath.getParent())) {
+                Files.createDirectory(tilePath.getParent());
             }
-            return getImage(id, potentialImageDirectory);
+            return load(id, tilePath);
         }
 
     }
 
-    private Image getImage(TileId id, Path potentialImageDirectory) throws IOException {
+    private Image load(TileId id, Path potentialImageDirectory) throws IOException {
         URL u = new URL(severName+"/"+id.zoom+"/"+id.X+"/"+id.Y+"/");
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");
@@ -55,25 +51,24 @@ public final class TileManager {
             byte[] imageBytes = i.readAllBytes();
             o.write(imageBytes);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
-            Iterator<TileId> it = cacheMemoryMap.keySet().iterator();
-            cacheMemoryMap.remove(it.next());
-            cacheMemoryMap.put(id,image);
+            if (memoryCache.keySet().size() == MEMORY_CACHE_SIZE) {
+                Iterator<TileId> it = memoryCache.keySet().iterator();
+                memoryCache.remove(it.next());
+            }
+            memoryCache.put(id, image);
             return image;
         }
     }
 
     private record TileId(int zoom, int X, int Y) {
+        public TileId {
+            Preconditions.checkArgument(isValid(zoom,X,Y));
+        }
         public static boolean isValid(int zoom, int X, int Y) {
 
-            double maxXY = Math.scalb(1d, 8 + zoom);
+            double maxXY = Math.scalb(1d, 8 + zoom) / 256;
 
             return (0 <= X && X < maxXY) && (0 <= Y && Y < maxXY);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return (obj instanceof TileId) && (zoom == ((TileId) obj).zoom) && (X == ((TileId) obj).X)
-                    && (Y == ((TileId) obj).Y);
         }
     }
 
