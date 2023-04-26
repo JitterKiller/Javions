@@ -57,9 +57,7 @@ public final class MapParameters {
 
     public void changeZoomLevel(int zoomDiff) {
 
-        int newZoom = Math2.clamp(ZOOM_MIN,getZoom() + zoomDiff,19);;
-
-        Preconditions.checkArgument(ZOOM_MIN <= newZoom && newZoom <= ZOOM_MAX);
+        int newZoom = Math2.clamp(ZOOM_MIN,getZoom() + zoomDiff,ZOOM_MAX);;
 
         setZoom(newZoom);
 
