@@ -29,25 +29,25 @@ public final class TileManager {
         if(memoryCache.containsKey(id)) return memoryCache.get(id);
 
         Path tilePath = Path.of(String.valueOf(diskCachePath),String.valueOf(id.zoom),
-                String.valueOf(id.X),String.valueOf(id.Y),".png");
+                String.valueOf(id.X), id.Y +".png");
 
         if(Files.exists(tilePath)) {
             return new Image(String.valueOf(tilePath.toUri()));
         } else {
             if (!Files.isDirectory(tilePath.getParent())) {
-                Files.createDirectory(tilePath.getParent());
+                Files.createDirectories(tilePath.getParent());
             }
             return load(id, tilePath);
         }
 
     }
 
-    private Image load(TileId id, Path potentialImageDirectory) throws IOException {
-        URL u = new URL("https://"+severName+"/"+id.zoom+"/"+id.X+"/"+id.Y+"/");
+    private Image load(TileId id, Path tilePath) throws IOException {
+        URL u = new URL("https://"+severName+"/"+id.zoom+"/"+id.X+"/"+id.Y+".png");
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");
         try (InputStream i = c.getInputStream();
-             OutputStream o = new FileOutputStream(new File(potentialImageDirectory.toUri()))) {
+             OutputStream o = new FileOutputStream(new File(tilePath.toUri()))) {
             byte[] imageBytes = i.readAllBytes();
             o.write(imageBytes);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
@@ -60,7 +60,7 @@ public final class TileManager {
         }
     }
 
-    private record TileId(int zoom, int X, int Y) {
+    record TileId(int zoom, int X, int Y) {
         public TileId {
             Preconditions.checkArgument(isValid(zoom,X,Y));
         }

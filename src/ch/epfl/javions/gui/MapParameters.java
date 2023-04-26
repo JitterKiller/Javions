@@ -10,40 +10,40 @@ public final class MapParameters {
     private static final int ZOOM_MAX = 19;
 
     private final IntegerProperty zoom = new SimpleIntegerProperty();
-    private final DoubleProperty minX = new SimpleDoubleProperty();
-    private final DoubleProperty minY = new SimpleDoubleProperty();
+    private final IntegerProperty minX = new SimpleIntegerProperty();
+    private final IntegerProperty minY = new SimpleIntegerProperty();
 
     public ReadOnlyIntegerProperty zoomProperty() {
         return zoom;
     }
-    public ReadOnlyDoubleProperty minXProperty() {
+    public ReadOnlyIntegerProperty minXProperty() {
         return minX;
     }
-    public ReadOnlyDoubleProperty minYProperty() {
+    public ReadOnlyIntegerProperty minYProperty() {
         return minY;
     }
 
     public int getZoom() {
         return zoomProperty().get();
     }
-    public double getMinX() {
+    public int getMinX() {
         return minXProperty().get();
     }
-    public double getMinY() {
+    public int getMinY() {
         return minYProperty().get();
     }
 
     private void setZoom(int zoom) {
         this.zoom.set(zoom);
     }
-    private void setMinX(double minX) {
+    private void setMinX(int minX) {
         this.minX.set(minX);
     }
-    private void setMinY(double minY) {
+    private void setMinY(int minY) {
         this.minY.set(minY);
     }
 
-    public MapParameters(int zoom, double minX, double minY) {
+    public MapParameters(int zoom, int minX, int minY) {
         Preconditions.checkArgument(ZOOM_MIN <= zoom && zoom <= ZOOM_MAX);
         setZoom(zoom);
         setMinX(minX);
@@ -61,7 +61,7 @@ public final class MapParameters {
 
         setZoom(newZoom);
 
-        double scaleFactor = Math.scalb(1d, zoomDiff);
+        int scaleFactor = (int) Math.scalb(1d, zoomDiff);
         setMinX(getMinX() * scaleFactor);
         setMinY(getMinY() * scaleFactor);
     }
