@@ -61,12 +61,13 @@ public final class TileManager {
     }
 
     record TileId(int zoom, int X, int Y) {
+        static int TILE_FACTOR = 256;
         public TileId {
             Preconditions.checkArgument(isValid(zoom,X,Y));
         }
         public static boolean isValid(int zoom, int X, int Y) {
 
-            double maxXY = Math.scalb(1d, 8 + zoom) / 256;
+            double maxXY = Math.scalb(1d, 8 + zoom) / TILE_FACTOR;
 
             return (0 <= X && X < maxXY) && (0 <= Y && Y < maxXY);
         }

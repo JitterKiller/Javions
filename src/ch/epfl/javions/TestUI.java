@@ -21,8 +21,8 @@ public class TestUI {
         var filePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
         var databaseFilePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\aircraft.zip";
         try (DataInputStream s = new DataInputStream(new BufferedInputStream(
-                new FileInputStream(filePC)))) {
-            var database = new AircraftDatabase(databaseFilePC);
+                new FileInputStream(fileMac)))) {
+            var database = new AircraftDatabase(databaseFileMac);
             var manager = new AircraftStateManager(database);
             var bytes = new byte[RawMessage.LENGTH];
             long startTime = System.nanoTime();

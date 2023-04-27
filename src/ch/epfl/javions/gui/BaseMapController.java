@@ -18,6 +18,7 @@ public final class BaseMapController {
     private final MapParameters parameters;
     private final Canvas canvas;
     private final Pane pane;
+    private Point2D memoryPosition;
     private boolean redrawNeeded;
 
     public BaseMapController(TileManager tileManager, MapParameters parameters) {
@@ -26,7 +27,6 @@ public final class BaseMapController {
         this.parameters = parameters;
         this.canvas = new Canvas();
         this.pane = new Pane(canvas);
-        this.redrawNeeded = false;
 
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
@@ -44,7 +44,9 @@ public final class BaseMapController {
 
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
         TileManager.TileId id = new TileManager.TileId(
-                parameters.getZoom(), parameters.getMinX(), parameters.getMinY());
+                parameters.getZoom(),
+                (int) parameters.getMinX() / TileManager.TileId.TILE_FACTOR,
+                (int) parameters.getMinY() / TileManager.TileId.TILE_FACTOR);
 
         try {
             graphicsContext.drawImage(tileManager.imageForTileAt(id), id.X(), id.Y());
@@ -86,22 +88,17 @@ public final class BaseMapController {
             parameters.changeZoomLevel(zoomDelta);
         });
 
-        pane.setOnMousePressed(e -> {
-            Point2D memoryPositon = new Point2D(e.getX(), e.getY());
-        });
+        pane.setOnMousePressed(e -> memoryPosition = new Point2D(e.getX(), e.getY()));
 
         pane.setOnMouseDragged(e -> {
-            Point2D memoryPositon = new Point2D(e.getX(), e.getY());
             if (e.getButton() == MouseButton.PRIMARY) {
-                double x = e.getX() - memoryPositon.getX();
-                double y = e.getY() - memoryPositon.getY();
-                parameters.translate(x,y);
+                double x = e.getX() - memoryPosition.getX();
+                double y = e.getY() - memoryPosition.getY();
+                parameters.scroll(x,y);
             }
         });
 
-        pane.setOnMouseReleased(e -> {
-            memoryPositon.set(null);
-        });
+        pane.setOnMouseReleased(e -> memoryPosition = null);
 
     }
 
