@@ -34,8 +34,8 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
      *
      * @throws NullPointerException     Si l'adresse ICAO est nulle.
      * @throws IllegalArgumentException Si l'horodatage du message est strictement inférieur à 0.
-     * @throws IllegalArgumentException Si l'argument speed est strictement inférieur à 0.
-     * @throws IllegalArgumentException Si l'argument trackOrHeading est strictement inférieur à 0.
+     *                                  Si l'argument speed est strictement inférieur à 0.
+     *                                  Si l'argument trackOrHeading est strictement inférieur à 0.
      */
     public AirborneVelocityMessage {
         Objects.requireNonNull(icaoAddress);
@@ -155,22 +155,22 @@ public record AirborneVelocityMessage(long timeStampNs, IcaoAddress icaoAddress,
      * Méthode qui vérifie si le sous-type du message brut est un message communiquant
      * la vitesse sol de l'aéronef, ainsi que sa route (Ground Speed).
      *
-     * @param ST L'attribut ST (sous-type du message).
+     * @param subType L'attribut ST (sous-type du message).
      * @return Vrai si le sous-type correspond à un message Ground Speed (sous-type de 1 ou 2), sinon faux.
      */
-    private static boolean isSubTypeGroundSpeed(int ST) {
-        return ST == 1 || ST == 2;
+    private static boolean isSubTypeGroundSpeed(int subType) {
+        return subType == 1 || subType == 2;
     }
 
     /**
      * Méthode qui vérifie si le sous-type du message brut est un message communiquant
      * la vitesse air de l'aéronef, ainsi que son cap (Air Speed).
      *
-     * @param ST L'attribut ST (sous-type du message).
+     * @param subType L'attribut ST (sous-type du message).
      * @return Vrai si le sous-type correspond à un message Air Speed (sous-type de 3 ou 4), sinon faux.
      */
-    private static boolean isSubTypeAirSpeed(int ST) {
-        return ST == 3 || ST == 4;
+    private static boolean isSubTypeAirSpeed(int subType) {
+        return subType == 3 || subType == 4;
     }
 
     /**
