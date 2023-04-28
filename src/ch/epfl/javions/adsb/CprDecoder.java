@@ -76,17 +76,9 @@ public final class CprDecoder {
             oddLongitudeTurn = computeLongitudeTurn(oddLongitudeZone, longitudeZoneNumber, x1);
         }
 
-        switch (mostRecent) {
-            case 0 -> {
-                return geoPosOf(evenLongitudeTurn,evenLatitudeTurn);
-            }
-            case 1 -> {
-                return geoPosOf(oddLongitudeTurn,oddLatitudeTurn);
-            }
-            default -> {
-                return null;
-            }
-        }
+        return mostRecent == 0 ?
+                geoPosOf(evenLongitudeTurn,evenLatitudeTurn) :
+                geoPosOf(oddLongitudeTurn, oddLatitudeTurn);
     }
 
     /**
