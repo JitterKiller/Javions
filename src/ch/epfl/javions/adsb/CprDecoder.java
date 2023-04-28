@@ -38,111 +38,69 @@ public final class CprDecoder {
     public static GeoPos decodePosition(double x0, double y0, double x1, double y1, int mostRecent) {
         Preconditions.checkArgument(mostRecent == 0 || mostRecent == 1);
 
-        double evenLatitudeDegree, oddLatitudeDegree;
+        double evenLatitudeTurn, oddLatitudeTurn;
 
         /* On définit déjà les longitudes des messages pairs et impairs.
          * De ce fait, le cas où le nombre de zones de longitude est égal à 1 est déjà traité.
          * Ces longitudes seront redéfinies dans le cas ou le nombre de zones de longitude n'est pas égal à 1.*/
-        double evenLongitudeDegree = Units.convert(refocusingOf(x0), Units.Angle.TURN, Units.Angle.DEGREE);
-        double oddLongitudeDegree = Units.convert(refocusingOf(x1), Units.Angle.TURN, Units.Angle.DEGREE);
+        double evenLongitudeTurn = refocusingOf(x0);
+        double oddLongitudeTurn = refocusingOf(x1);
 
-        /* On calcule le numéro de la zone de latitude dans lequel l'aéronef se trouve dans chacun des deux découpages */
+        /* On calcule le numéro de la zone de latitude dans lequel l'aéronef se
+         * trouve dans chacun des deux découpages */
         int latitudeZoneNumber = (int) Math.rint((y0 * ODD_LATITUDE_ZONES) - (y1 * EVEN_LATITUDE_ZONES));
 
-        int evenLatitudeZoneNumber, oddLatitudeZoneNumber;
-        /* On calcule les numéros de la zone de latitude pour le découpage pair et impair selon "latitudeZoneNumber". */
-        if (latitudeZoneNumber < 0) {
-            evenLatitudeZoneNumber = latitudeZoneNumber + EVEN_LATITUDE_ZONES;
-            oddLatitudeZoneNumber = latitudeZoneNumber + ODD_LATITUDE_ZONES;
-        } else {
-            evenLatitudeZoneNumber = latitudeZoneNumber;
-            oddLatitudeZoneNumber = latitudeZoneNumber;
-        }
+        evenLatitudeTurn = computeLatitudeTurn(EVEN_LATITUDE_ZONES_WIDTH, EVEN_LATITUDE_ZONES, latitudeZoneNumber, y0);
+        oddLatitudeTurn = computeLatitudeTurn(ODD_LATITUDE_ZONES_WIDTH, ODD_LATITUDE_ZONES, latitudeZoneNumber, y1);
 
-        /* On détermine ensuite la latitude à laquelle l'aéronef se trouvait au moment de l'envoi de chacun des deux messages
-         * Les latitudes des deux messages sont exprimés en tours, puis en degrés. */
-        double evenLatitudeTurn = EVEN_LATITUDE_ZONES_WIDTH * (evenLatitudeZoneNumber + y0);
-        evenLatitudeDegree = Units.convert(refocusingOf(evenLatitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
+        /* On calcule ensuite le nombre de zones de longitude dans le découpage
+         * pair avec les deux latitudes (paire et impaire). */
+        double AEven = computeA(evenLatitudeTurn);
+        double AOdd = computeA(oddLatitudeTurn);
 
-        double oddLatitudeTurn = ODD_LATITUDE_ZONES_WIDTH * (oddLatitudeZoneNumber + y1);
-        oddLatitudeDegree = Units.convert(refocusingOf(oddLatitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
-
-
-        /* On calcule ensuite le nombre de zones de longitude dans le découpage pair avec les deux latitudes (paire et impaire). */
-        double AEven = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH))
-                / Math.pow(Math.cos(Units.convertFrom(evenLatitudeDegree, Units.Angle.DEGREE)), 2);
-        double AOdd = (1d - Math.cos(2 * Math.PI * EVEN_LATITUDE_ZONES_WIDTH))
-                / Math.pow(Math.cos(Units.convertFrom(oddLatitudeDegree, Units.Angle.DEGREE)), 2);
-
-        double evenLongitudeZoneValue = Math.floor((2d * Math.PI) / Math.acos(1 - AEven));
-        double oddLongitudeZoneValue = Math.floor((2d * Math.PI) / Math.acos(1 - AOdd));
+        double evenLongitudeZoneValue = computeLongitudeZoneValue(AEven);
+        double oddLongitudeZoneValue = computeLongitudeZoneValue(AOdd);
 
         int evenLongitudeZone;
-        /* Si on obtient ainsi deux valeurs différentes, cela signifie qu'entre les deux messages,
-         * l'aéronef a changé de "bande d'altitude", et il n'est donc pas possible de déterminer sa position
-         * La méthode Double.compare() retourne 0 si les deux valeurs sont égales (même si c'est deux NaN).*/
+         /* La méthode Double.compare() retourne 0 si les deux valeurs sont égales (même si c'est deux NaN).*/
         if (Double.compare(evenLongitudeZoneValue, oddLongitudeZoneValue) == 0) {
-            /* Si le résultat de la formule n'est pas défini, par définition le nombre dde zones de longitude vaut 1.*/
-            if (areLongitudeZoneValuesNaN(AEven, AOdd)) {
-                evenLongitudeZone = 1;
-            } else {
-                evenLongitudeZone = (int) evenLongitudeZoneValue;
-            }
-        } else {
-            return null;
-        }
+            if (areLongitudeZoneValuesNaN(AEven, AOdd)) evenLongitudeZone = 1;
+            else evenLongitudeZone = (int) evenLongitudeZoneValue;
+        } else return null;
 
         int oddLongitudeZone = evenLongitudeZone - 1;
 
-        int evenLongitudeZoneNumber, oddLongitudeZoneNumber;
-        /* Enfin, on calcule le numéro de la zone de longitude dans lequel l'aéronef se trouve dans chacun des deux découpages.
-         * S'il est égal à 1, les deux longitudes ont déjà été calculées plus haut dans la méthode,
-         * S'il est supérieur à 1, on procède comme pour le calcul des numéros de numéros de la zone de latitude
-         * pour le découpage pair et impair.*/
         if (evenLongitudeZone > 1) {
-
             int longitudeZoneNumber = (int) Math.rint((x0 * oddLongitudeZone) - (x1 * evenLongitudeZone));
-
-            if (longitudeZoneNumber < 0) {
-                evenLongitudeZoneNumber = longitudeZoneNumber + evenLongitudeZone;
-                oddLongitudeZoneNumber = longitudeZoneNumber + oddLongitudeZone;
-            } else {
-                evenLongitudeZoneNumber = longitudeZoneNumber;
-                oddLongitudeZoneNumber = longitudeZoneNumber;
-            }
-
-            double evenLongitudeTurn = (1d / evenLongitudeZone) * (evenLongitudeZoneNumber + x0);
-            evenLongitudeDegree = Units.convert(refocusingOf(evenLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
-
-            double oddLongitudeTurn = (1d / oddLongitudeZone) * (oddLongitudeZoneNumber + x1);
-            oddLongitudeDegree = Units.convert(refocusingOf(oddLongitudeTurn), Units.Angle.TURN, Units.Angle.DEGREE);
-
+            evenLongitudeTurn = computeLongitudeTurn(evenLongitudeZone, longitudeZoneNumber, x0);
+            oddLongitudeTurn = computeLongitudeTurn(oddLongitudeZone, longitudeZoneNumber, x1);
         }
 
-        /* Renvoie un objet GeoPos selon le dernier message (s'il est pair, on utilise la méthode
-         * statique geoPosOf() avec les longitudes et latitudes des messages pairs, sinon ceux des
-         * messages impairs.) */
-        if (mostRecent == 0) {
-            return geoPosOf(evenLongitudeDegree, evenLatitudeDegree);
-        } else {
-            return geoPosOf(oddLongitudeDegree, oddLatitudeDegree);
+        switch (mostRecent) {
+            case 0 -> {
+                return geoPosOf(evenLongitudeTurn,evenLatitudeTurn);
+            }
+            case 1 -> {
+                return geoPosOf(oddLongitudeTurn,oddLatitudeTurn);
+            }
+            default -> {
+                return null;
+            }
         }
     }
 
     /**
      * Méthode qui renvoie un Objet GeoPos (la position de l'aéronef au moment de l'envoi du message)
+     * si la latitude de l'aéronef est valide.
      *
-     * @param longitudeDegree la longitude de l'aéronef en degrés.
-     * @param latitudeDegree  la latitude de l'aéronef en degrés.
-     * @return La position géographique de l'aéronef au moment de l'envoi du message
-     * selon sa latitude et sa longitude en T32 (converties depuis des degrés),
-     * ou null si la latitude en degrés n'est pas comprise entre -90° et 90° inclus.
+     * @param longitudeTurn la longitude de l'aéronef en tour.
+     * @param latitudeTurn  la latitude de l'aéronef en tour.
      */
-    private static GeoPos geoPosOf(double longitudeDegree, double latitudeDegree) {
+    private static GeoPos geoPosOf(double longitudeTurn, double latitudeTurn) {
         int longitudeT32, latitudeT32;
-        longitudeT32 = (int) Math.rint(Units.convert(longitudeDegree, Units.Angle.DEGREE, Units.Angle.T32));
-        latitudeT32 = (int) Math.rint(Units.convert(latitudeDegree, Units.Angle.DEGREE, Units.Angle.T32));
-        return (latitudeDegree <= 90d) && (latitudeDegree >= -90d) ? new GeoPos(longitudeT32, latitudeT32) : null;
+        longitudeT32 = (int) Math.rint(Units.convert(longitudeTurn, Units.Angle.TURN, Units.Angle.T32));
+        latitudeT32 = (int) Math.rint(Units.convert(latitudeTurn, Units.Angle.TURN, Units.Angle.T32));
+        return GeoPos.isValidLatitudeT32(latitudeT32) ? new GeoPos(longitudeT32, latitudeT32) : null;
     }
 
     /**
@@ -169,4 +127,62 @@ public final class CprDecoder {
     private static boolean areLongitudeZoneValuesNaN(double AEven, double AOdd) {
         return Double.isNaN(Math.acos(1 - AEven)) && Double.isNaN(Math.acos(1 - AOdd));
     }
+
+    /**
+     * Méthode statique qui permet de calculer le dénominateur A lors du calcul du nombre de zones de longitude
+     * (paires ou impaires).
+     *
+     * @param latitudeTurn La latitude en tours (pair ou impair).
+     * @return Le dénominateur A utilisé lors du calcul du nombre de zones de longitude.
+     */
+    private static double computeA(double latitudeTurn) {
+        double numerator = (1d - Math.cos(Units.Angle.TURN * EVEN_LATITUDE_ZONES_WIDTH));
+        return numerator / Math.pow(Math.cos(Units.convertFrom(latitudeTurn, Units.Angle.TURN)), 2);
+    }
+
+    /**
+     * Méthode statique qui permet de calculer la latitude en tour selon le découpage (pair ou impair).
+     *
+     * @param zoneWidth          La largeur des zones.
+     * @param numberOfZones      Le nombre de zones de latitude.
+     * @param latitudeZoneNumber Le numéro de zone de latitude dans lequel l'aéronef se trouve.
+     * @param y                  La latitude locale.
+     * @return La latitude de l'aéronef en tour.
+     */
+    private static double computeLatitudeTurn(double zoneWidth,
+                                              double numberOfZones,
+                                              double latitudeZoneNumber,
+                                              double y) {
+        return latitudeZoneNumber < 0 ?
+                refocusingOf(zoneWidth * (latitudeZoneNumber + numberOfZones + y)) :
+                refocusingOf(zoneWidth * (latitudeZoneNumber + y));
+    }
+
+    /**
+     * Méthode statique qui permet de calculer la longitude en tour selon le découpage (pair ou impair).
+     *
+     * @param numberOfZones      Le nombre de zones de longitude.
+     * @param latitudeZoneNumber Le numéro de zone de longitude dans lequel l'aéronef se trouve.
+     * @param x                  La longitude locale.
+     * @return La longitude de l'aéronef en tour.
+     */
+    private static double computeLongitudeTurn(double numberOfZones,
+                                               double latitudeZoneNumber,
+                                               double x) {
+        return latitudeZoneNumber < 0 ?
+                refocusingOf((1d / numberOfZones) * (latitudeZoneNumber + numberOfZones + x)) :
+                refocusingOf((1d / numberOfZones) * (latitudeZoneNumber + x));
+    }
+
+    /**
+     * Méthode statique qui permet de calculer le nombre de zones de longitude dans le découpage pair et impair
+     * (selon le dénominateur A).
+     *
+     * @param A Le dénominateur A utilisé dans le calcul.
+     * @return Le nombre de zones de longitude.
+     */
+    private static double computeLongitudeZoneValue(double A) {
+        return Math.floor(Units.Angle.TURN / Math.acos(1 - A));
+    }
+
 }
