@@ -17,6 +17,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public final class AircraftDatabase {
 
+    private static final String SEPARATOR = ",";
     private final String fileName;
 
     /**
@@ -54,7 +55,7 @@ public final class AircraftDatabase {
 
                 /* Parcourir toutes les lignes du fichier CSV */
                 while ((line = bufferedReader.readLine()) != null) {
-                    String[] fields = line.split(",", -1);
+                    String[] fields = line.split(SEPARATOR, -1);
                     IcaoAddress currentAddress = new IcaoAddress(fields[0]);
 
                     /* Si l'adresse ICAO correspond, créer un objet AircraftData avec les informations de
