@@ -58,6 +58,8 @@ public final class AircraftStateAccumulator<T extends AircraftStateSetter> {
             }
             case AirbornePositionMessage apm -> {
                 stateSetter.setAltitude(apm.altitude());
+                /* On mémorise le dernier message reçu dans son index du tableau correspondant
+                 * (lastMessages[0] si le message est pair, sinon lastMessages[1] s'il est impair). */
                 setParityMessage(apm);
                 if (canPositionBeDetermined(lastMessages[apm.parity() ^ 1], apm)) {
                     GeoPos pos = getPos(apm.parity(), apm);
