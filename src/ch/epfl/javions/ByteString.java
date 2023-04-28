@@ -12,6 +12,7 @@ import java.util.Objects;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class ByteString {
+    private static final HexFormat hf = HexFormat.of().withUpperCase();
     private final byte[] bytes;
 
     /**
@@ -30,19 +31,10 @@ public final class ByteString {
      * @param hexString Représentation hexadécimale de la chaîne d'octets.
      * @return la chaîne d'octets à partir de la représentation hexadécimale de la chaine d'octets.
      * @throws IllegalArgumentException si la chaîne donnée n'est pas de longueur paire.
-     * @throws NumberFormatException    si la chaîne contient un caractère qui n'est pas un chiffre hexadécimal.
+     * @throws IllegalArgumentException si la chaîne contient un caractère qui n'est pas un chiffre hexadécimal.
      */
     public static ByteString ofHexadecimalString(String hexString) {
-
-        Preconditions.checkArgument(hexString.length() % 2 == 0);
-
-        HexFormat hf = HexFormat.of().withUpperCase();
-
-        try {
-            return new ByteString(hf.parseHex(hexString));
-        } catch (IllegalArgumentException e) {
-            throw new NumberFormatException("Invalid hexadecimal string: " + hexString);
-        }
+        return new ByteString(hf.parseHex(hexString));
     }
 
     /**
@@ -63,7 +55,6 @@ public final class ByteString {
      *                                   de la classe Objects.
      */
     public int byteAt(int index) {
-        Objects.checkIndex(index, bytes.length);
         return Byte.toUnsignedInt(bytes[index]);
     }
 
@@ -84,12 +75,12 @@ public final class ByteString {
     public long bytesInRange(int fromIndex, int toIndex) {
 
         Objects.checkFromIndexSize(fromIndex, toIndex - fromIndex, bytes.length);
-        Preconditions.checkArgument(toIndex - fromIndex <= Long.BYTES);
+        Preconditions.checkArgument(toIndex - fromIndex < Long.BYTES);
 
         long result = 0;
 
         for (int i = fromIndex; i < toIndex; i++) {
-            result = (result << Long.BYTES) | Byte.toUnsignedLong(bytes[i]);
+            result = (result << Long.BYTES) | byteAt(i);
         }
 
         return result;
@@ -125,7 +116,6 @@ public final class ByteString {
      */
     @Override
     public String toString() {
-        HexFormat hf = HexFormat.of().withUpperCase();
         return hf.formatHex(bytes);
     }
 }
