@@ -29,6 +29,8 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
 
     private static final Crc24 Crc24 = new Crc24(GENERATOR);
     private static final int VALID_DF = 17;
+    private static final int DF_CA_START = 0, DF_CA_END = 0 + 1;
+    private static final int DF_START = 3, DF_SIZE = 5;
     private static final int ME_START = 4, ME_END = 10 + 1;
     private static final int ICAO_START = 1, ICAO_END = 3 + 1, ICAO_SIZE = 6;
     private static final int TYPE_CODE_START = 51, TYPE_CODE_SIZE = 5;
@@ -36,11 +38,12 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
     /**
      * Constructeur compact de l'enregistrement RawMessage.
      *
-     * @throws IllegalArgumentException si le temps d'arrivée est négatif ou
+     * @throws IllegalArgumentException si le temps d'arrivée est négatif
      *                                  si la longueur du message n'est pas égale à LENGTH (14).
      */
     public RawMessage {
-        Preconditions.checkArgument((timeStampNs >= 0) && (bytes.size() == LENGTH));
+        Preconditions.checkArgument(timeStampNs >= 0);
+        Preconditions.checkArgument(bytes.size() == LENGTH);
     }
 
     /**
@@ -52,7 +55,6 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @throws NullPointerException si le tableau d'octets est null.
      */
     public static RawMessage of(long timeStampNs, byte[] bytes) {
-        Objects.requireNonNull(bytes);
         return Crc24.crc(bytes) == 0 ? new RawMessage(timeStampNs, new ByteString(bytes)) : null;
     }
 
@@ -63,7 +65,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return La longueur du message (14) si le downlink format (DF) du message est 17, 0 sinon.
      */
     public static int size(byte byte0) {
-        return Byte.toUnsignedInt(byte0) >>> 3 == VALID_DF ? LENGTH : 0;
+        return Bits.extractUInt(byte0,DF_START,DF_SIZE) == VALID_DF ? LENGTH : 0;
     }
 
     /**
@@ -82,7 +84,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le downlink format (DF) du message.
      */
     public int downLinkFormat() {
-        return bytes().byteAt(0) >>> 3;
+        return Bits.extractUInt(bytes.bytesInRange(DF_CA_START,DF_CA_END),DF_START,DF_SIZE);
     }
 
     /**
@@ -92,7 +94,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      */
     public IcaoAddress icaoAddress() {
         return new IcaoAddress(HexFormat.of().withUpperCase()
-                    .toHexDigits(bytes().bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
+                    .toHexDigits(bytes.bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
     }
 
     /**
