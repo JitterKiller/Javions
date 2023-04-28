@@ -14,9 +14,10 @@ import java.io.InputStream;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class PowerComputer {
-    private final SamplesDecoder decoder;
-    private final short[] circularBuffer = new short[Byte.SIZE];
+    private static final int CIRCULAR_BUFFER_SIZE = 8;
+    private final short[] circularBuffer = new short[CIRCULAR_BUFFER_SIZE];
     private final short[] powerBuffer;
+    private final SamplesDecoder decoder;
     private final int batchSize;
 
     /**

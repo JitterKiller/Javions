@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 
 public final class PowerWindow {
-    private final static int BATCH_SIZE = 1 << 16;
+    private static final int BATCH_SIZE = 1 << 16;
     private final int windowSize;
     private final PowerComputer powerComputer;
     private long position = 0;

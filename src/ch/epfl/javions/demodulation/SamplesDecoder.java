@@ -15,7 +15,7 @@ import java.util.Objects;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class SamplesDecoder {
-    private final static int OFFSET = 2048;
+    private static final int OFFSET = 2048;
     private final InputStream stream;
     private final int batchSize;
     private final byte[] bytesBuffer;
@@ -57,12 +57,12 @@ public final class SamplesDecoder {
 
         int bytesRead = stream.readNBytes(bytesBuffer, 0, bytesBuffer.length);
 
-        for (int i = 0; i < bytesRead / 2; ++i) {
-            int byteIndex = i * 2;
+        for (int i = 0; i < bytesRead / Short.BYTES; ++i) {
+            int byteIndex = i * Short.BYTES;
             int sample = (Byte.toUnsignedInt(bytesBuffer[byteIndex + 1]) << Byte.SIZE)
                        | (Byte.toUnsignedInt(bytesBuffer[byteIndex]));
             batch[i] = (short) (sample - OFFSET);
         }
-        return bytesRead / 2;
+        return bytesRead / Short.BYTES;
     }
 }
