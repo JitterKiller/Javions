@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record AircraftTypeDesignator(String string) {
-    private static final Pattern pattern = Pattern.compile("[A-Z0-9]{2,4}");
+    private static final Pattern PATTERN = Pattern.compile("[A-Z0-9]{2,4}");
 
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
@@ -24,7 +24,7 @@ public record AircraftTypeDesignator(String string) {
      *                                  la méthode checkArgument()).
      */
     public AircraftTypeDesignator {
-        Preconditions.checkArgument(pattern.matcher(string).matches() || string.isEmpty());
+        Preconditions.checkArgument(PATTERN.matcher(string).matches() || string.isEmpty());
     }
 
 }

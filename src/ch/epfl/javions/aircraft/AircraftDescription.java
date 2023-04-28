@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record AircraftDescription(String string) {
-    private static final Pattern pattern = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
+    private static final Pattern PATTERN = Pattern.compile("[ABDGHLPRSTV-][0123468][EJPT-]");
 
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
@@ -25,7 +25,7 @@ public record AircraftDescription(String string) {
      *                                  Pattern et Matcher ainsi que la méthode checkArgument()).
      */
     public AircraftDescription {
-        Preconditions.checkArgument(pattern.matcher(string).matches() || string.isEmpty());
+        Preconditions.checkArgument(PATTERN.matcher(string).matches() || string.isEmpty());
     }
 
 }

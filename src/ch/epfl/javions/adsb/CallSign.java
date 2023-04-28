@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * @author Abdellah Janati Idrissi (362341)
  */
 public record CallSign(String string) {
-    private static final Pattern pattern = Pattern.compile("[A-Z0-9 ]{0,8}");
+    private static final Pattern PATTERN = Pattern.compile("[A-Z0-9 ]{0,8}");
 
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
@@ -25,7 +25,7 @@ public record CallSign(String string) {
      *                                  Pattern et Matcher ainsi que checkArgument).
      */
     public CallSign {
-        Preconditions.checkArgument(pattern.matcher(string).matches());
+        Preconditions.checkArgument(PATTERN.matcher(string).matches());
     }
 
 }

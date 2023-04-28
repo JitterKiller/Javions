@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record AircraftRegistration(String string) {
-    private static final Pattern pattern = Pattern.compile("[A-Z0-9 .?/_+-]+");
+    private static final Pattern PATTERN = Pattern.compile("[A-Z0-9 .?/_+-]+");
 
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
@@ -26,7 +26,7 @@ public record AircraftRegistration(String string) {
      * @throws IllegalArgumentException si cette chaine est vide.
      */
     public AircraftRegistration {
-        Preconditions.checkArgument(pattern.matcher(string).matches());
+        Preconditions.checkArgument(PATTERN.matcher(string).matches());
     }
 
 }

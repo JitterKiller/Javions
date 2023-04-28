@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public record IcaoAddress(String string) {
-    private static final Pattern pattern = Pattern.compile("[0-9A-F]{6}");
+    private static final Pattern PATTERN = Pattern.compile("[0-9A-F]{6}");
 
     /**
      * Le constructeur compact de cet enregistrement valide la chaîne qui lui est passée et lève
@@ -27,7 +27,7 @@ public record IcaoAddress(String string) {
      * @throws IllegalArgumentException Si cette chaine est vide.
      */
     public IcaoAddress {
-        Preconditions.checkArgument(pattern.matcher(string).matches());
+        Preconditions.checkArgument(PATTERN.matcher(string).matches());
     }
 
 }
