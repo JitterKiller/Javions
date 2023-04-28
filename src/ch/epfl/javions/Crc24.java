@@ -14,11 +14,12 @@ public final class Crc24 {
      */
     public static final int GENERATOR = 0xFFF409;
 
-    private static final int CRC_SIZE = 24, CRC_START = 0;
+    private static final int CRC_START = 0;
+    private static final int CRC_SIZE = 24;
     private static final int TOP_BIT = CRC_SIZE - Byte.BYTES;
     private static final int TOP_BYTE = CRC_SIZE - Byte.SIZE;
     private static final int TABLE_SIZE = 256;
-    private static final int[] TABLE = new int[TABLE_SIZE];
+    private final int[] table = new int[TABLE_SIZE];
 
     /**
      * Constructeur public de la classe Crc24 (appelle la méthode buildTable() pour
@@ -62,9 +63,9 @@ public final class Crc24 {
      *
      * @param generator le générateur du Crc utilisé pour générer la table.
      */
-    private static void buildTable(int generator) {
+    private void buildTable(int generator) {
         for (int i = 0; i < TABLE_SIZE; i++) {
-            TABLE[i] = crc_bitwise(generator, new byte[]{(byte) i});
+            table[i] = crc_bitwise(generator, new byte[]{(byte) i});
         }
     }
 
@@ -79,12 +80,12 @@ public final class Crc24 {
 
         /* Première boucle traitant les octets du message */
         for (byte b : bytes) {
-            crc = ((crc << Byte.SIZE) | Byte.toUnsignedInt(b)) ^ TABLE[Bits.extractUInt(crc, TOP_BYTE, Byte.SIZE)];
+            crc = ((crc << Byte.SIZE) | Byte.toUnsignedInt(b)) ^ table[Bits.extractUInt(crc, TOP_BYTE, Byte.SIZE)];
         }
 
         /* Seconde boucle traitant les 3 octets ajoutés */
         for (int i = CRC_START; i < 3; ++i) {
-            crc = ((crc << Byte.SIZE)) ^ TABLE[Bits.extractUInt(crc, TOP_BYTE, Byte.SIZE)];
+            crc = ((crc << Byte.SIZE)) ^ table[Bits.extractUInt(crc, TOP_BYTE, Byte.SIZE)];
         }
         return Bits.extractUInt(crc, CRC_START, CRC_SIZE);
     }
