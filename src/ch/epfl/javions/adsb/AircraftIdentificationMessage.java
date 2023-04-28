@@ -20,6 +20,9 @@ import java.util.Objects;
 public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAddress,
                                             int category, CallSign callSign) implements Message {
 
+    private static final int ASCII_LETTER_START = 1, ASCII_LETTER_END = 26;
+    private static final int ASCII_NUMBER_START = 48, ASCII_NUMBER_END = 57;
+    private static final int ASCII_ESCAPE_NUMBER = 32;
     private static final int ASCII_LETTER_OFFSET = 64;
     private static final int CALL_SIGN_CHAR_SIZE = 6;
     private static final int CA_START = 48, CA_SIZE = 3;
@@ -53,20 +56,17 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
         StringBuilder callSignID = new StringBuilder();
 
         for (int i = 42; i >= 0; i -= CALL_SIGN_CHAR_SIZE) {
-            int callSignExtractedInt = Bits.extractUInt(rawMessage.payload(), i, CALL_SIGN_CHAR_SIZE);
+            int callSignInt = Bits.extractUInt(rawMessage.payload(), i, CALL_SIGN_CHAR_SIZE);
 
-            switch (callSignExtractedInt) {
-
-                case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26
-                        -> callSignID.append((char) (callSignExtractedInt + ASCII_LETTER_OFFSET));
-
-                case 32, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57
-                        -> callSignID.append((char) callSignExtractedInt);
-
-                default -> {
-                    return null;
-                }
+            if (ASCII_LETTER_START <= callSignInt && callSignInt <= ASCII_LETTER_END) {
+                callSignID.append((char) (callSignInt + ASCII_LETTER_OFFSET));
+            } else if(ASCII_NUMBER_START <= callSignInt && callSignInt <= ASCII_NUMBER_END) {
+                callSignID.append((char) callSignInt);
+            } else if (callSignInt == ASCII_ESCAPE_NUMBER) {
+                callSignID.append((char) callSignInt);
             }
+            else return null;
+
         }
 
         CallSign callSign = new CallSign(callSignID.toString().stripTrailing());

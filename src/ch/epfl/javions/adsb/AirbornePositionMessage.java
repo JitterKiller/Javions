@@ -34,7 +34,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE, LAT_CPR_SIZE = CPR_BITS;
     private static final int Q1_MULTIPLIER_25 = 25, Q0_MULTIPLIER_100 = 100, Q0_MULTIPLIER_500 = 500;
     private static final int FORMAT_START = 34, FORMAT_SIZE = 1;
-    private static final int DIVIDER_FACTOR = -17;
+    private static final int NORMALIZED_FACTOR = -17;
 
     /**
      * Constructeur compact de AirbornePositionMessage
@@ -98,7 +98,7 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
         }
         return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
                 Units.convertFrom(altitude, Units.Length.FOOT), parity,
-                Math.scalb(longitude, DIVIDER_FACTOR), Math.scalb(latitude, DIVIDER_FACTOR));
+                Math.scalb(longitude, NORMALIZED_FACTOR), Math.scalb(latitude, NORMALIZED_FACTOR));
     }
 
     /**
