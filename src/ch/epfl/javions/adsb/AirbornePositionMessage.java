@@ -32,7 +32,9 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
     private static final int BASE_ALTITUDE_Q_1 = 1000, BASE_ALTITUDE_Q_0 = 1300;
     private static final int LON_CPR_START = 0, LON_CPR_SIZE = CPR_BITS;
     private static final int LAT_CPR_START = LON_CPR_START + LON_CPR_SIZE, LAT_CPR_SIZE = CPR_BITS;
+    private static final int Q1_MULTIPLIER_25 = 25, Q0_MULTIPLIER_100 = 100, Q0_MULTIPLIER_500 = 500;
     private static final int FORMAT_START = 34, FORMAT_SIZE = 1;
+    private static final int DIVIDER_FACTOR = -17;
 
     /**
      * Constructeur compact de AirbornePositionMessage
@@ -58,23 +60,24 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
      * ou null si l'altitude est invalide
      */
     public static AirbornePositionMessage of(RawMessage rawMessage) {
+        long payload = rawMessage.payload();
 
-        int inputALT = Bits.extractUInt(rawMessage.payload(), ALT_START, ALT_SIZE);
+        int inputALT = Bits.extractUInt(payload, ALT_START, ALT_SIZE);
 
-        int parity = Bits.extractUInt(rawMessage.payload(), FORMAT_START, FORMAT_SIZE);
-        double latitude = Bits.extractUInt(rawMessage.payload(), LAT_CPR_START, LAT_CPR_SIZE);
-        double longitude = Bits.extractUInt(rawMessage.payload(), LON_CPR_START, LON_CPR_SIZE);
+        int parity = Bits.extractUInt(payload, FORMAT_START, FORMAT_SIZE);
+        double latitude = Bits.extractUInt(payload, LAT_CPR_START, LAT_CPR_SIZE);
+        double longitude = Bits.extractUInt(payload, LON_CPR_START, LON_CPR_SIZE);
 
         double altitude;
 
         /* Selon la valeur du bit d'index Q, on calcule l'altitude différemment. */
         if (Bits.testBit(inputALT, Q_INDEX)) { /* Cas où Q = 1 */
 
-            int leftAltitudeBits = Bits.extractUInt(rawMessage.payload(), LEFT_ALT_START, LEFT_ALT_SIZE) << Q_INDEX;
-            int rightAltitudeBits = Bits.extractUInt(rawMessage.payload(), RIGHT_ALT_START, RIGHT_ALT_SIZE);
+            int leftAltitudeBits = Bits.extractUInt(payload, LEFT_ALT_START, LEFT_ALT_SIZE) << Q_INDEX;
+            int rightAltitudeBits = Bits.extractUInt(payload, RIGHT_ALT_START, RIGHT_ALT_SIZE);
             int altitudeValue = leftAltitudeBits | rightAltitudeBits;
 
-            altitude = altitudeValue * 25 - BASE_ALTITUDE_Q_1;
+            altitude = altitudeValue * Q1_MULTIPLIER_25 - BASE_ALTITUDE_Q_1;
 
         } else { /* Cas où Q = 0 */
 
@@ -91,11 +94,11 @@ public record AirbornePositionMessage(long timeStampNs, IcaoAddress icaoAddress,
             if (m100Feet == 7) m100Feet = 5;
             if (m500Feet % 2 == 1) m100Feet = 6 - m100Feet;
 
-            altitude = (m500Feet * 500) + (m100Feet * 100) - BASE_ALTITUDE_Q_0;
+            altitude = (m500Feet * Q0_MULTIPLIER_500) + (m100Feet * Q0_MULTIPLIER_100) - BASE_ALTITUDE_Q_0;
         }
         return new AirbornePositionMessage(rawMessage.timeStampNs(), rawMessage.icaoAddress(),
                 Units.convertFrom(altitude, Units.Length.FOOT), parity,
-                Math.scalb(longitude, -17), Math.scalb(latitude, -17));
+                Math.scalb(longitude, DIVIDER_FACTOR), Math.scalb(latitude, DIVIDER_FACTOR));
     }
 
     /**
