@@ -543,7 +543,7 @@ class AdsbDemodulatorTest {
         var samplesResourceMac = "/Users/adam/Downloads/samples_20230304_1442.bin";
         var samplesResourceWindows = "C:\\Users\\WshLaStreet\\Downloads\\samples_20230304_1442.bin";
         var expectedIt = EXPECTED_RAW_MESSAGE_DATA.iterator();
-        try (var s = new FileInputStream(samplesResourceMac)) {
+        try (var s = new FileInputStream(samplesResourceWindows)) {
             var demodulator = new AdsbDemodulator(s);
             while (expectedIt.hasNext()) {
                 var expected = expectedIt.next();
