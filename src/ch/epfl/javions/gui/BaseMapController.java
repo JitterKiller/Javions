@@ -1,16 +1,16 @@
 package ch.epfl.javions.gui;
+
+import ch.epfl.javions.GeoPos;
+import ch.epfl.javions.WebMercator;
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
-import javafx.geometry.Point2D;
 
 import java.io.IOException;
-
-import ch.epfl.javions.GeoPos;
 
 public final class BaseMapController {
 
@@ -27,6 +27,7 @@ public final class BaseMapController {
         this.parameters = parameters;
         this.canvas = new Canvas();
         this.pane = new Pane(canvas);
+        this.redrawNeeded = false;
 
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
@@ -84,26 +85,35 @@ public final class BaseMapController {
             long currentTime = System.currentTimeMillis();
             if (currentTime < minScrollTime.get()) return;
             minScrollTime.set(currentTime + 200);
-
+            parameters.scroll(e.getX(), e.getY());
             parameters.changeZoomLevel(zoomDelta);
+            parameters.scroll(-e.getX(), -e.getY());
         });
 
         pane.setOnMousePressed(e -> memoryPosition = new Point2D(e.getX(), e.getY()));
 
         pane.setOnMouseDragged(e -> {
-            if (e.getButton() == MouseButton.PRIMARY) {
-                double x = e.getX() - memoryPosition.getX();
-                double y = e.getY() - memoryPosition.getY();
-                parameters.scroll(x,y);
-            }
+            double x = e.getX() - memoryPosition.getX();
+            double y = e.getY() - memoryPosition.getY();
+
+            parameters.scroll(x,y);
+            memoryPosition.add(e.getX(), e.getY());
         });
 
-        pane.setOnMouseReleased(e -> memoryPosition = null);
+        pane.setOnMouseReleased(e -> memoryPosition.add(null));
 
     }
 
     public Pane pane (){ return pane; }
 
-    public void centerOn (GeoPos point){}
+    public void centerOn (GeoPos point){
+
+        double longitude = point.longitude();
+        double latitude = point.latitude();
+        double x = WebMercator.x(parameters.getZoom(), longitude);
+        double y = WebMercator.x(parameters.getZoom(), latitude);
+        parameters.setMinX(x - (canvas.getWidth()/2));
+        parameters.setMinX(y - (canvas.getHeight()/2));
+    }
 
 }

@@ -52,15 +52,8 @@ public final class AircraftStateManager {
     }
 
     public void purge() {
+        knownAircraftPositionsStates.removeIf(state ->
+                previousMessageTimeStampNs - state.getLastMessageTimeStampNs() >= ONE_MINUTE_TIME_STAMP_NS);
 
-        List<ObservableAircraftState> statesToRemove = new ArrayList<>();
-
-        for (ObservableAircraftState state : knownAircraftPositionsStates) {
-            if (previousMessageTimeStampNs - state.getLastMessageTimeStampNs() >= ONE_MINUTE_TIME_STAMP_NS) {
-                statesToRemove.add(state);
-            }
-        }
-        // Can cause ConcurrentModificationException error
-        statesToRemove.forEach(knownAircraftPositionsStates::remove);
     }
 }

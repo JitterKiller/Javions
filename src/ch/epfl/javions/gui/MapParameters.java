@@ -33,13 +33,13 @@ public final class MapParameters {
         return minYProperty().get();
     }
 
-    private void setZoom(int zoom) {
+    public void setZoom(int zoom) {
         this.zoom.set(zoom);
     }
-    private void setMinX(double minX) {
+    public void setMinX(double minX) {
         this.minX.set(minX);
     }
-    private void setMinY(double minY) {
+    public void setMinY(double minY) {
         this.minY.set(minY);
     }
 
