@@ -12,11 +12,14 @@ import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 
+import static ch.epfl.javions.gui.TileManager.TILE_SIDE;
+
 public final class BaseMapController {
 
     private final TileManager tileManager;
     private final MapParameters parameters;
     private final Canvas canvas;
+    private final GraphicsContext graphicsContext;
     private final Pane pane;
     private Point2D memoryPosition;
     private boolean redrawNeeded;
@@ -25,9 +28,9 @@ public final class BaseMapController {
 
         this.tileManager = tileManager;
         this.parameters = parameters;
-        this.canvas = new Canvas();
-        this.pane = new Pane(canvas);
-        this.redrawNeeded = false;
+        canvas = new Canvas();
+        pane = new Pane(canvas);
+        graphicsContext = canvas.getGraphicsContext2D();
 
         canvas.widthProperty().bind(pane.widthProperty());
         canvas.heightProperty().bind(pane.heightProperty());
@@ -42,17 +45,20 @@ public final class BaseMapController {
     }
 
     private void drawMap() {
-
-        GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
-        TileManager.TileId id = new TileManager.TileId(
-                parameters.getZoom(),
-                (int) parameters.getMinX() / TileManager.TileId.TILE_FACTOR,
-                (int) parameters.getMinY() / TileManager.TileId.TILE_FACTOR);
-
-        try {
-            graphicsContext.drawImage(tileManager.imageForTileAt(id), id.X(), id.Y());
-        } catch(IOException ignored){}
-
+        graphicsContext.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
+        for(int i = 0; i < pane.getWidth() + TILE_SIDE; i+= TILE_SIDE) {
+            for(int j = 0; j < pane.getHeight() + TILE_SIDE; j+= TILE_SIDE) {
+                int xTile = (int) (parameters.getMinXProperty() + i) / TILE_SIDE;
+                int yTile = (int) (parameters.getMinYProperty() + j) / TILE_SIDE;
+                TileManager.TileId id = new TileManager.TileId(parameters.getZoomProperty(), xTile, yTile);
+                int xToPlace = (int) (xTile * TILE_SIDE - parameters.getMinXProperty());
+                int yToPlace = (int) (yTile * TILE_SIDE - parameters.getMinYProperty());
+                try {
+                    graphicsContext.drawImage(tileManager.imageForTileAt(id),
+                            xToPlace, yToPlace);
+                } catch (IOException ignored){}
+            }
+        }
     }
 
     private void redrawIfNeeded() {
@@ -93,25 +99,27 @@ public final class BaseMapController {
         pane.setOnMousePressed(e -> memoryPosition = new Point2D(e.getX(), e.getY()));
 
         pane.setOnMouseDragged(e -> {
-            double x = e.getX() - memoryPosition.getX();
-            double y = e.getY() - memoryPosition.getY();
+            double x = (memoryPosition.getX() - e.getX());
+            double y = (memoryPosition.getY() - e.getY());
 
             parameters.scroll(x,y);
-            memoryPosition.add(e.getX(), e.getY());
+            memoryPosition = new Point2D(e.getX(), e.getY());
         });
 
-        pane.setOnMouseReleased(e -> memoryPosition.add(null));
+        pane.setOnMouseReleased(e -> memoryPosition.subtract(memoryPosition));
 
     }
 
-    public Pane pane (){ return pane; }
+    public Pane pane() {
+        return pane;
+    }
 
     public void centerOn (GeoPos point){
 
         double longitude = point.longitude();
         double latitude = point.latitude();
-        double x = WebMercator.x(parameters.getZoom(), longitude);
-        double y = WebMercator.x(parameters.getZoom(), latitude);
+        double x = WebMercator.x(parameters.getZoomProperty(), longitude);
+        double y = WebMercator.x(parameters.getZoomProperty(), latitude);
         parameters.setMinX(x - (canvas.getWidth()/2));
         parameters.setMinX(y - (canvas.getHeight()/2));
     }

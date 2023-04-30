@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class TileManager {
-
+    public static final int TILE_SIDE = 256;
     private static final int MEMORY_CACHE_SIZE = 100;
     private final Path diskCachePath;
     private final String severName;
@@ -61,13 +61,12 @@ public final class TileManager {
     }
 
     record TileId(int zoom, int X, int Y) {
-        static int TILE_FACTOR = 256;
         public TileId {
             Preconditions.checkArgument(isValid(zoom,X,Y));
         }
         public static boolean isValid(int zoom, int X, int Y) {
 
-            double maxXY = Math.scalb(1d, 8 + zoom) / TILE_FACTOR;
+            double maxXY = Math.scalb(1d, 8 + zoom) / TILE_SIDE;
 
             return (0 <= X && X < maxXY) && (0 <= Y && Y < maxXY);
         }

@@ -23,13 +23,13 @@ public final class MapParameters {
         return minY;
     }
 
-    public int getZoom() {
+    public int getZoomProperty() {
         return zoomProperty().get();
     }
-    public double getMinX() {
+    public double getMinXProperty() {
         return minXProperty().get();
     }
-    public double getMinY() {
+    public double getMinYProperty() {
         return minYProperty().get();
     }
 
@@ -51,18 +51,19 @@ public final class MapParameters {
     }
 
     public void scroll(double x, double y) {
-        setMinX(getMinX() + x);
-        setMinY(getMinY() + y);
+        setMinX(getMinXProperty() + x);
+        setMinY(getMinYProperty() + y);
     }
 
     public void changeZoomLevel(int zoomDelta) {
 
-        int newZoom = Math2.clamp(ZOOM_MIN,getZoom() + zoomDelta,ZOOM_MAX);;
+        int oldZoom = getZoomProperty();
+        int newZoom = Math2.clamp(ZOOM_MIN, getZoomProperty() + zoomDelta,ZOOM_MAX);;
 
         setZoom(newZoom);
 
-        double scaleFactor = Math.scalb(1d, newZoom - zoomDelta);
-        setMinX(getMinX() * scaleFactor);
-        setMinY(getMinY() * scaleFactor);
+        double scaleFactor = Math.scalb(1d, newZoom - oldZoom);
+        setMinX(getMinXProperty() * scaleFactor);
+        setMinY(getMinYProperty() * scaleFactor);
     }
 }
