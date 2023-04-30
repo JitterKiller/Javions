@@ -12,26 +12,52 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * La classe TileManager du sous-paquetage gui, représente un gestionnaire de tuiles OSM.
+ * Son rôle est d'obtenir les tuiles depuis un serveur de tuile et de les stocker dans un cache mémoire
+ * et dans un cache disque.
+ *
+ * @author Adam AIT BOUSSELHAM (356365)
+ * @author Abdellah JANATI IDRISSI (362341)
+ */
 public final class TileManager {
+
+    /**
+     * La taille de côté d'une tuile OSM (256 pixels).
+     */
     public static final int TILE_SIDE = 256;
     private static final int MEMORY_CACHE_SIZE = 100;
     private final Path diskCachePath;
     private final String severName;
     private final Map<TileId, Image> memoryCache = new LinkedHashMap<>(MEMORY_CACHE_SIZE);
 
+    /**
+     * Constructeur de la classe TileManager.
+     *
+     * @param diskCachePath Le chemin d'accès au dossier contenant le cache disque.
+     * @param serverName    Le nom du serveur de tuile.
+     */
     public TileManager(Path diskCachePath, String serverName) {
         this.diskCachePath = diskCachePath;
         this.severName = serverName;
     }
 
+    /**
+     * Seule méthode publique de TileManager prenant en argument l'identité d'une tuile (de type TileId)
+     * et retourne son image (de type Image de la bibliothèque JavaFX).
+     *
+     * @param id L'identité de la tuile.
+     * @return L'image correspondant à la tuile de type Image de la bibliothèque JavaFX.
+     * @throws IOException Si une erreur d'entrée/sortie se produit.
+     */
     public Image imageForTileAt(TileId id) throws IOException {
 
-        if(memoryCache.containsKey(id)) return memoryCache.get(id);
+        if (memoryCache.containsKey(id)) return memoryCache.get(id);
 
-        Path tilePath = Path.of(String.valueOf(diskCachePath),String.valueOf(id.zoom),
-                String.valueOf(id.X), id.Y +".png");
+        Path tilePath = Path.of(String.valueOf(diskCachePath), String.valueOf(id.zoom),
+                String.valueOf(id.X), id.Y + ".png");
 
-        if(Files.exists(tilePath)) {
+        if (Files.exists(tilePath)) {
             return new Image(String.valueOf(tilePath.toUri()));
         } else {
             if (!Files.isDirectory(tilePath.getParent())) {
@@ -42,8 +68,17 @@ public final class TileManager {
 
     }
 
+    /**
+     * Méthode utilisée lorsque la tuile ne se trouve ni dans le cache mémoire, ni dans le cache disque.
+     * Cette méthode s'occupe donc de télécharger et de stocker la tuile dans le cache disque/mémoire.
+     *
+     * @param id       L'identité de la tuile à télécharger.
+     * @param tilePath Le chemin d'accès de la tuile stockée dans le cache disque.
+     * @return L'image de type Image (JavaFX) téléchargée du serveur de tuile.
+     * @throws IOException Si une erreur d'entrée/sortie se produit.
+     */
     private Image load(TileId id, Path tilePath) throws IOException {
-        URL u = new URL("https://"+severName+"/"+id.zoom+"/"+id.X+"/"+id.Y+".png");
+        URL u = new URL("https://" + severName + "/" + id.zoom + "/" + id.X + "/" + id.Y + ".png");
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");
         try (InputStream i = c.getInputStream();
@@ -60,10 +95,27 @@ public final class TileManager {
         }
     }
 
+    /**
+     * L'enregistrement TileId, imbriqué dans la classe TileManager représente l'identité d'une tuile OSM.
+     *
+     * @param zoom Le niveau de zoom de la tuile.
+     * @param X    L'index X de la tuile.
+     * @param Y    L'index Y de la tuile.
+     */
     record TileId(int zoom, int X, int Y) {
         public TileId {
-            Preconditions.checkArgument(isValid(zoom,X,Y));
+            Preconditions.checkArgument(isValid(zoom, X, Y));
         }
+
+        /**
+         * Méthode publique et statique retournant vrai si et seulement si les attributs zoom, X et Y
+         * constituent une tuile valide.
+         *
+         * @param zoom Le niveau de zoom de la tuile a vérifié.
+         * @param X    L'index X de la tuile a vérifié.
+         * @param Y    L'index Y de la tuile a vérifié.
+         * @return Vrai si les trois attributs constituent une tuile valide, sinon faux.
+         */
         public static boolean isValid(int zoom, int X, int Y) {
 
             double maxXY = Math.scalb(1d, 8 + zoom) / TILE_SIDE;
