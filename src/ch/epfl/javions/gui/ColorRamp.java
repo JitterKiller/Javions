@@ -2,25 +2,8 @@ package ch.epfl.javions.gui;
 
 import ch.epfl.javions.Preconditions;
 import javafx.scene.paint.Color;
+
 public final class ColorRamp {
-    private final Color[] colors;
-    public ColorRamp(Color... colors) {
-        Preconditions.checkArgument(colors.length >= 2);
-        this.colors = colors;
-    }
-
-    public Color at(double t) {
-        if (t < 0) {
-            return colors[0];
-        }
-        if (t > 1) {
-            return colors[colors.length - 1];
-        }
-        int i = (int) Math.floor(t * (colors.length - 1));
-        double r = t * (colors.length - 1) - i;
-        return colors[i].interpolate(colors[i + 1], r);
-    }
-
     public static final ColorRamp PLASMA = new ColorRamp(
             Color.valueOf("0x0d0887ff"), Color.valueOf("0x220690ff"),
             Color.valueOf("0x320597ff"), Color.valueOf("0x40049dff"),
@@ -38,5 +21,23 @@ public final class ColorRamp {
             Color.valueOf("0xfdb52eff"), Color.valueOf("0xfdc229ff"),
             Color.valueOf("0xfccf25ff"), Color.valueOf("0xf9dd24ff"),
             Color.valueOf("0xf5eb27ff"), Color.valueOf("0xf0f921ff"));
+    private final Color[] colors;
+
+    public ColorRamp(Color... colors) {
+        Preconditions.checkArgument(colors.length >= 2);
+        this.colors = colors;
+    }
+
+    public Color at(double t) {
+        if (t < 0) {
+            return colors[0];
+        }
+        if (t > 1) {
+            return colors[colors.length - 1];
+        }
+        int i = (int) Math.floor(t * (colors.length - 1));
+        double r = t * (colors.length - 1) - i;
+        return colors[i].interpolate(colors[i + 1], r);
+    }
 
 }

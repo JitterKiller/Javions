@@ -21,6 +21,20 @@ public final class MapParameters {
     private final DoubleProperty minY = new SimpleDoubleProperty();
 
     /**
+     * Constructeur de MapParameters.
+     *
+     * @param zoom Le niveau de zoom.
+     * @param minX La coordonnée x du coin haut-gauche de la portion visible de la carte.
+     * @param minY La coordonnée y du coin haut-gauche de la portion visible de la carte.
+     */
+    public MapParameters(int zoom, double minX, double minY) {
+        Preconditions.checkArgument(ZOOM_MIN <= zoom && zoom <= ZOOM_MAX);
+        setZoom(zoom);
+        setMinX(minX);
+        setMinY(minY);
+    }
+
+    /**
      * Méthode d'accès à la propriété zoom en lecture seule.
      *
      * @return La propriété zoom.
@@ -74,32 +88,54 @@ public final class MapParameters {
         return minYProperty().get();
     }
 
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété zoom.
+     *
+     * @param zoom Le nouveau niveau zoom.
+     */
     public void setZoom(int zoom) {
         this.zoom.set(zoom);
     }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété minX.
+     *
+     * @param minX La nouvelle coordonnée x du coin haut-gauche de la portion visible de la carte.
+     */
     public void setMinX(double minX) {
         this.minX.set(minX);
     }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété minY.
+     *
+     * @param minY La nouvelle coordonnée y du coin haut-gauche de la portion visible de la carte.
+     */
     public void setMinY(double minY) {
         this.minY.set(minY);
     }
 
-    public MapParameters(int zoom, double minX, double minY) {
-        Preconditions.checkArgument(ZOOM_MIN <= zoom && zoom <= ZOOM_MAX);
-        setZoom(zoom);
-        setMinX(minX);
-        setMinY(minY);
-    }
-
+    /**
+     * Méthode qui permet la translation du coin haut-gauche de la portion visible de la carte vers
+     * le vecteur de composante (x,y).
+     *
+     * @param x La composante x du vecteur utilisé pour la translation de la portion visible de la carte.
+     * @param y La composante y du vecteur utilisé pour la translation de la portion visible de la carte.
+     */
     public void scroll(double x, double y) {
         setMinX(getMinXProperty() + x);
         setMinY(getMinYProperty() + y);
     }
 
+    /**
+     * Méthode qui permet d'ajouter zoomDelta (négatif ou positif) au niveau de zoom.
+     *
+     * @param zoomDelta La différence de niveau de zoom à ajouter.
+     */
     public void changeZoomLevel(int zoomDelta) {
 
         int oldZoom = getZoomProperty();
-        int newZoom = Math2.clamp(ZOOM_MIN, getZoomProperty() + zoomDelta,ZOOM_MAX);;
+        int newZoom = Math2.clamp(ZOOM_MIN, getZoomProperty() + zoomDelta, ZOOM_MAX);
 
         setZoom(newZoom);
 

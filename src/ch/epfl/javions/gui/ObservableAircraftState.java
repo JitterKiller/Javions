@@ -51,6 +51,26 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
+     * Méthode d'accès à l'adresse ICAO de l'aéronef dont l'état est destiné
+     * à être représenté par l'instance à créer.
+     *
+     * @return L'adresse ICAO de l'aéronef.
+     */
+    public IcaoAddress getAddress() {
+        return address;
+    }
+
+    /**
+     * Méthode d'accès aux caractéristiques fixes de cet aéronef,
+     * provenant de la base de données mictronics.
+     *
+     * @return Les caractéristiques de l'aéronef.
+     */
+    public AircraftData getData() {
+        return data;
+    }
+
+    /**
      * Méthode d'accès à la propriété lastMessageTimeStampNs en lecture seule.
      *
      * @return La propriété lastMessageTimeStampNs.
@@ -130,32 +150,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode de modification de la valeur contenue dans la propriété lastMessageTimeStampNs.
-     *
-     * @param timeStampNs Le nouveau timestamp en nanosecondes.
-     */
-    @Override
-    public void setLastMessageTimeStampNs(long timeStampNs) {
-        lastMessageTimeStampNs.set(timeStampNs);
-    }
-
-    /**
      * Méthode d'accès à la valeur contenue dans la propriété category.
      *
      * @return La valeur contenue dans la propriété category.
      */
     public int getCategory() {
         return categoryProperty().get();
-    }
-
-    /**
-     * Méthode de modification de la valeur contenue dans la propriété category.
-     *
-     * @param category La nouvelle catégorie de l'aéronef.
-     */
-    @Override
-    public void setCategory(int category) {
-        this.category.set(category);
     }
 
     /**
@@ -168,37 +168,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode de modification de la valeur contenue dans la propriété callSign.
-     *
-     * @param callSign Le nouveau call sign de l'aéronef.
-     */
-    @Override
-    public void setCallSign(CallSign callSign) {
-        this.callSign.set(callSign);
-    }
-
-    /**
      * Méthode d'accès à la valeur contenue dans la propriété position.
      *
      * @return La valeur contenue dans la propriété position.
      */
     public GeoPos getPosition() {
         return positionProperty().get();
-    }
-
-    /**
-     * Méthode de modification de la valeur contenue dans la propriété position.
-     *
-     * @param position La nouvelle position géographique de l'aéronef.
-     */
-    @Override
-    public void setPosition(GeoPos position) {
-        this.position.set(position);
-        AirbornePos potentialPos = new AirbornePos(position.longitudeT32(), position.latitudeT32());
-        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).getKey().equals(potentialPos))) {
-            trajectory.add(new Pair<>(potentialPos, getAltitude()));
-            curentMessageTimeStampNsTrajectory = getLastMessageTimeStampNs();
-        }
     }
 
     /**
@@ -220,6 +195,69 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
+     * Méthode d'accès à la valeur contenue dans la propriété velocity.
+     *
+     * @return La valeur contenue dans la propriété velocity.
+     */
+    public double getVelocity() {
+        return velocityProperty().get();
+    }
+
+    /**
+     * Méthode d'accès à la valeur contenue dans la propriété trackOrHeading.
+     *
+     * @return La valeur contenue dans la propriété trackOrHeading.
+     */
+    public double getTrackOrHeading() {
+        return trackOrHeadingProperty().get();
+    }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété lastMessageTimeStampNs.
+     *
+     * @param timeStampNs Le nouveau timestamp en nanosecondes.
+     */
+    @Override
+    public void setLastMessageTimeStampNs(long timeStampNs) {
+        lastMessageTimeStampNs.set(timeStampNs);
+    }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété category.
+     *
+     * @param category La nouvelle catégorie de l'aéronef.
+     */
+    @Override
+    public void setCategory(int category) {
+        this.category.set(category);
+    }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété callSign.
+     *
+     * @param callSign Le nouveau call sign de l'aéronef.
+     */
+    @Override
+    public void setCallSign(CallSign callSign) {
+        this.callSign.set(callSign);
+    }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété position.
+     *
+     * @param position La nouvelle position géographique de l'aéronef.
+     */
+    @Override
+    public void setPosition(GeoPos position) {
+        this.position.set(position);
+        AirbornePos potentialPos = new AirbornePos(position.longitudeT32(), position.latitudeT32());
+        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).getKey().equals(potentialPos))) {
+            trajectory.add(new Pair<>(potentialPos, getAltitude()));
+            curentMessageTimeStampNsTrajectory = getLastMessageTimeStampNs();
+        }
+    }
+
+    /**
      * Méthode de modification de la valeur contenue dans la propriété altitude.
      *
      * @param altitude La nouvelle altitude de l'aéronef.
@@ -234,15 +272,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode d'accès à la valeur contenue dans la propriété velocity.
-     *
-     * @return La valeur contenue dans la propriété velocity.
-     */
-    public double getVelocity() {
-        return velocityProperty().get();
-    }
-
-    /**
      * Méthode de modification de la valeur contenue dans la propriété velocity.
      *
      * @param velocity La nouvelle vitesse de l'aéronef.
@@ -253,15 +282,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode d'accès à la valeur contenue dans la propriété trackOrHeading.
-     *
-     * @return La valeur contenue dans la propriété trackOrHeading.
-     */
-    public double getTrackOrHeading() {
-        return trackOrHeadingProperty().get();
-    }
-
-    /**
      * Méthode de modification de la valeur contenue dans la propriété trackOrHeading.
      *
      * @param trackOrHeading Le nouveau cap / orientation de l'aéronef.
@@ -269,26 +289,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setTrackOrHeading(double trackOrHeading) {
         this.trackOrHeading.set(trackOrHeading);
-    }
-
-    /**
-     * Méthode d'accès à l'adresse ICAO de l'aéronef dont l'état est destiné
-     * à être représenté par l'instance à créer.
-     *
-     * @return L'adresse ICAO de l'aéronef.
-     */
-    public IcaoAddress getAddress() {
-        return address;
-    }
-
-    /**
-     * Méthode d'accès aux caractéristiques fixes de cet aéronef,
-     * provenant de la base de données mictronics.
-     *
-     * @return Les caractéristiques de l'aéronef.
-     */
-    public AircraftData getData() {
-        return data;
     }
 
     /**

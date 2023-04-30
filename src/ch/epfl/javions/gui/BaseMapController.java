@@ -14,6 +14,12 @@ import java.io.IOException;
 
 import static ch.epfl.javions.gui.TileManager.TILE_SIDE;
 
+/**
+ * La classe BaseMapController du sous-paquetage gui, gère l'affichage et l'interaction avec le fond de carte.
+ *
+ * @author Adam AIT BOUSSELHAM (356365)
+ * @author Abdellah JANATI IDRISSI (362341)
+ */
 public final class BaseMapController {
 
     private final TileManager tileManager;
@@ -24,6 +30,12 @@ public final class BaseMapController {
     private Point2D memoryPosition;
     private boolean redrawNeeded;
 
+    /**
+     * Constructeur de BaseMapController.
+     *
+     * @param tileManager Le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte.
+     * @param parameters  Les paramètres de la portion visible de la carte.
+     */
     public BaseMapController(TileManager tileManager, MapParameters parameters) {
 
         this.tileManager = tileManager;
@@ -44,10 +56,25 @@ public final class BaseMapController {
         listenersHandler();
     }
 
+    /**
+     * Méthode qui sert à retarder le re-dessin de la carte, appelle la méthode drawMap()
+     * si et seulement si l'attribut redrawNeeded est vrai.
+     */
+    private void redrawIfNeeded() {
+        if (!redrawNeeded) return;
+        redrawNeeded = false;
+
+        drawMap();
+    }
+
+
+    /**
+     * Méthode appelée dans redrawIfNeed(), dessine la carte avec les tuiles correspondantes.
+     */
     private void drawMap() {
-        graphicsContext.clearRect(0,0,canvas.getWidth(),canvas.getHeight());
-        for(int i = 0; i < pane.getWidth() + TILE_SIDE; i+= TILE_SIDE) {
-            for(int j = 0; j < pane.getHeight() + TILE_SIDE; j+= TILE_SIDE) {
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        for (int i = 0; i < pane.getWidth() + TILE_SIDE; i += TILE_SIDE) {
+            for (int j = 0; j < pane.getHeight() + TILE_SIDE; j += TILE_SIDE) {
                 int xTile = (int) (parameters.getMinXProperty() + i) / TILE_SIDE;
                 int yTile = (int) (parameters.getMinYProperty() + j) / TILE_SIDE;
                 TileManager.TileId id = new TileManager.TileId(parameters.getZoomProperty(), xTile, yTile);
@@ -56,24 +83,27 @@ public final class BaseMapController {
                 try {
                     graphicsContext.drawImage(tileManager.imageForTileAt(id),
                             xToPlace, yToPlace);
-                } catch (IOException ignored){}
+                } catch (IOException ignored) {
+                }
             }
         }
     }
 
-    private void redrawIfNeeded() {
-        if (!redrawNeeded) return;
-        redrawNeeded = false;
-
-        drawMap();
-    }
-
+    /**
+     * Méthode permettant de demander un re-dessin au prochain battement (60 secondes).
+     */
     private void redrawOnNextPulse() {
         redrawNeeded = true;
         Platform.requestNextPulse();
     }
 
-    private void listenersHandler(){
+
+    /**
+     * Méthode appelée dans le constructeur, permet de gérer les auditeurs JavaFX
+     * qui détectent les situations dans lesquelles le fond de carte doit être redessiné
+     * et appeler la méthode redrawOnNextPulse() dans ce cas.
+     */
+    private void listenersHandler() {
         parameters.zoomProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         parameters.minXProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         parameters.minYProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
@@ -81,7 +111,13 @@ public final class BaseMapController {
         canvas.heightProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
     }
 
-    private void eventHandler(){
+    /**
+     * Méthode appelée dans le constructeur, permet la gestion des événements d'utilisation
+     * de la molette de la souris ou du touchpad (pour changer le niveau de zoom de la carte)
+     * et le déplacement de la souris lorsque le bouton gauche est maintenu pressé (permet
+     * de faire glisser la carte).
+     */
+    private void eventHandler() {
 
         LongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {
@@ -102,7 +138,7 @@ public final class BaseMapController {
             double x = (memoryPosition.getX() - e.getX());
             double y = (memoryPosition.getY() - e.getY());
 
-            parameters.scroll(x,y);
+            parameters.scroll(x, y);
             memoryPosition = new Point2D(e.getX(), e.getY());
         });
 
@@ -110,18 +146,29 @@ public final class BaseMapController {
 
     }
 
+    /**
+     * Méthode d'accès à l'attribut pane.
+     *
+     * @return Le panneau JavaFX affichant le fond de carte.
+     */
     public Pane pane() {
         return pane;
     }
 
-    public void centerOn (GeoPos point){
+    /**
+     * Méthode permettant de centrer la carte sur un aéronef donné.
+     *
+     * @param point Le point à la surface de la Terre qui sera au centre de la portion
+     *              visible de la carte lorsqu'elle sera déplacée.
+     */
+    public void centerOn(GeoPos point) {
 
         double longitude = point.longitude();
         double latitude = point.latitude();
         double x = WebMercator.x(parameters.getZoomProperty(), longitude);
         double y = WebMercator.x(parameters.getZoomProperty(), latitude);
-        parameters.setMinX(x - (canvas.getWidth()/2));
-        parameters.setMinX(y - (canvas.getHeight()/2));
+        parameters.setMinX(x - (canvas.getWidth() / 2));
+        parameters.setMinX(y - (canvas.getHeight() / 2));
     }
 
 }
