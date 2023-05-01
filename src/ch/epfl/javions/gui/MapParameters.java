@@ -66,7 +66,7 @@ public final class MapParameters {
      *
      * @return La valeur contenue dans la propriété zoom.
      */
-    public int getZoomProperty() {
+    public int getZoom() {
         return zoomProperty().get();
     }
 
@@ -75,7 +75,7 @@ public final class MapParameters {
      *
      * @return La valeur contenue dans la propriété minX.
      */
-    public double getMinXProperty() {
+    public double getMinX() {
         return minXProperty().get();
     }
 
@@ -84,7 +84,7 @@ public final class MapParameters {
      *
      * @return La valeur contenue dans la propriété minY.
      */
-    public double getMinYProperty() {
+    public double getMinY() {
         return minYProperty().get();
     }
 
@@ -123,8 +123,8 @@ public final class MapParameters {
      * @param y La composante y du vecteur utilisé pour la translation de la portion visible de la carte.
      */
     public void scroll(double x, double y) {
-        setMinX(getMinXProperty() + x);
-        setMinY(getMinYProperty() + y);
+        setMinX(getMinX() + x);
+        setMinY(getMinY() + y);
     }
 
     /**
@@ -134,13 +134,13 @@ public final class MapParameters {
      */
     public void changeZoomLevel(int zoomDelta) {
 
-        int oldZoom = getZoomProperty();
-        int newZoom = Math2.clamp(ZOOM_MIN, getZoomProperty() + zoomDelta, ZOOM_MAX);
+        int oldZoom = getZoom();
+        int newZoom = Math2.clamp(ZOOM_MIN, getZoom() + zoomDelta, ZOOM_MAX);
 
         setZoom(newZoom);
 
         double scaleFactor = Math.scalb(1d, newZoom - oldZoom);
-        setMinX(getMinXProperty() * scaleFactor);
-        setMinY(getMinYProperty() * scaleFactor);
+        setMinX(getMinX() * scaleFactor);
+        setMinY(getMinY() * scaleFactor);
     }
 }

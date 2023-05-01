@@ -75,11 +75,11 @@ public final class BaseMapController {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         for (int i = 0; i < pane.getWidth() + TILE_SIDE; i += TILE_SIDE) {
             for (int j = 0; j < pane.getHeight() + TILE_SIDE; j += TILE_SIDE) {
-                int xTile = (int) (parameters.getMinXProperty() + i) / TILE_SIDE;
-                int yTile = (int) (parameters.getMinYProperty() + j) / TILE_SIDE;
-                TileManager.TileId id = new TileManager.TileId(parameters.getZoomProperty(), xTile, yTile);
-                int xToPlace = (int) (xTile * TILE_SIDE - parameters.getMinXProperty());
-                int yToPlace = (int) (yTile * TILE_SIDE - parameters.getMinYProperty());
+                int xTile = (int) (parameters.getMinX() + i) / TILE_SIDE;
+                int yTile = (int) (parameters.getMinY() + j) / TILE_SIDE;
+                TileManager.TileId id = new TileManager.TileId(parameters.getZoom(), xTile, yTile);
+                int xToPlace = (int) (xTile * TILE_SIDE - parameters.getMinX());
+                int yToPlace = (int) (yTile * TILE_SIDE - parameters.getMinY());
                 try {
                     graphicsContext.drawImage(tileManager.imageForTileAt(id),
                             xToPlace, yToPlace);
@@ -165,8 +165,8 @@ public final class BaseMapController {
 
         double longitude = point.longitude();
         double latitude = point.latitude();
-        double x = WebMercator.x(parameters.getZoomProperty(), longitude);
-        double y = WebMercator.x(parameters.getZoomProperty(), latitude);
+        double x = WebMercator.x(parameters.getZoom(), longitude);
+        double y = WebMercator.x(parameters.getZoom(), latitude);
         parameters.setMinX(x - (canvas.getWidth() / 2));
         parameters.setMinX(y - (canvas.getHeight() / 2));
     }
