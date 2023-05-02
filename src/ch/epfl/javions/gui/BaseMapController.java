@@ -77,13 +77,15 @@ public final class BaseMapController {
             for (int j = 0; j < pane.getHeight() + TILE_SIDE; j += TILE_SIDE) {
                 int xTile = (int) (parameters.getMinX() + i) / TILE_SIDE;
                 int yTile = (int) (parameters.getMinY() + j) / TILE_SIDE;
-                TileManager.TileId id = new TileManager.TileId(parameters.getZoom(), xTile, yTile);
-                int xToPlace = (int) (xTile * TILE_SIDE - parameters.getMinX());
-                int yToPlace = (int) (yTile * TILE_SIDE - parameters.getMinY());
-                try {
-                    graphicsContext.drawImage(tileManager.imageForTileAt(id),
-                            xToPlace, yToPlace);
-                } catch (IOException ignored) {
+                if(TileManager.TileId.isValid(parameters.getZoom(), xTile, yTile)) {
+                    TileManager.TileId id = new TileManager.TileId(parameters.getZoom(), xTile, yTile);
+                    int xToPlace = (int) (xTile * TILE_SIDE - parameters.getMinX());
+                    int yToPlace = (int) (yTile * TILE_SIDE - parameters.getMinY());
+                    try {
+                        graphicsContext.drawImage(tileManager.imageForTileAt(id),
+                                xToPlace, yToPlace);
+                    } catch (IOException ignored) {
+                    }
                 }
             }
         }
