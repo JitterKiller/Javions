@@ -25,6 +25,8 @@ public final class AircraftStateManager {
     private static final long ONE_MINUTE_TIME_STAMP_NS = 60_000_000_000L;
     private final Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> table = new HashMap<>();
     private final ObservableSet<ObservableAircraftState> aircraftStatesPosition = FXCollections.observableSet();
+    private final ObservableSet<ObservableAircraftState> unmodifiableAircraftStatesPosition
+            = FXCollections.unmodifiableObservableSet(aircraftStatesPosition);
     private final AircraftDatabase database;
     private long previousMessageTimeStampNs;
 
@@ -44,7 +46,7 @@ public final class AircraftStateManager {
      * @return L'ensemble des états observables des aéronefs dont la position est connue.
      */
     public ObservableSet<ObservableAircraftState> states() {
-        return FXCollections.unmodifiableObservableSet(aircraftStatesPosition);
+        return unmodifiableAircraftStatesPosition;
     }
 
     /**
