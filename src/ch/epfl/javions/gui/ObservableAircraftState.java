@@ -30,7 +30,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final ObjectProperty<GeoPos> position = new SimpleObjectProperty<>(null);
     private final ObservableList<Pair<AirbornePos, Double>> trajectory = FXCollections.observableArrayList();
     private final ObservableList<Pair<AirbornePos, Double>> unmodifiableTrajectory = FXCollections.unmodifiableObservableList(trajectory);
-    private final ListProperty<Pair<AirbornePos, Double>> unmodifiableTrajectoryProperty = new SimpleListProperty<>(unmodifiableTrajectory);
     private final DoubleProperty altitude = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty velocity = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(Double.NaN);
@@ -107,15 +106,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode d'accès à la propriété position en lecture seule.
-     *
-     * @return La propriété unmodifiableTrajectoryProperty.
-     */
-    public ObservableList<Pair<AirbornePos, Double>> trajectoryProperty() {
-        return unmodifiableTrajectoryProperty;
-    }
-
-    /**
      * Méthode d'accès à la propriété altitude en lecture seule.
      *
      * @return La propriété altitude.
@@ -181,8 +171,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      *
      * @return La valeur contenue dans la propriété unmodifiableTrajectoryProperty.
      */
-    public List<Pair<AirbornePos, Double>> getTrajectory() {
-        return unmodifiableTrajectoryProperty.get();
+    public ObservableList<Pair<AirbornePos, Double>> getTrajectory() {
+        return unmodifiableTrajectory;
     }
 
     /**

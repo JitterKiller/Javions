@@ -23,7 +23,7 @@ import static ch.epfl.javions.gui.TileManager.TILE_SIDE;
 public final class BaseMapController {
 
     private final TileManager tileManager;
-    private final MapParameters parameters;
+    private final MapParameters mapParameters;
     private final Canvas canvas;
     private final GraphicsContext graphicsContext;
     private final Pane pane;
@@ -34,12 +34,12 @@ public final class BaseMapController {
      * Constructeur de BaseMapController.
      *
      * @param tileManager Le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte.
-     * @param parameters  Les paramètres de la portion visible de la carte.
+     * @param mapParameters  Les paramètres de la portion visible de la carte.
      */
-    public BaseMapController(TileManager tileManager, MapParameters parameters) {
+    public BaseMapController(TileManager tileManager, MapParameters mapParameters) {
 
         this.tileManager = tileManager;
-        this.parameters = parameters;
+        this.mapParameters = mapParameters;
         canvas = new Canvas();
         pane = new Pane(canvas);
         graphicsContext = canvas.getGraphicsContext2D();
@@ -75,12 +75,12 @@ public final class BaseMapController {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         for (int i = 0; i < pane.getWidth() + TILE_SIDE; i += TILE_SIDE) {
             for (int j = 0; j < pane.getHeight() + TILE_SIDE; j += TILE_SIDE) {
-                int xTile = (int) (parameters.getMinX() + i) / TILE_SIDE;
-                int yTile = (int) (parameters.getMinY() + j) / TILE_SIDE;
-                if(TileManager.TileId.isValid(parameters.getZoom(), xTile, yTile)) {
-                    TileManager.TileId id = new TileManager.TileId(parameters.getZoom(), xTile, yTile);
-                    int xToPlace = (int) (xTile * TILE_SIDE - parameters.getMinX());
-                    int yToPlace = (int) (yTile * TILE_SIDE - parameters.getMinY());
+                int xTile = (int) (mapParameters.getMinX() + i) / TILE_SIDE;
+                int yTile = (int) (mapParameters.getMinY() + j) / TILE_SIDE;
+                if(TileManager.TileId.isValid(mapParameters.getZoom(), xTile, yTile)) {
+                    TileManager.TileId id = new TileManager.TileId(mapParameters.getZoom(), xTile, yTile);
+                    int xToPlace = (int) (xTile * TILE_SIDE - mapParameters.getMinX());
+                    int yToPlace = (int) (yTile * TILE_SIDE - mapParameters.getMinY());
                     try {
                         graphicsContext.drawImage(tileManager.imageForTileAt(id),
                                 xToPlace, yToPlace);
@@ -106,9 +106,9 @@ public final class BaseMapController {
      * et appeler la méthode redrawOnNextPulse() dans ce cas.
      */
     private void listenersHandler() {
-        parameters.zoomProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
-        parameters.minXProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
-        parameters.minYProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
+        mapParameters.zoomProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
+        mapParameters.minXProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
+        mapParameters.minYProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         canvas.widthProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         canvas.heightProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
     }
@@ -129,9 +129,9 @@ public final class BaseMapController {
             long currentTime = System.currentTimeMillis();
             if (currentTime < minScrollTime.get()) return;
             minScrollTime.set(currentTime + 200);
-            parameters.scroll(e.getX(), e.getY());
-            parameters.changeZoomLevel(zoomDelta);
-            parameters.scroll(-e.getX(), -e.getY());
+            mapParameters.scroll(e.getX(), e.getY());
+            mapParameters.changeZoomLevel(zoomDelta);
+            mapParameters.scroll(-e.getX(), -e.getY());
         });
 
         pane.setOnMousePressed(e -> memoryPosition = new Point2D(e.getX(), e.getY()));
@@ -140,7 +140,7 @@ public final class BaseMapController {
             double x = (memoryPosition.getX() - e.getX());
             double y = (memoryPosition.getY() - e.getY());
 
-            parameters.scroll(x, y);
+            mapParameters.scroll(x, y);
             memoryPosition = new Point2D(e.getX(), e.getY());
         });
 
@@ -167,10 +167,10 @@ public final class BaseMapController {
 
         double longitude = point.longitude();
         double latitude = point.latitude();
-        double x = WebMercator.x(parameters.getZoom(), longitude);
-        double y = WebMercator.x(parameters.getZoom(), latitude);
-        parameters.setMinX(x - (canvas.getWidth() / 2));
-        parameters.setMinX(y - (canvas.getHeight() / 2));
+        double x = WebMercator.x(mapParameters.getZoom(), longitude);
+        double y = WebMercator.x(mapParameters.getZoom(), latitude);
+        mapParameters.setMinX(x - (canvas.getWidth() / 2));
+        mapParameters.setMinX(y - (canvas.getHeight() / 2));
     }
 
 }

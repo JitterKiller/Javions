@@ -24,9 +24,7 @@ import java.util.Set;
 public final class AircraftStateManager {
     private static final long ONE_MINUTE_TIME_STAMP_NS = 60_000_000_000L;
     private final Map<IcaoAddress, AircraftStateAccumulator<ObservableAircraftState>> table = new HashMap<>();
-    private final ObservableSet<ObservableAircraftState> knownAircraftPositionsStates = FXCollections.observableSet();
-    private final ObservableSet<ObservableAircraftState> unmodifiableKnownAircraftPositionStates = FXCollections.unmodifiableObservableSet(knownAircraftPositionsStates);
-    private final SetProperty<ObservableAircraftState> unmodifiableKnownAircraftPositionStatesProperty = new SimpleSetProperty<>(unmodifiableKnownAircraftPositionStates);
+    private final ObservableSet<ObservableAircraftState> aircraftStatesPosition = FXCollections.observableSet();
     private final AircraftDatabase database;
     private long previousMessageTimeStampNs;
 
@@ -40,22 +38,13 @@ public final class AircraftStateManager {
     }
 
     /**
-     * Méthode d'accès à la propriété unmodifiableKnownAircraftPositionStatesProperty en lecture seule.
-     *
-     * @return La propriété unmodifiableKnownAircraftPositionStatesProperty.
-     */
-    public Set<ObservableAircraftState> knownAircraftPositionsStatesProperty() {
-        return unmodifiableKnownAircraftPositionStatesProperty.get();
-    }
-
-    /**
      * Méthode retournant l'ensemble observable, mais non modifiable,
      * des états observables des aéronefs dont la position est connue.
      *
      * @return L'ensemble des états observables des aéronefs dont la position est connue.
      */
-    public Set<ObservableAircraftState> states() {
-        return knownAircraftPositionsStatesProperty();
+    public ObservableSet<ObservableAircraftState> states() {
+        return FXCollections.unmodifiableObservableSet(aircraftStatesPosition);
     }
 
     /**
@@ -80,7 +69,7 @@ public final class AircraftStateManager {
         ObservableAircraftState stateSetter = accumulator.stateSetter();
         previousMessageTimeStampNs = stateSetter.getLastMessageTimeStampNs();
         if (stateSetter.getPosition() != null) {
-            knownAircraftPositionsStates.add(stateSetter);
+            aircraftStatesPosition.add(stateSetter);
         }
     }
 
@@ -90,7 +79,7 @@ public final class AircraftStateManager {
      * la réception du dernier message passé à updateWithMessage.
      */
     public void purge() {
-        knownAircraftPositionsStates.removeIf(state ->
+        aircraftStatesPosition.removeIf(state ->
                 previousMessageTimeStampNs - state.getLastMessageTimeStampNs() >= ONE_MINUTE_TIME_STAMP_NS);
 
     }
