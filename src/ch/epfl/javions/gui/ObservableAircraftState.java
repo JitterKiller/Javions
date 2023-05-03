@@ -10,7 +10,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,8 +27,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final IntegerProperty category = new SimpleIntegerProperty(-1);
     private final ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>(null);
     private final ObjectProperty<GeoPos> position = new SimpleObjectProperty<>(null);
-    private final ObservableList<Pair<AirbornePos, Double>> trajectory = FXCollections.observableArrayList();
-    private final ObservableList<Pair<AirbornePos, Double>> unmodifiableTrajectory = FXCollections.unmodifiableObservableList(trajectory);
+    private final ObservableList<AirbornePos> trajectory = FXCollections.observableArrayList();
+    private final ObservableList<AirbornePos> unmodifiableTrajectory
+            = FXCollections.unmodifiableObservableList(trajectory);
     private final DoubleProperty altitude = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty velocity = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(Double.NaN);
@@ -167,11 +167,11 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode d'accès à la valeur contenue dans la propriété unmodifiableTrajectoryProperty.
+     * Méthode d'accès à la liste observable mais non modifiable unmodifiableTrajectory.
      *
-     * @return La valeur contenue dans la propriété unmodifiableTrajectoryProperty.
+     * @return La liste observable mais non modifiable unmodifiableTrajectory.
      */
-    public ObservableList<Pair<AirbornePos, Double>> getTrajectory() {
+    public ObservableList<AirbornePos> getTrajectory() {
         return unmodifiableTrajectory;
     }
 
@@ -240,9 +240,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setPosition(GeoPos position) {
         this.position.set(position);
-        AirbornePos potentialPos = new AirbornePos(position.longitudeT32(), position.latitudeT32());
-        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).getKey().equals(potentialPos))) {
-            trajectory.add(new Pair<>(potentialPos, getAltitude()));
+        GeoPos potentialPos = new GeoPos(position.longitudeT32(), position.latitudeT32());
+        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).position.equals(potentialPos))) {
+            trajectory.add(new AirbornePos(position,getAltitude()));
             curentMessageTimeStampNsTrajectory = getLastMessageTimeStampNs();
         }
     }
@@ -256,8 +256,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public void setAltitude(double altitude) {
         this.altitude.set(altitude);
         if (getLastMessageTimeStampNs() == curentMessageTimeStampNsTrajectory) {
-            AirbornePos pos = new AirbornePos(getPosition().longitudeT32(), getPosition().latitudeT32());
-            trajectory.set(trajectory.size() - 1, new Pair<>(pos, altitude));
+            AirbornePos pos = new AirbornePos(getPosition(),altitude);
+            trajectory.set(trajectory.size() - 1, pos);
         }
     }
 
@@ -287,9 +287,9 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      * Chaque élément de la trajectoire est une paire constituée d'une position à la surface de la Terre
      * (longitude et latitude) ainsi qu'une altitude.
      *
-     * @param longitudeT32 La longitude de l'aéronef exprimé en T32.
-     * @param latitudeT32  La latitude de l'aéronef exprimé en T32.
+     * @param position La longitude de l'aéronef exprimé en T32.
+     * @param altitude  La latitude de l'aéronef exprimé en T32.
      */
-    public record AirbornePos(double longitudeT32, double latitudeT32) {
+    public record AirbornePos(GeoPos position, double altitude) {
     }
 }

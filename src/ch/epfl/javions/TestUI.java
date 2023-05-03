@@ -68,9 +68,9 @@ public class TestUI {
                     state.getCallSign() == null ? "" : state.getCallSign().string(),
                     state.getData() == null ? "" : state.getData().registration().string(),
                     model,
-                    Units.convert(state.getTrajectory().get(state.getTrajectory().size() - 1).getKey().longitudeT32(), Units.Angle.T32, Units.Angle.DEGREE),
-                    Units.convert(state.getTrajectory().get(state.getTrajectory().size() - 1).getKey().latitudeT32(), Units.Angle.T32, Units.Angle.DEGREE),
-                    (int) Math.rint(state.getTrajectory().get(state.getTrajectory().size() - 1).getValue()),
+                    Units.convert(state.getTrajectory().get(state.getTrajectory().size() - 1).position().longitudeT32(), Units.Angle.T32, Units.Angle.DEGREE),
+                    Units.convert(state.getTrajectory().get(state.getTrajectory().size() - 1).position().latitudeT32(), Units.Angle.T32, Units.Angle.DEGREE),
+                    (int) Math.rint(state.getTrajectory().get(state.getTrajectory().size() - 1).altitude()),
                     Double.isNaN(state.getVelocity()) ? Double.NaN : (int) Math.rint(Units.convertTo(state.getVelocity(), Units.Speed.KILOMETER_PER_HOUR)),
                     Array.getChar(directions, directionIndex)));
         }
