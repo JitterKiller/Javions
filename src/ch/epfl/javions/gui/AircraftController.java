@@ -7,9 +7,7 @@ import ch.epfl.javions.aircraft.AircraftData;
 import ch.epfl.javions.aircraft.AircraftDescription;
 import ch.epfl.javions.aircraft.AircraftTypeDesignator;
 import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.*;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -46,7 +44,9 @@ public final class AircraftController {
                 change -> {
                     if(change.wasAdded()){
                         annotatedAircraft(change.getElementAdded());
-                    } else {
+                    }
+                    if(change.wasRemoved()){
+                        System.out.println("un changement a été détécté");
                         pane.getChildren().remove(pane.lookup("#"+
                                 change.getElementRemoved().getAddress().string()));
                     }
@@ -83,7 +83,7 @@ public final class AircraftController {
         Group labelIcon = new Group(label(aircraftState),icon(aircraftState));
         SimpleObjectProperty<GeoPos> positionProperty = new SimpleObjectProperty<>();
         positionProperty.bind(aircraftState.positionProperty());
-        labelBinds(labelIcon,positionProperty);
+        labelIconBinds(labelIcon,positionProperty);
         return labelIcon;
     }
 
@@ -102,14 +102,13 @@ public final class AircraftController {
         return label;
     }
 
-    private void labelBinds(Group label, SimpleObjectProperty<GeoPos> positionProperty ){
-
-        label.layoutXProperty().bind(Bindings.createDoubleBinding(
+    private void labelIconBinds(Group labelIcon, SimpleObjectProperty<GeoPos> positionProperty ){
+        labelIcon.layoutXProperty().bind(Bindings.createDoubleBinding(
                 () -> xScreen(positionProperty),
                 mapParameters.zoomProperty(),
                 mapParameters.minXProperty(),
                 positionProperty));
-        label.layoutYProperty().bind(Bindings.createDoubleBinding(
+        labelIcon.layoutYProperty().bind(Bindings.createDoubleBinding(
                 () -> yScreen(positionProperty),
                 mapParameters.zoomProperty(),
                 mapParameters.minYProperty(),
