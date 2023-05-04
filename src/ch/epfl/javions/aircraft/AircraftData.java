@@ -6,7 +6,7 @@ import java.util.Objects;
  * L'enregistrement AircraftData, du sous-paquetage aircraft, public, représente les données d'un véhicule aérien.
  *
  * @param registration           l'immatriculation de l'aéronef
- * @param typeDesignator         le type de l'aéronef
+ * @param typeDesignator         l'indicateur de type de l'aéronef
  * @param model                  le modèle de l'aéronef
  * @param description            la description de l'aéronef
  * @param wakeTurbulenceCategory la catégorie de turbulence de l'aéronef

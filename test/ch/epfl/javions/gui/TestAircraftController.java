@@ -67,8 +67,9 @@ public final class TestAircraftController extends Application {
         primaryStage.show();
 
         var macM = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
+        var winM = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
 
-        var mi = readAllMessages(macM)
+        var mi = readAllMessages(winM)
                 .iterator();
 
         // Animation des aéronefs
