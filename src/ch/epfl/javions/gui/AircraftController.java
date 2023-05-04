@@ -20,13 +20,14 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+
+import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 
 public final class AircraftController {
 
@@ -135,6 +136,16 @@ public final class AircraftController {
                     line.setStartY(WebMercator.y(mapParameters.getZoom(), currentTrajectory.position().latitude()));
                     line.setEndX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i + 1).position().longitude()));
                     line.setEndY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i + 1).position().latitude()));
+                    if(currentTrajectory.position().equals(trajectoryList.get(i +1).position())) {
+                        Color color = ColorRamp.PLASMA.at(Math.cbrt(currentTrajectory.altitude()/12_000));
+                        line.setStroke(color);
+                    } else{
+                        Color color1 = ColorRamp.PLASMA.at(Math.cbrt(trajectoryList.get(i + 1).altitude()/12_000));
+                        Color color2 = ColorRamp.PLASMA.at(Math.cbrt(trajectoryList.get(i + 1).altitude()/12_000));
+                        Stop s1 = new Stop(0, color1);
+                        Stop s2 = new Stop(1, color2);
+                        line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
+                    }
                     trajectory.getChildren().add(line);
                 }
                 i++;
@@ -201,11 +212,18 @@ public final class AircraftController {
                     , WakeTurbulenceCategory.UNKNOWN);
         }
 
+        ObjectProperty<AircraftIcon> aircraftIconProperty = new SimpleObjectProperty<>(aircraftIcon);
+
         icon.getStyleClass().add(ICON_CLASS);
-        icon.setContent(aircraftIcon.svgPath());
+        icon.contentProperty().bind(Bindings.createStringBinding(
+                () -> aircraftIconProperty.get().svgPath(),aircraftIconProperty
+        ));
+        icon.fillProperty().bind(aircraftState.altitudeProperty().map(
+                (b) -> ColorRamp.PLASMA.at(Math.cbrt(b.doubleValue()/12_000))));
         icon.rotateProperty().bind(Bindings.createDoubleBinding(
-                () -> aircraftIcon.canRotate() ? Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE)
-                        : 0, aircraftState.trackOrHeadingProperty()
+                () -> aircraftIcon.canRotate() ?
+                        Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
+                aircraftState.trackOrHeadingProperty()
         ));
         icon.setOnMousePressed(e -> selectedAircraft.set(aircraftState));
         return icon;
