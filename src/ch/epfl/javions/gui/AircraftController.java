@@ -30,14 +30,12 @@ import javafx.scene.text.Text;
 import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 
 public final class AircraftController {
-
-
     private static final String CSS_FILE = "aircraft.css";
     private static final String TRAJECTORY_CLASS = "trajectory";
     private static final String ICON_CLASS = "aircraft";
     private static final String LABEL_CLASS = "label";
+    private static final int MAX_ALT = 12_000;
     private final MapParameters mapParameters;
-    private final ObservableSet<ObservableAircraftState> aircraftStates;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private Pane pane;
 
@@ -46,7 +44,6 @@ public final class AircraftController {
                               ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
         this.mapParameters = mapParameters;
-        this.aircraftStates = aircraftStates;
         this.selectedAircraft = selectedAircraft;
         initializePane();
         addAllAnnotatedAircraft(aircraftStates);
@@ -71,7 +68,6 @@ public final class AircraftController {
     private void addAllAnnotatedAircraft(ObservableSet<ObservableAircraftState> aircraftStates) {
         for (ObservableAircraftState aircraftState : aircraftStates) {
             annotatedAircraft(aircraftState);
-            aircraftStates.add(aircraftState);
         }
     }
 
@@ -137,13 +133,10 @@ public final class AircraftController {
                     line.setEndX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i + 1).position().longitude()));
                     line.setEndY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i + 1).position().latitude()));
                     if(currentTrajectory.position().equals(trajectoryList.get(i +1).position())) {
-                        Color color = ColorRamp.PLASMA.at(Math.cbrt(currentTrajectory.altitude()/12_000));
-                        line.setStroke(color);
+                        line.setStroke(getColor(currentTrajectory.altitude()));
                     } else{
-                        Color color1 = ColorRamp.PLASMA.at(Math.cbrt(trajectoryList.get(i + 1).altitude()/12_000));
-                        Color color2 = ColorRamp.PLASMA.at(Math.cbrt(trajectoryList.get(i + 1).altitude()/12_000));
-                        Stop s1 = new Stop(0, color1);
-                        Stop s2 = new Stop(1, color2);
+                        Stop s1 = new Stop(0, getColor(currentTrajectory.altitude()));
+                        Stop s2 = new Stop(1, getColor(trajectoryList.get(i + 1).altitude()));
                         line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
                     }
                     trajectory.getChildren().add(line);
@@ -195,36 +188,41 @@ public final class AircraftController {
 
     private SVGPath icon(ObservableAircraftState aircraftState) {
         AircraftData data = aircraftState.getData();
-        int category = aircraftState.getCategory();
 
-        AircraftIcon aircraftIcon;
+        ObjectProperty<AircraftIcon> aircraftIconProperty = new SimpleObjectProperty<>();
         SVGPath icon = new SVGPath();
 
-        if (data != null) {
-            aircraftIcon = AircraftIcon.iconFor(data.typeDesignator(),
-                    data.description(),
-                    category,
-                    data.wakeTurbulenceCategory());
-        } else {
-            aircraftIcon = AircraftIcon.iconFor(new AircraftTypeDesignator("")
-                    , new AircraftDescription("")
-                    , category
-                    , WakeTurbulenceCategory.UNKNOWN);
-        }
-
-        ObjectProperty<AircraftIcon> aircraftIconProperty = new SimpleObjectProperty<>(aircraftIcon);
+        aircraftIconProperty.bind(aircraftState.categoryProperty().map(
+                (category) -> {
+                    AircraftIcon aircraftIcon;
+                    if (data != null) {
+                        aircraftIcon = AircraftIcon.iconFor(
+                                data.typeDesignator(),
+                                data.description(),
+                                category.intValue(),
+                                data.wakeTurbulenceCategory()
+                        );
+                    } else {
+                        aircraftIcon = AircraftIcon.iconFor(
+                                new AircraftTypeDesignator(""),
+                                new AircraftDescription(""),
+                                category.intValue(),
+                                WakeTurbulenceCategory.UNKNOWN
+                        );
+                    }
+                    return aircraftIcon;
+                }));
 
         icon.getStyleClass().add(ICON_CLASS);
-        icon.contentProperty().bind(Bindings.createStringBinding(
-                () -> aircraftIconProperty.get().svgPath(),aircraftIconProperty
-        ));
-        icon.fillProperty().bind(aircraftState.altitudeProperty().map(
-                (b) -> ColorRamp.PLASMA.at(Math.cbrt(b.doubleValue()/12_000))));
+        icon.contentProperty().bind(aircraftIconProperty.map(AircraftIcon::svgPath));
         icon.rotateProperty().bind(Bindings.createDoubleBinding(
-                () -> aircraftIcon.canRotate() ?
+                () -> (aircraftIconProperty.get().canRotate()) &&
+                        (!Double.isNaN(aircraftState.getTrackOrHeading())) ?
                         Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
                 aircraftState.trackOrHeadingProperty()
         ));
+        icon.fillProperty().bind(aircraftState.altitudeProperty().map(
+                (b) -> getColor(b.doubleValue())));
         icon.setOnMousePressed(e -> selectedAircraft.set(aircraftState));
         return icon;
     }
@@ -255,6 +253,10 @@ public final class AircraftController {
         } else b.append("?");
         b.append("km/h" + "\u2002").append((int) Math.rint(aircraftState.getAltitude())).append("m");
         return b.toString();
+    }
+
+    private Color getColor(double a){
+        return ColorRamp.PLASMA.at(Math.cbrt(a/MAX_ALT));
     }
 
     public Pane pane() {

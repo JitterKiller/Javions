@@ -21,10 +21,11 @@ public final class ColorRamp {
             Color.valueOf("0xfdb52eff"), Color.valueOf("0xfdc229ff"),
             Color.valueOf("0xfccf25ff"), Color.valueOf("0xf9dd24ff"),
             Color.valueOf("0xf5eb27ff"), Color.valueOf("0xf0f921ff"));
+    private static final int MINIMUM_COLORS = 2;
     private final Color[] colors;
 
     public ColorRamp(Color... colors) {
-        Preconditions.checkArgument(colors.length >= 2);
+        Preconditions.checkArgument(colors.length >= MINIMUM_COLORS);
         this.colors = colors;
     }
 
