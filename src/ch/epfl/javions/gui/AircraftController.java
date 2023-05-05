@@ -35,6 +35,7 @@ public final class AircraftController {
     private static final String ICON_CLASS = "aircraft";
     private static final String LABEL_CLASS = "label";
     private static final int MAX_ALT = 12_000;
+    private static final int MIN_ZOOM_LABEL_VISIBLE = 11;
     private final MapParameters mapParameters;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private Pane pane;
@@ -81,8 +82,6 @@ public final class AircraftController {
     private Group trajectory(ObservableAircraftState aircraftState) {
         Group trajectory = new Group();
 
-        ObjectProperty<ObservableAircraftState> currentAircraft = new SimpleObjectProperty<>(aircraftState);
-
         ObservableList<ObservableAircraftState.AirbornePos> trajectoryList = aircraftState.getTrajectory();
 
         aircraftState.getTrajectory().addListener((ListChangeListener<? super ObservableAircraftState.AirbornePos>)
@@ -113,8 +112,7 @@ public final class AircraftController {
                 mapParameters.minYProperty()
         ).negate());
         trajectory.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> currentAircraft.get().equals(selectedAircraft.get()),
-                currentAircraft,
+                () -> aircraftState.equals(selectedAircraft.get()),
                 selectedAircraft
         ));
         trajectory.getStyleClass().add(TRAJECTORY_CLASS);
@@ -152,6 +150,19 @@ public final class AircraftController {
         return labelIcon;
     }
 
+    private void labelIconBinds(Group labelIcon, ReadOnlyObjectProperty<GeoPos> positionProperty) {
+        labelIcon.layoutXProperty().bind(Bindings.createDoubleBinding(
+                () -> xScreen(positionProperty),
+                mapParameters.zoomProperty(),
+                mapParameters.minXProperty(),
+                positionProperty));
+        labelIcon.layoutYProperty().bind(Bindings.createDoubleBinding(
+                () -> yScreen(positionProperty),
+                mapParameters.zoomProperty(),
+                mapParameters.minYProperty(),
+                positionProperty));
+    }
+
     private Group label(ObservableAircraftState aircraftState) {
         Text t = new Text();
         t.textProperty().bind(Bindings.createStringBinding(
@@ -167,23 +178,13 @@ public final class AircraftController {
         Group label = new Group(r, t);
         label.getStyleClass().add(LABEL_CLASS);
         label.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> mapParameters.getZoom() >= 11, mapParameters.zoomProperty()
+                () -> mapParameters.getZoom() >= MIN_ZOOM_LABEL_VISIBLE
+                    || aircraftState.equals(selectedAircraft.get()),
+                mapParameters.zoomProperty(),
+                selectedAircraft
         ));
 
         return label;
-    }
-
-    private void labelIconBinds(Group labelIcon, ReadOnlyObjectProperty<GeoPos> positionProperty) {
-        labelIcon.layoutXProperty().bind(Bindings.createDoubleBinding(
-                () -> xScreen(positionProperty),
-                mapParameters.zoomProperty(),
-                mapParameters.minXProperty(),
-                positionProperty));
-        labelIcon.layoutYProperty().bind(Bindings.createDoubleBinding(
-                () -> yScreen(positionProperty),
-                mapParameters.zoomProperty(),
-                mapParameters.minYProperty(),
-                positionProperty));
     }
 
     private SVGPath icon(ObservableAircraftState aircraftState) {

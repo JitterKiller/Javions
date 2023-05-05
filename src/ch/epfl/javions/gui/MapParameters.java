@@ -26,6 +26,7 @@ public final class MapParameters {
      * @param zoom Le niveau de zoom.
      * @param minX La coordonnée x du coin haut-gauche de la portion visible de la carte.
      * @param minY La coordonnée y du coin haut-gauche de la portion visible de la carte.
+     * @throws IllegalArgumentException si le niveau de zoom n'est pas compris entre 6 et 19 inclus.
      */
     public MapParameters(int zoom, double minX, double minY) {
         Preconditions.checkArgument(ZOOM_MIN <= zoom && zoom <= ZOOM_MAX);
