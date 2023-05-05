@@ -130,9 +130,9 @@ public final class AircraftController {
                     line.setStartY(WebMercator.y(mapParameters.getZoom(), currentTrajectory.position().latitude()));
                     line.setEndX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i + 1).position().longitude()));
                     line.setEndY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i + 1).position().latitude()));
-                    if(currentTrajectory.position().equals(trajectoryList.get(i +1).position())) {
+                    if (currentTrajectory.position().equals(trajectoryList.get(i + 1).position())) {
                         line.setStroke(getColor(currentTrajectory.altitude()));
-                    } else{
+                    } else {
                         Stop s1 = new Stop(0, getColor(currentTrajectory.altitude()));
                         Stop s2 = new Stop(1, getColor(trajectoryList.get(i + 1).altitude()));
                         line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
@@ -179,7 +179,7 @@ public final class AircraftController {
         label.getStyleClass().add(LABEL_CLASS);
         label.visibleProperty().bind(Bindings.createBooleanBinding(
                 () -> mapParameters.getZoom() >= MIN_ZOOM_LABEL_VISIBLE
-                    || aircraftState.equals(selectedAircraft.get()),
+                        || aircraftState.equals(selectedAircraft.get()),
                 mapParameters.zoomProperty(),
                 selectedAircraft
         ));
@@ -256,8 +256,8 @@ public final class AircraftController {
         return b.toString();
     }
 
-    private Color getColor(double a){
-        return ColorRamp.PLASMA.at(Math.cbrt(a/MAX_ALT));
+    private Color getColor(double a) {
+        return ColorRamp.PLASMA.at(Math.cbrt(a / MAX_ALT));
     }
 
     public Pane pane() {
