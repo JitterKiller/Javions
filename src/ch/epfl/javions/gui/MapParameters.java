@@ -72,24 +72,6 @@ public final class MapParameters {
     }
 
     /**
-     * Méthode d'accès à la valeur contenue dans la propriété minX.
-     *
-     * @return La valeur contenue dans la propriété minX.
-     */
-    public double getMinX() {
-        return minXProperty().get();
-    }
-
-    /**
-     * Méthode d'accès à la valeur contenue dans la propriété minY.
-     *
-     * @return La valeur contenue dans la propriété minY.
-     */
-    public double getMinY() {
-        return minYProperty().get();
-    }
-
-    /**
      * Méthode de modification de la valeur contenue dans la propriété zoom.
      *
      * @param zoom Le nouveau niveau zoom.
@@ -99,12 +81,30 @@ public final class MapParameters {
     }
 
     /**
+     * Méthode d'accès à la valeur contenue dans la propriété minX.
+     *
+     * @return La valeur contenue dans la propriété minX.
+     */
+    public double getMinX() {
+        return minXProperty().get();
+    }
+
+    /**
      * Méthode de modification de la valeur contenue dans la propriété minX.
      *
      * @param minX La nouvelle coordonnée x du coin haut-gauche de la portion visible de la carte.
      */
     public void setMinX(double minX) {
         this.minX.set(minX);
+    }
+
+    /**
+     * Méthode d'accès à la valeur contenue dans la propriété minY.
+     *
+     * @return La valeur contenue dans la propriété minY.
+     */
+    public double getMinY() {
+        return minYProperty().get();
     }
 
     /**

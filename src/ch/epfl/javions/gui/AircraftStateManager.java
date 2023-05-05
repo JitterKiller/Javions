@@ -4,15 +4,12 @@ import ch.epfl.javions.adsb.AircraftStateAccumulator;
 import ch.epfl.javions.adsb.Message;
 import ch.epfl.javions.aircraft.AircraftDatabase;
 import ch.epfl.javions.aircraft.IcaoAddress;
-import javafx.beans.property.SetProperty;
-import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * La classe AircraftStateManager du sous-paquetage gui, a pour but de garder à jour les états

@@ -13,11 +13,12 @@ import javafx.scene.paint.Color;
  */
 public final class ColorRamp {
 
-    /** Dégradé de couleur Plasma utilisé pour colorier
+    /**
+     * Dégradé de couleur Plasma utilisé pour colorier
      * les icônes et trajectoires d'aéronefs en fonction de leur altitude.
-     *  La couleur la plus à gauche - un bleu foncé - correspond aux valeurs inférieures ou égales à 0,
-     *  tandis que la couleur la plus à droite - un jaune clair - correspond aux valeurs supérieures ou égales à 1.
-     *  Les couleurs intermédiaires correspondent aux valeurs comprises entre 0 et 1.
+     * La couleur la plus à gauche - un bleu foncé - correspond aux valeurs inférieures ou égales à 0,
+     * tandis que la couleur la plus à droite - un jaune clair - correspond aux valeurs supérieures ou égales à 1.
+     * Les couleurs intermédiaires correspondent aux valeurs comprises entre 0 et 1.
      */
     public static final ColorRamp PLASMA = new ColorRamp(
             Color.valueOf("0x0d0887ff"), Color.valueOf("0x220690ff"),

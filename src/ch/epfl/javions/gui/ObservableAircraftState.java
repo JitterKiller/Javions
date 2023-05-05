@@ -139,12 +139,32 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
+     * Méthode de modification de la valeur contenue dans la propriété lastMessageTimeStampNs.
+     *
+     * @param timeStampNs Le nouveau timestamp en nanosecondes.
+     */
+    @Override
+    public void setLastMessageTimeStampNs(long timeStampNs) {
+        lastMessageTimeStampNs.set(timeStampNs);
+    }
+
+    /**
      * Méthode d'accès à la valeur contenue dans la propriété category.
      *
      * @return La valeur contenue dans la propriété category.
      */
     public int getCategory() {
         return categoryProperty().get();
+    }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété category.
+     *
+     * @param category La nouvelle catégorie de l'aéronef.
+     */
+    @Override
+    public void setCategory(int category) {
+        this.category.set(category);
     }
 
     /**
@@ -157,12 +177,37 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
+     * Méthode de modification de la valeur contenue dans la propriété callSign.
+     *
+     * @param callSign Le nouveau call sign de l'aéronef.
+     */
+    @Override
+    public void setCallSign(CallSign callSign) {
+        this.callSign.set(callSign);
+    }
+
+    /**
      * Méthode d'accès à la valeur contenue dans la propriété position.
      *
      * @return La valeur contenue dans la propriété position.
      */
     public GeoPos getPosition() {
         return positionProperty().get();
+    }
+
+    /**
+     * Méthode de modification de la valeur contenue dans la propriété position.
+     *
+     * @param position La nouvelle position géographique de l'aéronef.
+     */
+    @Override
+    public void setPosition(GeoPos position) {
+        this.position.set(position);
+        GeoPos potentialPos = new GeoPos(position.longitudeT32(), position.latitudeT32());
+        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).position.equals(potentialPos))) {
+            trajectory.add(new AirbornePos(position, getAltitude()));
+            curentMessageTimeStampNsTrajectory = getLastMessageTimeStampNs();
+        }
     }
 
     /**
@@ -184,69 +229,6 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     }
 
     /**
-     * Méthode d'accès à la valeur contenue dans la propriété velocity.
-     *
-     * @return La valeur contenue dans la propriété velocity.
-     */
-    public double getVelocity() {
-        return velocityProperty().get();
-    }
-
-    /**
-     * Méthode d'accès à la valeur contenue dans la propriété trackOrHeading.
-     *
-     * @return La valeur contenue dans la propriété trackOrHeading.
-     */
-    public double getTrackOrHeading() {
-        return trackOrHeadingProperty().get();
-    }
-
-    /**
-     * Méthode de modification de la valeur contenue dans la propriété lastMessageTimeStampNs.
-     *
-     * @param timeStampNs Le nouveau timestamp en nanosecondes.
-     */
-    @Override
-    public void setLastMessageTimeStampNs(long timeStampNs) {
-        lastMessageTimeStampNs.set(timeStampNs);
-    }
-
-    /**
-     * Méthode de modification de la valeur contenue dans la propriété category.
-     *
-     * @param category La nouvelle catégorie de l'aéronef.
-     */
-    @Override
-    public void setCategory(int category) {
-        this.category.set(category);
-    }
-
-    /**
-     * Méthode de modification de la valeur contenue dans la propriété callSign.
-     *
-     * @param callSign Le nouveau call sign de l'aéronef.
-     */
-    @Override
-    public void setCallSign(CallSign callSign) {
-        this.callSign.set(callSign);
-    }
-
-    /**
-     * Méthode de modification de la valeur contenue dans la propriété position.
-     *
-     * @param position La nouvelle position géographique de l'aéronef.
-     */
-    @Override
-    public void setPosition(GeoPos position) {
-        this.position.set(position);
-        GeoPos potentialPos = new GeoPos(position.longitudeT32(), position.latitudeT32());
-        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).position.equals(potentialPos))) {
-            trajectory.add(new AirbornePos(position,getAltitude()));
-            curentMessageTimeStampNsTrajectory = getLastMessageTimeStampNs();
-        }
-    }
-
-    /**
      * Méthode de modification de la valeur contenue dans la propriété altitude.
      *
      * @param altitude La nouvelle altitude de l'aéronef.
@@ -255,9 +237,18 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     public void setAltitude(double altitude) {
         this.altitude.set(altitude);
         if (getLastMessageTimeStampNs() == curentMessageTimeStampNsTrajectory) {
-            AirbornePos pos = new AirbornePos(getPosition(),altitude);
+            AirbornePos pos = new AirbornePos(getPosition(), altitude);
             trajectory.set(trajectory.size() - 1, pos);
         }
+    }
+
+    /**
+     * Méthode d'accès à la valeur contenue dans la propriété velocity.
+     *
+     * @return La valeur contenue dans la propriété velocity.
+     */
+    public double getVelocity() {
+        return velocityProperty().get();
     }
 
     /**
@@ -268,6 +259,15 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setVelocity(double velocity) {
         this.velocity.set(velocity);
+    }
+
+    /**
+     * Méthode d'accès à la valeur contenue dans la propriété trackOrHeading.
+     *
+     * @return La valeur contenue dans la propriété trackOrHeading.
+     */
+    public double getTrackOrHeading() {
+        return trackOrHeadingProperty().get();
     }
 
     /**
@@ -287,7 +287,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      * (longitude et latitude) ainsi qu'une altitude.
      *
      * @param position La longitude de l'aéronef exprimé en T32.
-     * @param altitude  La latitude de l'aéronef exprimé en T32.
+     * @param altitude La latitude de l'aéronef exprimé en T32.
      */
     public record AirbornePos(GeoPos position, double altitude) {
     }

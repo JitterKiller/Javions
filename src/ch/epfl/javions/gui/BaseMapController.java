@@ -33,8 +33,8 @@ public final class BaseMapController {
     /**
      * Constructeur de BaseMapController.
      *
-     * @param tileManager Le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte.
-     * @param mapParameters  Les paramètres de la portion visible de la carte.
+     * @param tileManager   Le gestionnaire de tuiles à utiliser pour obtenir les tuiles de la carte.
+     * @param mapParameters Les paramètres de la portion visible de la carte.
      */
     public BaseMapController(TileManager tileManager, MapParameters mapParameters) {
 
@@ -77,7 +77,7 @@ public final class BaseMapController {
             for (int j = 0; j < pane.getHeight() + TILE_SIDE; j += TILE_SIDE) {
                 int xTile = (int) (mapParameters.getMinX() + i) / TILE_SIDE;
                 int yTile = (int) (mapParameters.getMinY() + j) / TILE_SIDE;
-                if(TileManager.TileId.isValid(mapParameters.getZoom(), xTile, yTile)) {
+                if (TileManager.TileId.isValid(mapParameters.getZoom(), xTile, yTile)) {
                     TileManager.TileId id = new TileManager.TileId(mapParameters.getZoom(), xTile, yTile);
                     int xToPlace = (int) (xTile * TILE_SIDE - mapParameters.getMinX());
                     int yToPlace = (int) (yTile * TILE_SIDE - mapParameters.getMinY());
