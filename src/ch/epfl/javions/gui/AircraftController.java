@@ -33,6 +33,7 @@ public final class AircraftController {
     private static final String LABEL_CLASS = "label";
     private static final int MAX_ALT = 12_000;
     private static final int MIN_ZOOM_LABEL_VISIBLE = 11;
+    private static final int RECT_OFFSET = 4;
     private final MapParameters mapParameters;
     private final ObservableSet<ObservableAircraftState> aircraftStates;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
@@ -170,8 +171,8 @@ public final class AircraftController {
                 aircraftState.altitudeProperty()));
 
         Rectangle r = new Rectangle();
-        r.widthProperty().bind(t.layoutBoundsProperty().map(b -> b.getWidth() + 4));
-        r.heightProperty().bind(t.layoutBoundsProperty().map(b -> b.getHeight() + 4));
+        r.widthProperty().bind(t.layoutBoundsProperty().map(b -> b.getWidth() + RECT_OFFSET));
+        r.heightProperty().bind(t.layoutBoundsProperty().map(b -> b.getHeight() + RECT_OFFSET));
 
 
         Group label = new Group(r, t);
