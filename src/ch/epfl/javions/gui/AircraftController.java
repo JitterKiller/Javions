@@ -54,8 +54,9 @@ public final class AircraftController {
                         annotatedAircraft(change.getElementAdded());
                     }
                     if (change.wasRemoved()) {
-                        pane.getChildren().remove(pane.lookup("#" +
-                                change.getElementRemoved().getAddress().string()));
+                        pane.getChildren().removeIf(
+                                e -> change.getElementRemoved().getAddress().string().equals(e.getId())
+                        );
                     }
                 });
     }

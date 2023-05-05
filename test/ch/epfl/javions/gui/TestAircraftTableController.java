@@ -58,11 +58,13 @@ public final class TestAircraftTableController extends Application {
         primaryStage.setScene(new Scene(atc.pane()));
         primaryStage.show();
 
-        var macM = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
-        var winM = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
+        URL mURL = getClass().getResource("/messages_20230318_0915.bin");
+        assert mURL != null;
+        String u = Path.of(mURL.toURI()).toString();
 
-        var mi = readAllMessages(macM)
+        var mi = readAllMessages(u)
                 .iterator();
+
         // Animation des aéronefs
         new AnimationTimer() {
             @Override

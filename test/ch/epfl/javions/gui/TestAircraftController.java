@@ -66,10 +66,11 @@ public final class TestAircraftController extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
 
-        var macM = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
-        var winM = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
+        URL mURL = getClass().getResource("/messages_20230318_0915.bin");
+        assert mURL != null;
+        String u = Path.of(mURL.toURI()).toString();
 
-        var mi = readAllMessages(winM)
+        var mi = readAllMessages(u)
                 .iterator();
 
         // Animation des aéronefs
