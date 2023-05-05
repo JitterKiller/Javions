@@ -69,7 +69,7 @@ public final class Bits {
      *         Faux (false) si le bit de "value" d'index donné vaut 0.
      */
     public static boolean testBit(long value) {
-        return testBit(value,0);
+        return testBit(value, 0);
     }
 }
 

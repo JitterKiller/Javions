@@ -36,11 +36,11 @@ public class TestUI {
                     Thread.sleep(1);
                     bool = System.nanoTime() - startTime >= timeStampNs;
                 } while (!bool);
-                if(pm != null) manager.updateWithMessage(pm);
+                if (pm != null) manager.updateWithMessage(pm);
                 manager.purge();
                 ArrayList<ObservableAircraftState> states = new ArrayList<>(manager.states());
                 states.sort(new AddressComparator());
-                if(!states.isEmpty()) printTable(states);
+                if (!states.isEmpty()) printTable(states);
             }
         }
         catch (EOFException ignored) {}

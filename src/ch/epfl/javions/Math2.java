@@ -41,6 +41,6 @@ public final class Math2 {
      * @return le sinus hyperbolique réciproque de son argument x.
      */
     public static double asinh(double x) {
-        return Math.log(x + Math.hypot(1,x));
+        return Math.log(x + Math.hypot(1, x));
     }
 }
