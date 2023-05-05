@@ -12,10 +12,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
+import javafx.collections.*;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
@@ -37,6 +34,7 @@ public final class AircraftController {
     private static final int MAX_ALT = 12_000;
     private static final int MIN_ZOOM_LABEL_VISIBLE = 11;
     private final MapParameters mapParameters;
+    private final ObservableSet<ObservableAircraftState> aircraftStates;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private Pane pane;
 
@@ -45,9 +43,10 @@ public final class AircraftController {
                               ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
         this.mapParameters = mapParameters;
+        this.aircraftStates = FXCollections.unmodifiableObservableSet(aircraftStates);
         this.selectedAircraft = selectedAircraft;
         initializePane();
-        addAllAnnotatedAircraft(aircraftStates);
+        addAllAnnotatedAircraft(this.aircraftStates);
         aircraftStates.addListener((SetChangeListener<ObservableAircraftState>)
                 change -> {
                     if (change.wasAdded()) {
