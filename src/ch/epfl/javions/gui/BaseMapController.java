@@ -73,8 +73,8 @@ public final class BaseMapController {
      */
     private void drawMap() {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        for (int i = 0; i < pane.getWidth() + TILE_SIDE; i += TILE_SIDE) {
-            for (int j = 0; j < pane.getHeight() + TILE_SIDE; j += TILE_SIDE) {
+        for (int i = 0; i < canvas.getWidth() + TILE_SIDE; i += TILE_SIDE) {
+            for (int j = 0; j < canvas.getHeight() + TILE_SIDE; j += TILE_SIDE) {
                 int xTile = (int) (mapParameters.getMinX() + i) / TILE_SIDE;
                 int yTile = (int) (mapParameters.getMinY() + j) / TILE_SIDE;
                 if (TileManager.TileId.isValid(mapParameters.getZoom(), xTile, yTile)) {
