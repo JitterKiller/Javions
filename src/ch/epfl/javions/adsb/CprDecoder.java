@@ -62,7 +62,7 @@ public final class CprDecoder {
         double oddLongitudeZoneValue = computeLongitudeZoneValue(AOdd);
 
         int evenLongitudeZone;
-         /* La méthode Double.compare() retourne 0 si les deux valeurs sont égales (même si c'est deux NaN).*/
+        /* La méthode Double.compare() retourne 0 si les deux valeurs sont égales (même si c'est deux NaN).*/
         if (Double.compare(evenLongitudeZoneValue, oddLongitudeZoneValue) == 0) {
             if (areLongitudeZoneValuesNaN(AEven, AOdd)) evenLongitudeZone = 1;
             else evenLongitudeZone = (int) evenLongitudeZoneValue;
@@ -77,7 +77,7 @@ public final class CprDecoder {
         }
 
         return mostRecent == 0 ?
-                geoPosOf(evenLongitudeTurn,evenLatitudeTurn) :
+                geoPosOf(evenLongitudeTurn, evenLatitudeTurn) :
                 geoPosOf(oddLongitudeTurn, oddLatitudeTurn);
     }
 

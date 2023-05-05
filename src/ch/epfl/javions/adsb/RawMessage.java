@@ -7,7 +7,6 @@ import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.aircraft.IcaoAddress;
 
 import java.util.HexFormat;
-import java.util.Objects;
 
 import static ch.epfl.javions.Crc24.GENERATOR;
 
@@ -65,7 +64,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return La longueur du message (14) si le downlink format (DF) du message est 17, 0 sinon.
      */
     public static int size(byte byte0) {
-        return Bits.extractUInt(byte0,DF_START,DF_SIZE) == VALID_DF ? LENGTH : 0;
+        return Bits.extractUInt(byte0, DF_START, DF_SIZE) == VALID_DF ? LENGTH : 0;
     }
 
     /**
@@ -84,7 +83,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      * @return le downlink format (DF) du message.
      */
     public int downLinkFormat() {
-        return Bits.extractUInt(bytes.bytesInRange(DF_CA_START,DF_CA_END),DF_START,DF_SIZE);
+        return Bits.extractUInt(bytes.bytesInRange(DF_CA_START, DF_CA_END), DF_START, DF_SIZE);
     }
 
     /**
@@ -94,7 +93,7 @@ public record RawMessage(long timeStampNs, ByteString bytes) {
      */
     public IcaoAddress icaoAddress() {
         return new IcaoAddress(HexFormat.of().withUpperCase()
-                    .toHexDigits(bytes.bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
+                .toHexDigits(bytes.bytesInRange(ICAO_START, ICAO_END), ICAO_SIZE));
     }
 
     /**

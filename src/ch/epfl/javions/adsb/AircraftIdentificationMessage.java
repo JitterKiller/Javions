@@ -60,12 +60,9 @@ public record AircraftIdentificationMessage(long timeStampNs, IcaoAddress icaoAd
 
             if (LETTER_START <= callSignInt && callSignInt <= LETTER_END) {
                 callSignID.append((char) (callSignInt + ASCII_LETTER_OFFSET));
-            }
-            else if(NUMBER_START <= callSignInt && callSignInt <= NUMBER_END || callSignInt == ESCAPE_NUMBER) {
+            } else if (NUMBER_START <= callSignInt && callSignInt <= NUMBER_END || callSignInt == ESCAPE_NUMBER) {
                 callSignID.append((char) callSignInt);
-            }
-            else return null;
-
+            } else return null;
         }
 
         CallSign callSign = new CallSign(callSignID.toString().stripTrailing());
