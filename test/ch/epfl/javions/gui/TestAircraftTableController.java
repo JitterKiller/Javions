@@ -48,7 +48,7 @@ public final class TestAircraftTableController extends Application {
         URL dbUrl = getClass().getResource("/aircraft.zip");
         assert dbUrl != null;
         String f = Path.of(dbUrl.toURI()).toString();
-        var db = new AircraftDatabase("C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\aircraft.zip");
+        var db = new AircraftDatabase(f);
 
         AircraftStateManager asm = new AircraftStateManager(db);
         ObjectProperty<ObservableAircraftState> sap =
@@ -61,7 +61,7 @@ public final class TestAircraftTableController extends Application {
         var macM = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
         var winM = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
 
-        var mi = readAllMessages(winM)
+        var mi = readAllMessages(macM)
                 .iterator();
         // Animation des aéronefs
         new AnimationTimer() {

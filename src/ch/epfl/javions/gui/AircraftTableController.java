@@ -71,7 +71,8 @@ public final class AircraftTableController {
 
     }
 
-    private void setColumnsComparators(TableColumn<ObservableAircraftState, String> tableColumn, NumberFormat nf) {
+    private void setColumnsComparators(TableColumn<ObservableAircraftState, String> tableColumn,
+                                       NumberFormat nf) {
         tableColumn.setComparator((s1, s2) -> {
             if (s1.isEmpty() || s2.isEmpty()) {
                 return s1.compareTo(s2);
@@ -140,29 +141,26 @@ public final class AircraftTableController {
         TableColumn<ObservableAircraftState, String> longitudeColumn = new TableColumn<>("Longitude (°)");
         longitudeColumn.getStyleClass().add("numeric");
         longitudeColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
-        longitudeColumn.setCellValueFactory(f ->
-                new ReadOnlyStringWrapper(nf4.format(f.getValue().getPosition().longitude())));
+        longitudeColumn.setCellValueFactory(f -> f.getValue().positionProperty().map(d -> nf4.format(d.longitude())));
         setColumnsComparators(longitudeColumn, nf4);
 
         TableColumn<ObservableAircraftState, String> latitudeColumn = new TableColumn<>("Latitude (°)");
         latitudeColumn.getStyleClass().add(NUMERIC_CLASS);
         latitudeColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
-        latitudeColumn.setCellValueFactory(f ->
-                new ReadOnlyStringWrapper(nf4.format(f.getValue().getPosition().latitude())));
+        latitudeColumn.setCellValueFactory(f -> f.getValue().positionProperty().map(d -> nf4.format(d.latitude())));
         setColumnsComparators(latitudeColumn, nf4);
 
         TableColumn<ObservableAircraftState, String> altitudeColumn = new TableColumn<>("Altitude (m)");
         altitudeColumn.getStyleClass().add(NUMERIC_CLASS);
         altitudeColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
-        altitudeColumn.setCellValueFactory(f ->
-                new ReadOnlyStringWrapper(nf0.format(f.getValue().getAltitude())));
+        altitudeColumn.setCellValueFactory(f -> f.getValue().altitudeProperty().map(d -> nf0.format(d.doubleValue())));
         setColumnsComparators(altitudeColumn, nf0);
 
         TableColumn<ObservableAircraftState, String> velocityColumn = new TableColumn<>("Vitesse (km/h)");
         velocityColumn.getStyleClass().add(NUMERIC_CLASS);
         velocityColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
-        velocityColumn.setCellValueFactory(f ->
-                new ReadOnlyStringWrapper(nf0.format(Units.convertTo(f.getValue().getVelocity(), Units.Speed.KILOMETER_PER_HOUR))));
+        velocityColumn.setCellValueFactory(f -> f.getValue().velocityProperty().map(d -> nf0.format(
+                Units.convertTo(d.doubleValue(),Units.Speed.KILOMETER_PER_HOUR))));
         setColumnsComparators(velocityColumn, nf0);
 
         tableView.getColumns().setAll(List.of(icaoColumn, callSignColumn, registrationColumn, modelColumn, typeDesignator,
