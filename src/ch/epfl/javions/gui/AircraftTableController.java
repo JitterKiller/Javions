@@ -3,8 +3,12 @@ package ch.epfl.javions.gui;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
-import javafx.beans.property.*;
-import javafx.collections.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
@@ -58,7 +62,6 @@ public final class AircraftTableController {
                 tableView.scrollTo(newS);
             }
         });
-
 
         tableView.getSelectionModel().selectedItemProperty().addListener((p, oldS, newS) -> {
             if (newS != null) {
