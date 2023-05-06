@@ -1,5 +1,7 @@
-package ch.epfl.javions;
+package ch.epfl.javions.gui;
 
+import ch.epfl.javions.ByteString;
+import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.Message;
 import ch.epfl.javions.adsb.MessageParser;
 import ch.epfl.javions.adsb.RawMessage;
@@ -9,21 +11,26 @@ import ch.epfl.javions.gui.ObservableAircraftState;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 public class TestUI {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         System.out.println("\033[H\033[2J");
-        var fileMac = "/Users/adam/Documents/CS-108/Javions/resources/messages_20230318_0915.bin";
-        var databaseFileMac = "/Users/adam/Documents/CS-108/Javions/resources/aircraft.zip";
-        var filePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\messages_20230318_0915.bin";
-        var databaseFilePC = "C:\\Users\\WshLaStreet\\Desktop\\Javions\\resources\\aircraft.zip";
+        URL mURL = TestUI.class.getResource("/messages_20230318_0915.bin");
+        assert mURL != null;
+        String u = Path.of(mURL.toURI()).toString();
         try (DataInputStream s = new DataInputStream(new BufferedInputStream(
-                new FileInputStream(fileMac)))) {
-            var database = new AircraftDatabase(databaseFileMac);
-            var manager = new AircraftStateManager(database);
+                new FileInputStream(u)))) {
+            URL dbUrl = TestUI.class.getResource("/aircraft.zip");
+            assert dbUrl != null;
+            String f = Path.of(dbUrl.toURI()).toString();
+            var db = new AircraftDatabase(f);
+            var manager = new AircraftStateManager(db);
             var bytes = new byte[RawMessage.LENGTH];
             long startTime = System.nanoTime();
             while (true) {
@@ -44,7 +51,7 @@ public class TestUI {
             }
         }
         catch (EOFException ignored) {}
-        catch (InterruptedException e) {throw new RuntimeException(e);}
+        catch (InterruptedException | URISyntaxException e) {throw new RuntimeException(e);}
     }
 
     private static void printTable(ArrayList<ObservableAircraftState> states) throws InterruptedException {

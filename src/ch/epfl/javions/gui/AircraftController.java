@@ -35,7 +35,6 @@ public final class AircraftController {
     private static final int MIN_ZOOM_LABEL_VISIBLE = 11;
     private static final int RECT_OFFSET = 4;
     private final MapParameters mapParameters;
-    private final ObservableSet<ObservableAircraftState> aircraftStates;
     private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private Pane pane;
 
@@ -44,10 +43,9 @@ public final class AircraftController {
                               ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
         this.mapParameters = mapParameters;
-        this.aircraftStates = FXCollections.unmodifiableObservableSet(aircraftStates);
         this.selectedAircraft = selectedAircraft;
         initializePane();
-        addAllAnnotatedAircraft(this.aircraftStates);
+        addAllAnnotatedAircraft(aircraftStates);
         aircraftStates.addListener((SetChangeListener<ObservableAircraftState>)
                 change -> {
                     if (change.wasAdded()) {
