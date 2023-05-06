@@ -12,7 +12,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.*;
+import javafx.beans.value.ObservableObjectValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
@@ -59,6 +63,18 @@ public final class AircraftController {
                 });
     }
 
+    private ReadOnlyObjectProperty<ObservableAircraftState> selectedAircraftProperty() {
+        return selectedAircraft;
+    }
+
+    private ObservableAircraftState getSelectedAircraft() {
+        return selectedAircraftProperty().get();
+    }
+
+    private void setSelectedAircraft(ObservableAircraftState selectedAircraft) {
+        this.selectedAircraft.set(selectedAircraft);
+    }
+
     private void initializePane() {
         pane = new Pane(new Canvas());
         pane.getStylesheets().add(CSS_FILE);
@@ -81,64 +97,47 @@ public final class AircraftController {
     private Group trajectory(ObservableAircraftState aircraftState) {
         Group trajectory = new Group();
 
-        ObservableList<ObservableAircraftState.AirbornePos> trajectoryList = aircraftState.getTrajectory();
-
-        aircraftState.getTrajectory().addListener((ListChangeListener<? super ObservableAircraftState.AirbornePos>)
-                change -> {
-                    trajectory.getChildren().clear();
-                    trajectoryUpdate(trajectory, trajectoryList);
-                });
-
-        mapParameters.zoomProperty().addListener((ChangeListener<? super Number>)
-                (p, oldS, newS) -> {
-                    trajectory.getChildren().clear();
-                    trajectoryUpdate(trajectory, trajectoryList);
-                });
-
-        trajectory.visibleProperty().addListener((ChangeListener<? super Boolean>)
-                (p, oldS, newS) -> {
-                    trajectory.getChildren().clear();
-                    trajectoryUpdate(trajectory, trajectoryList);
-                });
-
+        trajectory.visibleProperty().bind(Bindings.createBooleanBinding(
+                () -> aircraftState.equals(getSelectedAircraft()), selectedAircraftProperty()));
 
         trajectory.layoutXProperty().bind(Bindings.createDoubleBinding(
-                mapParameters::getMinX,
-                mapParameters.minXProperty()
-        ).negate());
+                mapParameters::getMinX, mapParameters.minXProperty()).negate());
+
         trajectory.layoutYProperty().bind(Bindings.createDoubleBinding(
-                mapParameters::getMinY,
-                mapParameters.minYProperty()
-        ).negate());
-        trajectory.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> aircraftState.equals(selectedAircraft.get()),
-                selectedAircraft
-        ));
+                mapParameters::getMinY, mapParameters.minYProperty()).negate());
+
+        aircraftState.getTrajectory().addListener((ListChangeListener<? super ObservableAircraftState.AirbornePos>)
+                change -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+
+        mapParameters.zoomProperty().addListener((ChangeListener<? super Number>)
+                (p, oldS, newS) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+
+        trajectory.visibleProperty().addListener((ChangeListener<? super Boolean>)
+                (p, oldS, newS) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+
+
         trajectory.getStyleClass().add(TRAJECTORY_CLASS);
 
         return trajectory;
     }
 
     private void trajectoryUpdate(Group trajectory, ObservableList<ObservableAircraftState.AirbornePos> trajectoryList) {
-        if (trajectory.isVisible()) {
-            int i = 0;
-            for (ObservableAircraftState.AirbornePos currentTrajectory : trajectoryList) {
-                if (i < trajectoryList.size() - 1) {
-                    Line line = new Line();
-                    line.setStartX(WebMercator.x(mapParameters.getZoom(), currentTrajectory.position().longitude()));
-                    line.setStartY(WebMercator.y(mapParameters.getZoom(), currentTrajectory.position().latitude()));
-                    line.setEndX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i + 1).position().longitude()));
-                    line.setEndY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i + 1).position().latitude()));
-                    if (currentTrajectory.position().equals(trajectoryList.get(i + 1).position())) {
-                        line.setStroke(getColor(currentTrajectory.altitude()));
-                    } else {
-                        Stop s1 = new Stop(0, getColor(currentTrajectory.altitude()));
-                        Stop s2 = new Stop(1, getColor(trajectoryList.get(i + 1).altitude()));
-                        line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
-                    }
-                    trajectory.getChildren().add(line);
+        trajectory.getChildren().clear();
+        if(trajectory.isVisible()) {
+            for (int i = 0; i < trajectoryList.size() - 1; ++i) {
+                Line line = new Line();
+                line.setStartX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i).position().longitude()));
+                line.setStartY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i).position().latitude()));
+                line.setEndX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i + 1).position().longitude()));
+                line.setEndY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i + 1).position().latitude()));
+                if (trajectoryList.get(i).position().equals(trajectoryList.get(i + 1).position())) {
+                    line.setStroke(getColor(trajectoryList.get(i).altitude()));
+                } else {
+                    Stop s1 = new Stop(0, getColor(trajectoryList.get(i).altitude()));
+                    Stop s2 = new Stop(1, getColor(trajectoryList.get(i + 1).altitude()));
+                    line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
                 }
-                i++;
+                trajectory.getChildren().add(line);
             }
         }
     }
@@ -178,9 +177,9 @@ public final class AircraftController {
         label.getStyleClass().add(LABEL_CLASS);
         label.visibleProperty().bind(Bindings.createBooleanBinding(
                 () -> mapParameters.getZoom() >= MIN_ZOOM_LABEL_VISIBLE
-                        || aircraftState.equals(selectedAircraft.get()),
+                        || aircraftState.equals(getSelectedAircraft()),
                 mapParameters.zoomProperty(),
-                selectedAircraft
+                selectedAircraftProperty()
         ));
 
         return label;
@@ -223,7 +222,7 @@ public final class AircraftController {
         ));
         icon.fillProperty().bind(aircraftState.altitudeProperty().map(
                 (b) -> getColor(b.doubleValue())));
-        icon.setOnMousePressed(e -> selectedAircraft.set(aircraftState));
+        icon.setOnMousePressed(e -> setSelectedAircraft(aircraftState));
         return icon;
     }
 

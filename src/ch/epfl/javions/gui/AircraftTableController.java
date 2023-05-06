@@ -4,6 +4,7 @@ import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ObservableSet;
@@ -36,13 +37,14 @@ public final class AircraftTableController {
     private static final int DOUBLE_CLICK = 2;
     private static final NumberFormat NUMBER_FORMAT_0 = NumberFormat.getInstance();
     private static final NumberFormat NUMBER_FORMAT_4 = NumberFormat.getInstance();
-    private final ObjectProperty<ObservableAircraftState> stateProperty;
+    private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private final TableView<ObservableAircraftState> tableView = new TableView<>();
+    private Consumer<ObservableAircraftState> stateConsumer;
 
     public AircraftTableController(ObservableSet<ObservableAircraftState> states,
-                                   ObjectProperty<ObservableAircraftState> stateProperty) {
+                                   ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
-        this.stateProperty = stateProperty;
+        this.selectedAircraft = selectedAircraft;
         createTableView(tableView);
         setNumberFormat();
 
@@ -51,24 +53,36 @@ public final class AircraftTableController {
                 tableView.getItems().add(c.getElementAdded());
                 tableView.sort();
             }
-            if (c.wasRemoved()) {
-                tableView.getItems().remove(c.getElementRemoved());
-            }
+            if (c.wasRemoved()) tableView.getItems().remove(c.getElementRemoved());
         });
 
-        stateProperty.addListener((p, oldS, newS) -> {
+        selectedAircraftProperty().addListener((p, oldS, newS) -> {
             tableView.getSelectionModel().select(newS);
-            if (oldS != newS) {
-                tableView.scrollTo(newS);
-            }
+            if (oldS != newS) tableView.scrollTo(newS);
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener((p, oldS, newS) -> {
-            if (newS != null) {
-                stateProperty.set(newS);
-            }
+            if (newS != null) setSelectedAircraft(newS);
         });
 
+        tableView.setOnMouseClicked(e -> {
+            if (e.getClickCount() == DOUBLE_CLICK && e.getButton() == MouseButton.PRIMARY) {
+                if (stateConsumer != null && getSelectedAircraft() != null)
+                    stateConsumer.accept(getSelectedAircraft());
+            }
+        });
+    }
+
+    private ReadOnlyObjectProperty<ObservableAircraftState> selectedAircraftProperty() {
+        return selectedAircraft;
+    }
+
+    private ObservableAircraftState getSelectedAircraft() {
+        return selectedAircraftProperty().get();
+    }
+
+    private void setSelectedAircraft(ObservableAircraftState selectedAircraft) {
+        this.selectedAircraft.set(selectedAircraft);
     }
 
     private void setNumberFormat() {
@@ -88,7 +102,7 @@ public final class AircraftTableController {
                 try {
                     return Double.compare(nf.parse(s1).doubleValue(), nf.parse(s2).doubleValue());
                 } catch (ParseException e) {
-                    throw new RuntimeException(e);
+                    throw new Error(e);
                 }
             }
         });
@@ -175,12 +189,6 @@ public final class AircraftTableController {
     }
 
     public void setOnDoubleClick(Consumer<ObservableAircraftState> stateConsumer) {
-        tableView.setOnMouseClicked(e -> {
-            if (e.getClickCount() == DOUBLE_CLICK && e.getButton() == MouseButton.PRIMARY) {
-                ObservableAircraftState selectedState = tableView.getSelectionModel().getSelectedItem();
-                if (stateConsumer != null && selectedState != null) stateConsumer.accept(selectedState);
-            }
-        });
+        this.stateConsumer = stateConsumer;
     }
-
 }
