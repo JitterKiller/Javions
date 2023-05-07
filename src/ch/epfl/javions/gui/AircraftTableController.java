@@ -17,14 +17,21 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS;
 
-
+/**
+ *
+ */
 public final class AircraftTableController {
 
     private static final String TABLE_CSS = "table.css";
     private static final String NUMERIC_CLASS = "numeric";
+    private static final String ICAO_COLUMN_TITLE = "OACI";
+    private static final String CALL_SIGN_COLUMN_TITLE = "Indicatif";
+    private static final String REGISTRATION_COLUMN_TITLE = "Immatriculation";
+    private static final ReadOnlyStringWrapper EMPTY_STRING = new ReadOnlyStringWrapper("");
     private static final int ICAO_PREF_WIDTH = 60;
     private static final int CALL_SIGN_PREF_WIDTH = 70;
     private static final int REGISTRATION_PREF_WIDTH = 90;
@@ -125,32 +132,24 @@ public final class AircraftTableController {
 
         TableColumn<ObservableAircraftState, String> registrationColumn = new TableColumn<>("Immatriculation");
         registrationColumn.setPrefWidth(REGISTRATION_PREF_WIDTH);
-        registrationColumn.setCellValueFactory(f -> {
-            AircraftData ad = f.getValue().getData();
-            return new ReadOnlyObjectWrapper<>(ad).map(d -> d.registration().string());
-        });
+        registrationColumn.setCellValueFactory(f ->
+                new ReadOnlyObjectWrapper<>(f.getValue().getData()).map(d -> d.registration().string()));
 
 
         TableColumn<ObservableAircraftState, String> modelColumn = new TableColumn<>("Modèle");
         modelColumn.setPrefWidth(MODEL_PREF_WIDTH);
-        modelColumn.setCellValueFactory(f -> {
-            AircraftData ad = f.getValue().getData();
-            return new ReadOnlyObjectWrapper<>(ad).map(AircraftData::model);
-        });
+        modelColumn.setCellValueFactory(f ->
+                new ReadOnlyObjectWrapper<>(f.getValue().getData()).map(AircraftData::model));
 
         TableColumn<ObservableAircraftState, String> typeDesignator = new TableColumn<>("Type");
         typeDesignator.setPrefWidth(TYPE_DESIGNATOR_PREF_WIDTH);
-        typeDesignator.setCellValueFactory(f -> {
-            AircraftData ad = f.getValue().getData();
-            return new ReadOnlyObjectWrapper<>(ad).map(d -> d.typeDesignator().string());
-        });
+        typeDesignator.setCellValueFactory(f ->
+                new ReadOnlyObjectWrapper<>(f.getValue().getData()).map(d -> d.typeDesignator().string()));
 
         TableColumn<ObservableAircraftState, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setPrefWidth(DESCRIPTION_PREF_WIDTH);
-        descriptionColumn.setCellValueFactory(f -> {
-            AircraftData ad = f.getValue().getData();
-            return new ReadOnlyObjectWrapper<>(ad).map(d -> d.description().string());
-        });
+        descriptionColumn.setCellValueFactory(f ->
+                new ReadOnlyObjectWrapper<>(f.getValue().getData()).map(d -> d.description().string()));
 
         TableColumn<ObservableAircraftState, String> longitudeColumn = new TableColumn<>("Longitude (°)");
         longitudeColumn.getStyleClass().add("numeric");

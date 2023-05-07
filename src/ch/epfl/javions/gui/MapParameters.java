@@ -76,7 +76,7 @@ public final class MapParameters {
      *
      * @param zoom Le nouveau niveau zoom.
      */
-    public void setZoom(int zoom) {
+    private void setZoom(int zoom) {
         this.zoom.set(zoom);
     }
 
@@ -94,7 +94,7 @@ public final class MapParameters {
      *
      * @param minX La nouvelle coordonnée x du coin haut-gauche de la portion visible de la carte.
      */
-    public void setMinX(double minX) {
+    private void setMinX(double minX) {
         this.minX.set(minX);
     }
 
@@ -112,7 +112,7 @@ public final class MapParameters {
      *
      * @param minY La nouvelle coordonnée y du coin haut-gauche de la portion visible de la carte.
      */
-    public void setMinY(double minY) {
+    private void setMinY(double minY) {
         this.minY.set(minY);
     }
 

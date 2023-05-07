@@ -144,7 +144,7 @@ public final class BaseMapController {
             memoryPosition = new Point2D(e.getX(), e.getY());
         });
 
-        pane.setOnMouseReleased(e -> memoryPosition.subtract(memoryPosition));
+        pane.setOnMouseReleased(e -> memoryPosition = null);
 
     }
 
@@ -167,10 +167,11 @@ public final class BaseMapController {
 
         double longitude = point.longitude();
         double latitude = point.latitude();
-        double x = WebMercator.x(mapParameters.getZoom(), longitude);
-        double y = WebMercator.x(mapParameters.getZoom(), latitude);
-        mapParameters.setMinX(x - (canvas.getWidth() / 2));
-        mapParameters.setMinX(y - (canvas.getHeight() / 2));
+
+        double x = WebMercator.x(mapParameters.getZoom(), longitude) + (canvas.getWidth() / 2);
+        double y = WebMercator.x(mapParameters.getZoom(), latitude) + (canvas.getHeight() / 2);
+
+        mapParameters.scroll(x,y);
     }
 
 }

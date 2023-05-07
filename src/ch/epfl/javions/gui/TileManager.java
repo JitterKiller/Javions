@@ -52,11 +52,15 @@ public final class TileManager {
      */
     public Image imageForTileAt(TileId id) throws IOException {
 
+        /* Si l'image est contenue dans le cache mémoire, on la retourne directement.*/
         if (memoryCache.containsKey(id)) return memoryCache.get(id);
 
         Path tilePath = Path.of(String.valueOf(diskCachePath), String.valueOf(id.zoom),
                 String.valueOf(id.X), id.Y + ".png");
 
+        /* Sinon, on retourne l'image si elle est contenue dans le cache disque
+         * Sinon on la télécharge depuis le serveur de tuile et on la retourne avec la méthode load()
+         * (en s'assurant de bien la placée dans le cache disque et le cache mémoire. */
         if (Files.exists(tilePath)) {
             return new Image(String.valueOf(tilePath.toUri()));
         } else {
@@ -86,6 +90,7 @@ public final class TileManager {
             byte[] imageBytes = i.readAllBytes();
             o.write(imageBytes);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
+            /* Si la taille du cache mémoire est égale à 100, on supprime l'Image la moins utilisée du cache. */
             if (memoryCache.keySet().size() == MEMORY_CACHE_SIZE) {
                 Iterator<TileId> it = memoryCache.keySet().iterator();
                 memoryCache.remove(it.next());
@@ -103,6 +108,14 @@ public final class TileManager {
      * @param Y    L'index Y de la tuile.
      */
     record TileId(int zoom, int X, int Y) {
+
+        /**
+         * Constructeur compact de l'enregistrement TileID, vérifie si les
+         * arguments zoom, X et Y sont valides à l'aide de la méthode isValid().
+         *
+         * @throws IllegalArgumentException Si les arguments zoom, X et Y ne sont pas valides.
+         *                                  (ne constituent pas une tuile valide).
+         */
         public TileId {
             Preconditions.checkArgument(isValid(zoom, X, Y));
         }

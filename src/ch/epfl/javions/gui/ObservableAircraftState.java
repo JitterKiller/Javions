@@ -27,8 +27,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     private final ObjectProperty<CallSign> callSign = new SimpleObjectProperty<>(null);
     private final ObjectProperty<GeoPos> position = new SimpleObjectProperty<>(null);
     private final ObservableList<AirbornePos> trajectory = FXCollections.observableArrayList();
-    private final ObservableList<AirbornePos> unmodifiableTrajectory
-            = FXCollections.unmodifiableObservableList(trajectory);
+    private final ObservableList<AirbornePos> unmodifiableTrajectory = FXCollections.unmodifiableObservableList(trajectory);
     private final DoubleProperty altitude = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty velocity = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(Double.NaN);
@@ -41,6 +40,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      *                à être représenté par l'instance à créer.
      * @param data    Les caractéristiques fixes de cet aéronef,
      *                provenant de la base de données mictronics.
+     * @throws NullPointerException si L'adresse ICAO de l'aéronef passée en argument est nulle.
      */
     public ObservableAircraftState(IcaoAddress address, AircraftData data) {
         Objects.requireNonNull(address);
