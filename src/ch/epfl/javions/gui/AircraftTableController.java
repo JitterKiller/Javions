@@ -17,7 +17,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS;
 
@@ -27,7 +26,7 @@ import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUEN
 public final class AircraftTableController {
 
     private static final String TABLE_CSS = "table.css";
-    private static final String NUMERIC_CLASS = "numeric";
+    private static final String TABLE_CLASS = "numeric";
     private static final String ICAO_COLUMN_TITLE = "OACI";
     private static final String CALL_SIGN_COLUMN_TITLE = "Indicatif";
     private static final String REGISTRATION_COLUMN_TITLE = "Immatriculation";
@@ -118,6 +117,7 @@ public final class AircraftTableController {
     private void createTableView(TableView<ObservableAircraftState> tableView) {
 
         tableView.getStylesheets().add(TABLE_CSS);
+        tableView.getStyleClass().add(TABLE_CLASS);
         tableView.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         tableView.setTableMenuButtonVisible(true);
 
@@ -152,28 +152,24 @@ public final class AircraftTableController {
                 new ReadOnlyObjectWrapper<>(f.getValue().getData()).map(d -> d.description().string()));
 
         TableColumn<ObservableAircraftState, String> longitudeColumn = new TableColumn<>("Longitude (°)");
-        longitudeColumn.getStyleClass().add("numeric");
         longitudeColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
         longitudeColumn.setCellValueFactory(f -> f.getValue().positionProperty().map(d ->
                 NUMBER_FORMAT_4.format(Units.convertTo(d.longitude(), Units.Angle.DEGREE))));
         setColumnsComparators(longitudeColumn, NUMBER_FORMAT_4);
 
         TableColumn<ObservableAircraftState, String> latitudeColumn = new TableColumn<>("Latitude (°)");
-        latitudeColumn.getStyleClass().add(NUMERIC_CLASS);
         latitudeColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
         latitudeColumn.setCellValueFactory(f -> f.getValue().positionProperty().map(d ->
                 NUMBER_FORMAT_4.format(Units.convertTo(d.latitude(), Units.Angle.DEGREE))));
         setColumnsComparators(latitudeColumn, NUMBER_FORMAT_4);
 
         TableColumn<ObservableAircraftState, String> altitudeColumn = new TableColumn<>("Altitude (m)");
-        altitudeColumn.getStyleClass().add(NUMERIC_CLASS);
         altitudeColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
         altitudeColumn.setCellValueFactory(f -> f.getValue().altitudeProperty().map(d ->
                 NUMBER_FORMAT_0.format(d.doubleValue())));
         setColumnsComparators(altitudeColumn, NUMBER_FORMAT_0);
 
         TableColumn<ObservableAircraftState, String> velocityColumn = new TableColumn<>("Vitesse (km/h)");
-        velocityColumn.getStyleClass().add(NUMERIC_CLASS);
         velocityColumn.setPrefWidth(NUMERIC_COLUMN_PREF_WIDTH);
         velocityColumn.setCellValueFactory(f -> f.getValue().velocityProperty().map(d ->
                 NUMBER_FORMAT_0.format(Units.convertTo(d.doubleValue(), Units.Speed.KILOMETER_PER_HOUR))));

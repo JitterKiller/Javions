@@ -24,13 +24,12 @@ public class TestUI {
         URL mURL = TestUI.class.getResource("/messages_20230318_0915.bin");
         assert mURL != null;
         String u = Path.of(mURL.toURI()).toString();
+        URL dbUrl = TestUI.class.getResource("/aircraft.zip");
+        assert dbUrl != null;
+        String f = Path.of(dbUrl.toURI()).toString();
         try (DataInputStream s = new DataInputStream(new BufferedInputStream(
                 new FileInputStream(u)))) {
-            URL dbUrl = TestUI.class.getResource("/aircraft.zip");
-            assert dbUrl != null;
-            String f = Path.of(dbUrl.toURI()).toString();
-            var db = new AircraftDatabase(f);
-            var manager = new AircraftStateManager(db);
+            var manager = new AircraftStateManager(new AircraftDatabase(f));
             var bytes = new byte[RawMessage.LENGTH];
             long startTime = System.nanoTime();
             while (true) {
@@ -51,7 +50,7 @@ public class TestUI {
             }
         }
         catch (EOFException ignored) {}
-        catch (InterruptedException | URISyntaxException e) {throw new RuntimeException(e);}
+        catch (InterruptedException e) {throw new RuntimeException(e);}
     }
 
     private static void printTable(ArrayList<ObservableAircraftState> states) throws InterruptedException {

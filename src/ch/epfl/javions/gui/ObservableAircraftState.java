@@ -203,11 +203,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setPosition(GeoPos position) {
         this.position.set(position);
-        GeoPos potentialPos = new GeoPos(position.longitudeT32(), position.latitudeT32());
-        if (trajectory.isEmpty() || !(trajectory.get(trajectory.size() - 1).position.equals(potentialPos))) {
-            trajectory.add(new AirbornePos(position, getAltitude()));
-            curentMessageTimeStampNsTrajectory = getLastMessageTimeStampNs();
-        }
+        if(!(Double.isNaN(getAltitude())))
+            trajectory.add(new AirbornePos(position,getAltitude()));
     }
 
     /**
@@ -236,9 +233,12 @@ public final class ObservableAircraftState implements AircraftStateSetter {
     @Override
     public void setAltitude(double altitude) {
         this.altitude.set(altitude);
-        if (getLastMessageTimeStampNs() == curentMessageTimeStampNsTrajectory) {
-            AirbornePos pos = new AirbornePos(getPosition(), altitude);
-            trajectory.set(trajectory.size() - 1, pos);
+        if(Objects.nonNull(getPosition())) {
+            AirbornePos pos = new AirbornePos(getPosition(),altitude);
+            if(trajectory.isEmpty()) trajectory.add(pos);
+            if (getLastMessageTimeStampNs() == curentMessageTimeStampNsTrajectory) {
+                trajectory.set(trajectory.size() - 1, pos);
+            }
         }
     }
 
