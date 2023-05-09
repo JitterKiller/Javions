@@ -34,22 +34,6 @@ public final class StatusLineController {
         return messageCount;
     }
 
-    private int getAircraftCount() {
-        return aircraftCount.get();
-    }
-
-    private Long getMessageCount() {
-        return messageCount.get();
-    }
-
-    private void setAircraftCount(int s){
-        aircraftCount.set(s);
-    }
-
-    private void setMessageCount(long s){
-        messageCount.set(s);
-    }
-
     public Pane pane() {
         return pane;
     }
