@@ -3,15 +3,15 @@ package ch.epfl.javions.gui;
 import ch.epfl.javions.GeoPos;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
+import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import ch.epfl.javions.aircraft.AircraftDescription;
 import ch.epfl.javions.aircraft.AircraftTypeDesignator;
 import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -21,11 +21,16 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 
@@ -66,7 +71,7 @@ public final class AircraftController {
         this.mapParameters = mapParameters;
         this.selectedAircraft = selectedAircraft;
         initializePane();
-        addAllAnnotatedAircraft(aircraftStates);
+        aircraftStates.forEach(this::annotatedAircraft);
         aircraftStates.addListener((SetChangeListener<ObservableAircraftState>)
                 change -> {
                     if (change.wasAdded()) {
@@ -132,20 +137,6 @@ public final class AircraftController {
     }
 
     /**
-     * Méthode appelée dans le constructeur qui s'occupe d'ajouter tous les états d'aéronefs passés en arguments
-     * dans le panneau JavaFX (en appelant la méthode annotatedAircraft()).
-     *
-     * @param aircraftStates l'ensemble (observable, mais non modifiable) des états des aéronefs
-     *                       qui doivent apparaître sur la vue (provient de la méthode states()
-     *                       de la classe AircraftStateManager).
-     */
-    private void addAllAnnotatedAircraft(ObservableSet<ObservableAircraftState> aircraftStates) {
-        for (ObservableAircraftState aircraftState : aircraftStates) {
-            annotatedAircraft(aircraftState);
-        }
-    }
-
-    /**
      * Méthode qui crée le groupe représentant la trajectoire de l'aéronef passé en argument
      * (cette méthode sera utilisée et appelée pour constituer le groupe global de l'état de l'aéronef en question).
      *
@@ -170,14 +161,12 @@ public final class AircraftController {
      * @param aircraftState L'état de l'aéronef.
      */
     private void trajectoryBinds(Group trajectory, ObservableAircraftState aircraftState) {
-        trajectory.visibleProperty().bind(Bindings.createBooleanBinding(
-                () -> aircraftState.equals(getSelectedAircraft()), selectedAircraftProperty()));
+        trajectory.visibleProperty().bind(
+                selectedAircraftProperty().map(b -> b.getAddress().equals(aircraftState.getAddress())));
 
-        trajectory.layoutXProperty().bind(Bindings.createDoubleBinding(
-                mapParameters::getMinX, mapParameters.minXProperty()).negate());
+        trajectory.layoutXProperty().bind(mapParameters.minXProperty().negate());
 
-        trajectory.layoutYProperty().bind(Bindings.createDoubleBinding(
-                mapParameters::getMinY, mapParameters.minYProperty()).negate());
+        trajectory.layoutYProperty().bind(mapParameters.minYProperty().negate());
     }
 
     /**
@@ -192,14 +181,16 @@ public final class AircraftController {
      * @param aircraftState L'état de l'aéronef.
      */
     private void trajectoryListeners(Group trajectory, ObservableAircraftState aircraftState) {
-        aircraftState.getTrajectory().addListener((ListChangeListener<? super ObservableAircraftState.AirbornePos>)
-                change -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+        trajectory.visibleProperty().addListener(
+                (p, oldV, newV) -> {
+                    if(newV) trajectoryUpdate(trajectory, aircraftState.getTrajectory());
+                    else trajectory.getChildren().clear();
+                });
 
-        mapParameters.zoomProperty().addListener((ChangeListener<? super Number>)
-                (p, oldS, newS) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+        aircraftState.getTrajectory().addListener((ListChangeListener<ObservableAircraftState.AirbornePos>)
+                c -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
 
-        trajectory.visibleProperty().addListener((ChangeListener<? super Boolean>)
-                (p, oldS, newS) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+        mapParameters.zoomProperty().addListener((z, oldZ, newZ) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
     }
 
     /**
@@ -214,25 +205,27 @@ public final class AircraftController {
      */
     private void trajectoryUpdate(Group trajectory, ObservableList<ObservableAircraftState.AirbornePos> trajectoryList) {
         trajectory.getChildren().clear();
-
-        if (trajectory.isVisible()) {
-            for (int i = 0; i < trajectoryList.size() - 1; ++i) {
-                Line line = new Line();
-                line.setStartX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i).position().longitude()));
-                line.setStartY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i).position().latitude()));
-                line.setEndX(WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i + 1).position().longitude()));
-                line.setEndY(WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i + 1).position().latitude()));
-                /* Si l'altitude de l'aéronef à la position i est égale à celle à la position i+1,
-                 * la couleur de la trajectoire est une couleur simple, de type Color. */
-                if (trajectoryList.get(i).altitude() == trajectoryList.get(i + 1).altitude()) {
-                    line.setStroke(getColor(trajectoryList.get(i).altitude()));
-                    /* Sinon c'est un dégradé de couleur entre la couleur l'altitude à la position i,
-                     *  t la couleur à la position i+1 */
+        if(trajectory.isVisible()){
+            double startX = WebMercator.x(mapParameters.getZoom(), trajectoryList.get(0).position().longitude());
+            double startY = WebMercator.y(mapParameters.getZoom(), trajectoryList.get(0).position().latitude());
+            double endX, endY;
+            Color startC  = getColor(trajectoryList.get(0).altitude());
+            Color endC;
+            for (int i = 1; i < trajectoryList.size() - 1; ++i) {
+                endX = WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i).position().longitude());
+                endY = WebMercator.y(mapParameters.getZoom(), trajectoryList.get(i).position().latitude());
+                endC = getColor(trajectoryList.get(i).altitude());
+                Line line = new Line(startX, startY, endX, endY);
+                if (startC.equals(endC)) {
+                    line.setStroke(startC);
                 } else {
-                    Stop s1 = new Stop(0, getColor(trajectoryList.get(i).altitude()));
-                    Stop s2 = new Stop(1, getColor(trajectoryList.get(i + 1).altitude()));
+                    Stop s1 = new Stop(0, startC);
+                    Stop s2 = new Stop(1, endC);
                     line.setStroke(new LinearGradient(0, 0, 1, 0, true, NO_CYCLE, s1, s2));
                 }
+                startX = endX;
+                startY = endY;
+                startC = endC;
                 trajectory.getChildren().add(line);
             }
         }
@@ -324,7 +317,8 @@ public final class AircraftController {
         t.textProperty().bind(Bindings.createStringBinding(
                 () -> getFirstLine(aircraftState) + "\n" + getSecondLine(aircraftState),
                 aircraftState.velocityProperty(),
-                aircraftState.altitudeProperty()));
+                aircraftState.altitudeProperty(),
+                aircraftState.callSignProperty()));
 
         Rectangle r = new Rectangle();
         r.widthProperty().bind(t.layoutBoundsProperty().map(b -> b.getWidth() + RECT_OFFSET));
@@ -352,11 +346,13 @@ public final class AircraftController {
      */
     private String getFirstLine(ObservableAircraftState aircraftState) {
         AircraftData data = aircraftState.getData();
-        if (data == null) {
-            return aircraftState.getAddress().string();
-        }
-        return data.registration().string().isEmpty() ? data.typeDesignator().string() : data.registration().string();
+        CallSign callSign = aircraftState.getCallSign();
+
+        return (data != null && !data.registration().string().isEmpty()) ?
+                data.registration().string() :
+                (callSign != null ? callSign.string() : aircraftState.getAddress().string());
     }
+
 
     /**
      * Méthode utilisée dans la mise en place des liens du texte. Elle permet d'avoir la
@@ -425,8 +421,7 @@ public final class AircraftController {
                 () -> (aircraftIconProperty.get().canRotate()) &&
                         (!Double.isNaN(aircraftState.getTrackOrHeading())) ?
                         Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
-                aircraftState.trackOrHeadingProperty()
-        ));
+                aircraftState.trackOrHeadingProperty()));
         icon.fillProperty().bind(aircraftState.altitudeProperty().map(
                 (b) -> getColor(b.doubleValue())));
         icon.setOnMousePressed(e -> setSelectedAircraft(aircraftState));

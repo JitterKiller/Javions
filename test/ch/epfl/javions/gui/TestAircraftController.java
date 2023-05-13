@@ -10,7 +10,6 @@ import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -18,7 +17,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public final class TestAircraftController extends Application {
@@ -79,7 +77,6 @@ public final class TestAircraftController extends Application {
             public void handle(long now) {
                 try {
                     for (int i = 0; i < 10; i += 1) {
-                        assert mi.next() != null;
                         Message m = MessageParser.parse(mi.next());
                         asm.purge();
                         if (m != null) asm.updateWithMessage(m);

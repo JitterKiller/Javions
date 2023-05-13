@@ -65,10 +65,10 @@ public final class ColorRamp {
      * @return La couleur correspondante.
      */
     public Color at(double t) {
-        if (t < 0) {
+        if (t <= 0) {
             return colors[0];
         }
-        if (t > 1) {
+        if (t >= 1) {
             return colors[colors.length - 1];
         }
         int i = (int) Math.floor(t * (colors.length - 1));
