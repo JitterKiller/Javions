@@ -134,11 +134,11 @@ public final class Main extends Application {
                     if (message != null) {
                         try {
                             asm.updateWithMessage(message);
+                            slc.setMessageCount(slc.getMessageCount() + 1);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     }
-                    slc.setMessageCount(slc.getMessageCount() + 1);
                 }
                 asm.purge();
             }
