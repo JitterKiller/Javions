@@ -26,12 +26,20 @@ public final class StatusLineController {
         pane.setRight(messageCountText);
     }
 
-    public ReadOnlyIntegerProperty aircraftCountProperty() {
+    public IntegerProperty aircraftCountProperty() {
         return aircraftCount;
     }
 
     public ReadOnlyLongProperty messageCountProperty() {
         return messageCount;
+    }
+
+    public long getMessageCount() {
+        return messageCountProperty().get();
+    }
+
+    public void setMessageCount(long messageCount){
+        this.messageCount.set(messageCount);
     }
 
     public Pane pane() {

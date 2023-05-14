@@ -6,3 +6,6 @@
 .DS_Store
 .DS_Store?
 **/.DS_Store
+
+#Ignore Samples.Bin file
+samples_20230304_1442.bin

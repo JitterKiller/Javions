@@ -168,10 +168,10 @@ public final class BaseMapController {
         double longitude = point.longitude();
         double latitude = point.latitude();
 
-        double x = WebMercator.x(mapParameters.getZoom(), longitude) + (canvas.getWidth() / 2);
-        double y = WebMercator.x(mapParameters.getZoom(), latitude) + (canvas.getHeight() / 2);
+        double x = WebMercator.x(mapParameters.getZoom(), longitude) - mapParameters.getMinX() - canvas.getWidth() / 2;
+        double y = WebMercator.y(mapParameters.getZoom(), latitude) - mapParameters.getMinY() - canvas.getHeight() / 2;
 
-        mapParameters.scroll(x,y);
+        mapParameters.scroll(x, y);
     }
 
 }

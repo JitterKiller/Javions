@@ -9,9 +9,9 @@ import ch.epfl.javions.aircraft.AircraftDescription;
 import ch.epfl.javions.aircraft.AircraftTypeDesignator;
 import ch.epfl.javions.aircraft.WakeTurbulenceCategory;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -21,16 +21,11 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 
@@ -183,7 +178,7 @@ public final class AircraftController {
     private void trajectoryListeners(Group trajectory, ObservableAircraftState aircraftState) {
         trajectory.visibleProperty().addListener(
                 (p, oldV, newV) -> {
-                    if(newV) trajectoryUpdate(trajectory, aircraftState.getTrajectory());
+                    if (newV) trajectoryUpdate(trajectory, aircraftState.getTrajectory());
                     else trajectory.getChildren().clear();
                 });
 
@@ -205,11 +200,11 @@ public final class AircraftController {
      */
     private void trajectoryUpdate(Group trajectory, ObservableList<ObservableAircraftState.AirbornePos> trajectoryList) {
         trajectory.getChildren().clear();
-        if(trajectory.isVisible()){
+        if (trajectory.isVisible()) {
             double startX = WebMercator.x(mapParameters.getZoom(), trajectoryList.get(0).position().longitude());
             double startY = WebMercator.y(mapParameters.getZoom(), trajectoryList.get(0).position().latitude());
             double endX, endY;
-            Color startC  = getColor(trajectoryList.get(0).altitude());
+            Color startC = getColor(trajectoryList.get(0).altitude());
             Color endC;
             for (int i = 1; i < trajectoryList.size() - 1; ++i) {
                 endX = WebMercator.x(mapParameters.getZoom(), trajectoryList.get(i).position().longitude());

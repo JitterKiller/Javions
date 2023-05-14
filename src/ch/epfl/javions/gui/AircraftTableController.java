@@ -5,7 +5,10 @@ import ch.epfl.javions.Units;
 import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -27,7 +30,7 @@ import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUEN
 public final class AircraftTableController {
 
     private static final String TABLE_CSS = "table.css";
-    private static final String TABLE_CLASS = "numeric";
+    private static final String NUMERIC_COLUMN_CLASS = "numeric";
     private static final String ICAO_COLUMN_TITLE = "OACI";
     private static final String CALL_SIGN_COLUMN_TITLE = "Indicatif";
     private static final String REGISTRATION_COLUMN_TITLE = "Immatriculation";
@@ -71,7 +74,8 @@ public final class AircraftTableController {
 
         selectedAircraftProperty().addListener((p, oldS, newS) -> {
             tableView.getSelectionModel().select(newS);
-            if (oldS != newS) tableView.scrollTo(newS);
+            if (!selectedAircraft.get().equals(getSelectedAircraft()))
+                tableView.scrollTo(newS);
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener(
@@ -141,19 +145,18 @@ public final class AircraftTableController {
         column.setCellValueFactory(f -> {
             ObservableValue<Double> value = function.apply(f.getValue());
             return Bindings.createStringBinding(() -> {
-                if(!Double.isNaN(value.getValue())){
-                    return nf.format(Units.convertTo(value.getValue(),unit));
+                if (!Double.isNaN(value.getValue())) {
+                    return nf.format(Units.convertTo(value.getValue(), unit));
                 } else return "";
-                },value);
+            }, value);
         });
-
+        column.getStyleClass().add(NUMERIC_COLUMN_CLASS);
         return column;
     }
 
     private void createTableView(TableView<ObservableAircraftState> tableView) {
 
         tableView.getStylesheets().add(TABLE_CSS);
-        tableView.getStyleClass().add(TABLE_CLASS);
         tableView.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
         tableView.setTableMenuButtonVisible(true);
 
@@ -214,7 +217,7 @@ public final class AircraftTableController {
 
         tableView.getColumns().setAll(
                 List.of(icaoColumn, callSignColumn, registrationColumn, modelColumn, typeDesignator,
-                descriptionColumn, longitudeColumn, latitudeColumn, altitudeColumn, velocityColumn));
+                        descriptionColumn, longitudeColumn, latitudeColumn, altitudeColumn, velocityColumn));
     }
 
     public TableView<ObservableAircraftState> pane() {
