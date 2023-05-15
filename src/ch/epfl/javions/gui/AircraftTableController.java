@@ -74,7 +74,7 @@ public final class AircraftTableController {
 
         selectedAircraftProperty().addListener((p, oldS, newS) -> {
             tableView.getSelectionModel().select(newS);
-            if (!selectedAircraft.get().equals(getSelectedAircraft()))
+            if (!tableView.getSelectionModel().getSelectedItem().equals(oldS))
                 tableView.scrollTo(newS);
         });
 
@@ -83,8 +83,8 @@ public final class AircraftTableController {
 
         tableView.setOnMouseClicked(e -> {
             if (e.getClickCount() == DOUBLE_CLICK && e.getButton() == MouseButton.PRIMARY) {
-                if (stateConsumer != null && getSelectedAircraft() != null)
-                    stateConsumer.accept(getSelectedAircraft());
+                if (stateConsumer != null && tableView.getSelectionModel().getSelectedItem() != null)
+                    stateConsumer.accept(tableView.getSelectionModel().getSelectedItem());
             }
         });
     }

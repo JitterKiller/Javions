@@ -33,6 +33,7 @@ public final class Main extends Application {
     private static final int MIN_WIDTH = 800;
     private static final int MIN_HEIGHT = 600;
     private static final int NS_TO_MS = 1_000_000;
+    private static final long PURGE_UPDATE_NS = 1_000_000_000L;
     private static final String TITLE = "Javions";
     private static final String DEFAULT_TILE_SERVER = "tile.openstreetmap.org";
     private static final String DEFAULT_CACHE_DIR = "tile-cache";
@@ -110,7 +111,7 @@ public final class Main extends Application {
         slc.aircraftCountProperty().bind(Bindings.size(asm.states()));
         atc.setOnDoubleClick(state -> bmc.centerOn(state.getPosition()));
 
-        new Thread(() -> {
+        Runnable runnable = () -> {
             if (args.isEmpty()) {
                 try {
                     readRadioMessages();
@@ -124,9 +125,14 @@ public final class Main extends Application {
                     throw new RuntimeException(e);
                 }
             }
-        }).start();
+        };
+
+        Thread thread = new Thread(runnable);
+        thread.setDaemon(true);
+        thread.start();
 
         new AnimationTimer() {
+            private long lastUpdate = 0;
             @Override
             public void handle(long now) {
                 while(!queue.isEmpty()){
@@ -140,7 +146,10 @@ public final class Main extends Application {
                         }
                     }
                 }
-                asm.purge();
+                if(now - lastUpdate >= PURGE_UPDATE_NS) {
+                    asm.purge();
+                    lastUpdate= now;
+                }
             }
         }.start();
     }
