@@ -73,9 +73,9 @@ public final class AircraftTableController {
         });
 
         selectedAircraftProperty().addListener((p, oldS, newS) -> {
-            tableView.getSelectionModel().select(newS);
-            if (!tableView.getSelectionModel().getSelectedItem().equals(oldS))
+            if (!newS.equals(tableView.getSelectionModel().getSelectedItem()))
                 tableView.scrollTo(newS);
+            tableView.getSelectionModel().select(newS);
         });
 
         tableView.getSelectionModel().selectedItemProperty().addListener(
