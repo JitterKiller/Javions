@@ -24,9 +24,6 @@ import java.util.function.Function;
 
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS;
 
-/**
- *
- */
 public final class AircraftTableController {
 
     private static final String TABLE_CSS = "table.css";
