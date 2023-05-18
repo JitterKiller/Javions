@@ -19,13 +19,18 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Consumer;
 
+/**
+ * La classe Main du sous-paquetage gui contient le programme principal.
+ *
+ * @author Adam AIT BOUSSELHAM (356365)
+ * @author Abdellah JANATI IDRISSI (362341)
+ */
 public final class Main extends Application {
     private static final int DEFAULT_ZOOM_LEVEL = 8;
     private static final int DEFAULT_MERCATOR_X = 33_530;
@@ -40,12 +45,23 @@ public final class Main extends Application {
     private static final String DEFAULT_DATABASE_URI = "/aircraft.zip";
     private static final ConcurrentLinkedQueue<RawMessage> queue = new ConcurrentLinkedQueue<>();
 
+    /**
+     * Méthode main de la classe Main qui appelle la méthode launch de la classe abstraite
+     * Application dont JavaFX hérite.
+     *
+     * @param args Les arguments du lancement du programme.
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
-    private void readRadioMessages()
-            throws IOException, InterruptedException {
+    /**
+     * Méthode qui démodule des messages reçus par une radio (connectée au périphérique actuel)
+     * et les places directement dans une file de type ConcurrentLinkedQueue.
+     *
+     * @throws IOException Si une erreur se produit lors de la lecture du flux.
+     */
+    private void readRadioMessages() throws IOException {
         AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
         RawMessage nextMessage;
         while ((nextMessage = demodulator.nextMessage()) != null) {
@@ -53,6 +69,14 @@ public final class Main extends Application {
         }
     }
 
+    /**
+     * Méthode qui démodule des messages provenant d'un fichier, ces derniers n'y sont placés
+     * que lorsqu'une durée égale à leur horodatage s'est écoulée depuis le début de l'exécution du programme.
+     *
+     * @param fileName Le nom du fichier contenant les messages.
+     * @throws IOException Si une erreur se produit lors de l'accès ou la lecture
+     *                     des messages du fichier contenant les messages.
+     */
     private void readFileMessages(String fileName) throws IOException {
         try (DataInputStream s = new DataInputStream(
                 new BufferedInputStream(
@@ -65,7 +89,7 @@ public final class Main extends Application {
                 assert bytesRead == RawMessage.LENGTH;
                 long currentTime = System.nanoTime();
                 RawMessage rawMessage = new RawMessage(timeStampNs, new ByteString(bytes));
-                Thread.sleep(Math.max(0,(timeStampNs- (currentTime - startTime)))/NS_TO_MS);
+                Thread.sleep(Math.max(0, (timeStampNs - (currentTime - startTime))) / NS_TO_MS);
                 queue.add(rawMessage);
             }
         } catch (EOFException ignored) {
@@ -75,8 +99,16 @@ public final class Main extends Application {
         }
     }
 
+    /**
+     * Méthode qui démarre l'application en construisant le graphe de scène correspondant à l'interface graphique,
+     * démarrant le fil d'exécution chargé d'obtenir les messages, et enfin démarrant le "minuteur d'animation"
+     * chargé de mettre à jour les états d'aéronefs en fonction des messages reçus.
+     *
+     * @param primaryStage La scène principale de cette application.
+     * @throws URISyntaxException Si le chemin d'accès à la base de donnée d'aéronefs est invalide.
+     */
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws URISyntaxException {
 
         List<String> args = getParameters().getRaw();
 
@@ -111,44 +143,49 @@ public final class Main extends Application {
         slc.aircraftCountProperty().bind(Bindings.size(asm.states()));
         atc.setOnDoubleClick(state -> bmc.centerOn(state.getPosition()));
 
-        Runnable runnable = () -> {
-            if (args.isEmpty()) {
-                try {
-                    readRadioMessages();
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                try {
-                    readFileMessages(args.get(0));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        };
 
-        Thread thread = new Thread(runnable);
+        /* Fil d'exécution chargé d'obtenir les messages des aéronefs*/
+        Thread thread = new Thread(() -> {
+            try {
+                if (args.isEmpty()) readRadioMessages();
+                else readFileMessages(args.get(0));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         thread.setDaemon(true);
         thread.start();
 
+        /* Minuteur D'animation chargé de mettre à jour les états d'aéronefs en fonction des messages reçus */
         new AnimationTimer() {
             private long lastUpdate = 0;
+
+            /**
+             * Méthode appelée périodiquement par le fil JavaFX.
+             * Se charge de traiter les messages.
+             * Vide simplement la file partagée avec le fil chargé d'obtenir les messages et passe chacun
+             * des éléments qu'elle contient à la méthode updateWithMessage de l'instance de AircraftStateManager
+             * chargée de gérer les états des aéronefs.
+             * Cela provoque, indirectement, la mise à jour de l'interface graphique.
+             *
+             * @param now La fréquence utilisée pour appeler la méthode handle() (en nanosecondes).
+             */
             @Override
             public void handle(long now) {
-                while(!queue.isEmpty()){
+                while (!queue.isEmpty()) {
                     Message message = MessageParser.parse(queue.poll());
                     if (message != null) {
                         try {
                             asm.updateWithMessage(message);
-                            slc.setMessageCount(slc.getMessageCount() + 1);
+                            slc.messageCountProperty().set(slc.messageCountProperty().get() + 1);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                     }
                 }
-                if(now - lastUpdate >= PURGE_UPDATE_NS) {
+                if (now - lastUpdate >= PURGE_UPDATE_NS) {
                     asm.purge();
-                    lastUpdate= now;
+                    lastUpdate = now;
                 }
             }
         }.start();

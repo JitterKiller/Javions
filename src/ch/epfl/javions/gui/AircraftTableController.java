@@ -6,7 +6,6 @@ import ch.epfl.javions.adsb.CallSign;
 import ch.epfl.javions.aircraft.AircraftData;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
@@ -24,6 +23,12 @@ import java.util.function.Function;
 
 import static javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS;
 
+/**
+ * La classe AircraftTableController du sous-paquetage gui gère la table des aéronefs.
+ *
+ * @author Adam AIT BOUSSELHAM (356365)
+ * @author Abdellah JANATI IDRISSI (362341)
+ */
 public final class AircraftTableController {
 
     private static final String TABLE_CSS = "table.css";
@@ -50,17 +55,25 @@ public final class AircraftTableController {
     private static final int DOUBLE_CLICK = 2;
     private static final NumberFormat NUMBER_FORMAT_0 = NumberFormat.getInstance();
     private static final NumberFormat NUMBER_FORMAT_4 = NumberFormat.getInstance();
-    private final ObjectProperty<ObservableAircraftState> selectedAircraft;
     private final TableView<ObservableAircraftState> tableView = new TableView<>();
-    private Consumer<ObservableAircraftState> stateConsumer;
 
+    /**
+     * Constructeur public de la classe AircraftTableController.
+     *
+     * @param states           L'ensemble (observable, mais non modifiable) des états des aéronefs
+     *                         qui doivent apparaître sur la vue (provient de la méthode states()
+     *                         de la classe AircraftStateManager)
+     * @param selectedAircraft La propriété JavaFX contenant l'état de l'aéronef sélectionné,
+     *                         dont le contenu peut être nul lorsque aucun aéronef n'est sélectionné.
+     */
     public AircraftTableController(ObservableSet<ObservableAircraftState> states,
                                    ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
-        this.selectedAircraft = selectedAircraft;
-        createTableView(tableView);
+        setTableView(tableView);
         setNumberFormat();
 
+        /* Mise en place de l'auditeur sur l'ensemble des états d'aéronefs passé au constructeur,
+         * afin de correctement faire apparaître et disparaître les aéronefs correspondants de la table. */
         states.addListener((SetChangeListener<ObservableAircraftState>) c -> {
             if (c.wasAdded()) {
                 tableView.getItems().add(c.getElementAdded());
@@ -69,35 +82,23 @@ public final class AircraftTableController {
             if (c.wasRemoved()) tableView.getItems().remove(c.getElementRemoved());
         });
 
-        selectedAircraftProperty().addListener((p, oldS, newS) -> {
+        /* Mise en place de l'auditeur sur la propriété passée au constructeur. */
+        selectedAircraft.addListener((p, oldS, newS) -> {
             if (!newS.equals(tableView.getSelectionModel().getSelectedItem()))
                 tableView.scrollTo(newS);
             tableView.getSelectionModel().select(newS);
         });
 
+        /* Mise en place de l'auditeur la propriété selectedItemProperty du modèle de sélection. */
         tableView.getSelectionModel().selectedItemProperty().addListener(
-                (p, oldS, newS) -> setSelectedAircraft(newS));
+                (p, oldS, newS) -> selectedAircraft.set(newS));
 
-        tableView.setOnMouseClicked(e -> {
-            if (e.getClickCount() == DOUBLE_CLICK && e.getButton() == MouseButton.PRIMARY) {
-                if (stateConsumer != null && tableView.getSelectionModel().getSelectedItem() != null)
-                    stateConsumer.accept(tableView.getSelectionModel().getSelectedItem());
-            }
-        });
     }
 
-    public ReadOnlyObjectProperty<ObservableAircraftState> selectedAircraftProperty() {
-        return selectedAircraft;
-    }
-
-    public ObservableAircraftState getSelectedAircraft() {
-        return selectedAircraftProperty().get();
-    }
-
-    public void setSelectedAircraft(ObservableAircraftState selectedAircraft) {
-        this.selectedAircraft.set(selectedAircraft);
-    }
-
+    /**
+     * Méthode privée qui permet de configurer les deux instances de NumberFormat pour les colones numériques
+     * (l'une ayant le nombre de décimaux après la virgule à 0 et l'autre à 4.)
+     */
     private void setNumberFormat() {
         NUMBER_FORMAT_0.setMinimumFractionDigits(DECIMALS_ALT_SPEED);
         NUMBER_FORMAT_0.setMaximumFractionDigits(DECIMALS_ALT_SPEED);
@@ -106,9 +107,17 @@ public final class AircraftTableController {
         NUMBER_FORMAT_4.setMaximumFractionDigits(DECIMALS_LON_LAT);
     }
 
-    private void setColumnsComparators(TableColumn<ObservableAircraftState, String> tableColumn,
+    /**
+     * Méthode qui permet de modifier le comparateur associé aux colonnes numériques
+     * au moyen de la méthode setComparator.
+     *
+     * @param numericColumn La colonne numérique à laquelle on modifie le comparateur.
+     * @param nf            L'instance de NumberFormat pour transformer Le contenu des colones numériques (qui sont des
+     *                      chaines de caractères à la base) en nombres que l'on peut comparer.
+     */
+    private void setColumnsComparators(TableColumn<ObservableAircraftState, String> numericColumn,
                                        NumberFormat nf) {
-        tableColumn.setComparator((s1, s2) -> {
+        numericColumn.setComparator((s1, s2) -> {
             if (s1.isEmpty() || s2.isEmpty()) {
                 return s1.compareTo(s2);
             } else {
@@ -121,8 +130,16 @@ public final class AircraftTableController {
         });
     }
 
+    /**
+     * Méthode privée servant à créer une nouvelle colonne textuelle.
+     *
+     * @param title     Le titre de la colonne.
+     * @param prefWidth Sa largeur préférée.
+     * @param function  La fonction servant à bien afficher la valeur dans les cellules de la colonne.
+     * @return Une colonne textuelle fonctionnelle.
+     */
     private TableColumn<ObservableAircraftState, String> createTextualColumn
-            (String title, int prefWidth, Function<ObservableAircraftState, ObservableValue<String>> function) {
+    (String title, int prefWidth, Function<ObservableAircraftState, ObservableValue<String>> function) {
 
         TableColumn<ObservableAircraftState, String> column = new TableColumn<>(title);
         column.setPrefWidth(prefWidth);
@@ -132,6 +149,15 @@ public final class AircraftTableController {
         return column;
     }
 
+    /**
+     * Méthode privée servant à créer une nouvelle colonne numérique.
+     *
+     * @param title    Le titre de la colonne.
+     * @param function La fonction servant à bien afficher la valeur dans les cellules de la colonne.
+     * @param nf       L'instance de NumberFormat pour n'afficher que certains décimaux après la virgule des valeurs.
+     * @param unit     L'unité des valeurs à afficher.
+     * @return Une colonne numérique fonctionnelle.
+     */
     private TableColumn<ObservableAircraftState, String> createNumericalColumn(
             String title, Function<ObservableAircraftState, ObservableValue<Double>> function,
             NumberFormat nf, double unit) {
@@ -151,7 +177,15 @@ public final class AircraftTableController {
         return column;
     }
 
-    private void createTableView(TableView<ObservableAircraftState> tableView) {
+    /**
+     * Méthode appelée dans le constructeur de la classe.
+     * Elle configure l'instance tableView.
+     * Elle appelle les méthodes createTextualColumn() et createNumericalColumn() pour instancier
+     * les différentes colonnes textuelles et numériques de la table.
+     *
+     * @param tableView L'instance de TableView à configurer.
+     */
+    private void setTableView(TableView<ObservableAircraftState> tableView) {
 
         tableView.getStylesheets().add(TABLE_CSS);
         tableView.setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY_SUBSEQUENT_COLUMNS);
@@ -217,11 +251,30 @@ public final class AircraftTableController {
                         descriptionColumn, longitudeColumn, latitudeColumn, altitudeColumn, velocityColumn));
     }
 
+    /**
+     * Méthode retournant le nœud à la racine du graphe de scène de la classe AircraftTableController
+     *
+     * @return Retourne l'instance tableView.
+     */
     public TableView<ObservableAircraftState> pane() {
         return tableView;
     }
 
+    /**
+     * Méthode qui prend en argument une valeur de type Consumer<ObservableAircraftState>
+     * et qui enregistre ce dernier dans un attribut de la classe AircraftTableController.
+     * Le consumer sera utilisé dans un gestionnaire d'événement lié à la tableView
+     * (lorsqu'un double click sera effectué sur la table et qu'un aéronef est actuellement sélectionné,
+     * on appelle la méthode accept du Consumer en lui passant en argument l'état de cet aéronef.)
+     *
+     * @param stateConsumer Le Consumer<ObservableAircraftState>.
+     */
     public void setOnDoubleClick(Consumer<ObservableAircraftState> stateConsumer) {
-        this.stateConsumer = stateConsumer;
+        tableView.setOnMouseClicked(e -> {
+            if (e.getClickCount() == DOUBLE_CLICK && e.getButton() == MouseButton.PRIMARY) {
+                if (stateConsumer != null && tableView.getSelectionModel().getSelectedItem() != null)
+                    stateConsumer.accept(tableView.getSelectionModel().getSelectedItem());
+            }
+        });
     }
 }
