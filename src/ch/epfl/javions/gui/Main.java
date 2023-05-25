@@ -43,7 +43,6 @@ public final class Main extends Application {
     private static final String DEFAULT_TILE_SERVER = "tile.openstreetmap.org";
     private static final String DEFAULT_CACHE_DIR = "tile-cache";
     private static final String DEFAULT_DATABASE_URI = "/aircraft.zip";
-    private static final ConcurrentLinkedQueue<RawMessage> queue = new ConcurrentLinkedQueue<>();
 
     /**
      * Méthode main de la classe Main qui appelle la méthode launch de la classe abstraite
@@ -61,7 +60,7 @@ public final class Main extends Application {
      *
      * @throws IOException Si une erreur se produit lors de la lecture du flux.
      */
-    private void readRadioMessages() throws IOException {
+    private void readRadioMessages(ConcurrentLinkedQueue<RawMessage> queue) throws IOException {
         AdsbDemodulator demodulator = new AdsbDemodulator(System.in);
         RawMessage nextMessage;
         while ((nextMessage = demodulator.nextMessage()) != null) {
@@ -77,7 +76,7 @@ public final class Main extends Application {
      * @throws IOException Si une erreur se produit lors de l'accès ou la lecture
      *                     des messages du fichier contenant les messages.
      */
-    private void readFileMessages(String fileName) throws IOException {
+    private void readFileMessages(String fileName, ConcurrentLinkedQueue<RawMessage> queue) throws IOException {
         try (DataInputStream s = new DataInputStream(
                 new BufferedInputStream(
                         new FileInputStream(fileName)))) {
@@ -110,6 +109,7 @@ public final class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws URISyntaxException {
 
+        ConcurrentLinkedQueue<RawMessage> queue = new ConcurrentLinkedQueue<>();
         List<String> args = getParameters().getRaw();
 
         TileManager tm = new TileManager(Path.of(DEFAULT_CACHE_DIR), DEFAULT_TILE_SERVER);
@@ -147,10 +147,10 @@ public final class Main extends Application {
         /* Fil d'exécution chargé d'obtenir les messages des aéronefs*/
         Thread thread = new Thread(() -> {
             try {
-                if (args.isEmpty()) readRadioMessages();
-                else readFileMessages(args.get(0));
+                if (args.isEmpty()) readRadioMessages(queue);
+                else readFileMessages(args.get(0), queue);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new UncheckedIOException(e);
             }
         });
         thread.setDaemon(true);
@@ -177,9 +177,9 @@ public final class Main extends Application {
                     if (message != null) {
                         try {
                             asm.updateWithMessage(message);
-                            slc.messageCountProperty().set(slc.messageCountProperty().get() + 1);
+                            slc.addMessage();
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            throw new UncheckedIOException(e);
                         }
                     }
                 }

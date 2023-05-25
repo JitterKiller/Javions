@@ -14,17 +14,33 @@ import javafx.scene.text.Text;
 public final class StatusLineController {
 
     private static final String BORDER_PANE_CSS = "status.css";
-    private final BorderPane pane;
     private final IntegerProperty aircraftCount = new SimpleIntegerProperty(0);
     private final LongProperty messageCount = new SimpleLongProperty(0);
+    private BorderPane pane;
 
     /**
-     * Constructeur par défaut de la classe StatusLineController qui construit le graphe de scène
+     * Constructeur par défaut de la classe StatusLineController
+     * qui construit le graphe de scène.
      */
     public StatusLineController() {
+        initializePane();
+        setupBindings();
+    }
+
+    /**
+     * Méthode appelée dans le constructeur qui initialise le panneau JavaFX
+     * sur lequel la ligne d'état est affichée.
+     */
+    private void initializePane() {
         pane = new BorderPane();
         pane.getStyleClass().add(BORDER_PANE_CSS);
+    }
 
+    /**
+     * Méthode appelée dans le constructeur, permet d'afficher de la bonne manière
+     * le bon nombre d'aéronefs visible et le nombre de messages reçus.
+     */
+    private void setupBindings() {
         Text aircraftCountText = new Text();
         aircraftCountText.textProperty().bind(aircraftCountProperty().asString("Aéronefs visibles : %d"));
 
@@ -52,6 +68,14 @@ public final class StatusLineController {
      */
     public LongProperty messageCountProperty() {
         return messageCount;
+    }
+
+    /**
+     * Méthode permettant d'ajouter un message à la propriété contenant le nombre de messages reçus
+     * depuis le début de l'exécution du programme.
+     */
+    public void addMessage() {
+        messageCount.set(messageCount.get() + 1);
     }
 
     /**

@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 /**
  * La classe TileManager du sous-paquetage gui, représente un gestionnaire de tuiles OSM.
@@ -27,9 +28,14 @@ public final class TileManager {
      */
     public static final int TILE_SIDE = 256;
     private static final int MEMORY_CACHE_SIZE = 100;
+    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+    private static final String DELIMITER = "/";
+    private static final String PREFIX = "https://";
+    private static final String PNG = ".png";
     private final Path diskCachePath;
     private final String severName;
-    private final Map<TileId, Image> memoryCache = new LinkedHashMap<>(MEMORY_CACHE_SIZE);
+    private final Map<TileId, Image> memoryCache =
+            new LinkedHashMap<>(MEMORY_CACHE_SIZE, DEFAULT_LOAD_FACTOR, true);
 
     /**
      * Constructeur de la classe TileManager.
@@ -56,13 +62,15 @@ public final class TileManager {
         if (memoryCache.containsKey(id)) return memoryCache.get(id);
 
         Path tilePath = Path.of(String.valueOf(diskCachePath), String.valueOf(id.zoom),
-                String.valueOf(id.X), id.Y + ".png");
+                String.valueOf(id.X), id.Y + PNG);
 
         /* Sinon, on retourne l'image si elle est contenue dans le cache disque
          * Sinon on la télécharge depuis le serveur de tuile et on la retourne avec la méthode load()
          * (en s'assurant de bien la placée dans le cache disque et le cache mémoire. */
         if (Files.exists(tilePath)) {
-            return new Image(String.valueOf(tilePath.toUri()));
+            Image image = new Image(String.valueOf(tilePath.toUri()));
+            addToMemoryCache(id,image);
+            return image;
         } else {
             if (!Files.isDirectory(tilePath.getParent())) {
                 Files.createDirectories(tilePath.getParent());
@@ -82,7 +90,9 @@ public final class TileManager {
      * @throws IOException Si une erreur d'entrée/sortie se produit.
      */
     private Image load(TileId id, Path tilePath) throws IOException {
-        URL u = new URL("https://" + severName + "/" + id.zoom + "/" + id.X + "/" + id.Y + ".png");
+        StringJoiner imageURL = new StringJoiner(DELIMITER,PREFIX,PNG);
+        imageURL.add(severName).add(String.valueOf(id.zoom)).add(String.valueOf(id.X)).add(String.valueOf(id.Y));
+        URL u = new URL(imageURL.toString());
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");
         try (InputStream i = c.getInputStream();
@@ -90,14 +100,23 @@ public final class TileManager {
             byte[] imageBytes = i.readAllBytes();
             o.write(imageBytes);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
-            /* Si la taille du cache mémoire est égale à 100, on supprime l'Image la moins utilisée du cache. */
-            if (memoryCache.keySet().size() == MEMORY_CACHE_SIZE) {
-                Iterator<TileId> it = memoryCache.keySet().iterator();
-                memoryCache.remove(it.next());
-            }
-            memoryCache.put(id, image);
+            addToMemoryCache(id,image);
             return image;
         }
+    }
+
+    /**
+     * Méthode qui permet d'ajouter une image au cache mémoire.
+     * Si la taille du cache mémoire est égale à 100, on supprime l'Image la moins utilisée du cache.
+     * @param id L'identité de la tuile à télécharger.
+     * @param image L'image correspondant à la tuile.
+     */
+    private void addToMemoryCache(TileId id, Image image) {
+        if (memoryCache.keySet().size() == MEMORY_CACHE_SIZE) {
+            Iterator<TileId> it = memoryCache.keySet().iterator();
+            memoryCache.remove(it.next());
+        }
+        memoryCache.put(id,image);
     }
 
     /**
@@ -130,9 +149,7 @@ public final class TileManager {
          * @return Vrai si les trois attributs constituent une tuile valide, sinon faux.
          */
         public static boolean isValid(int zoom, int X, int Y) {
-
-            double maxXY = Math.scalb(1d, 8 + zoom) / TILE_SIDE;
-
+            double maxXY = 1 << zoom;
             return (0 <= X && X < maxXY) && (0 <= Y && Y < maxXY);
         }
     }

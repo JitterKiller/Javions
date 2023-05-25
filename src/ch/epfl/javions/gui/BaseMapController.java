@@ -24,9 +24,9 @@ public final class BaseMapController {
 
     private final TileManager tileManager;
     private final MapParameters mapParameters;
-    private final Canvas canvas;
-    private final GraphicsContext graphicsContext;
-    private final Pane pane;
+    private Canvas canvas;
+    private GraphicsContext graphicsContext;
+    private Pane pane;
     private Point2D memoryPosition;
     private boolean redrawNeeded;
 
@@ -40,20 +40,11 @@ public final class BaseMapController {
 
         this.tileManager = tileManager;
         this.mapParameters = mapParameters;
-        canvas = new Canvas();
-        pane = new Pane(canvas);
-        graphicsContext = canvas.getGraphicsContext2D();
 
-        canvas.widthProperty().bind(pane.widthProperty());
-        canvas.heightProperty().bind(pane.heightProperty());
-
-        canvas.sceneProperty().addListener((p, oldS, newS) -> {
-            assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
-        });
-
-        eventHandler();
-        listenersHandler();
+        initializePane();
+        setupEvents();
+        setupListeners();
+        setupBindings();
     }
 
     /**
@@ -99,18 +90,32 @@ public final class BaseMapController {
         Platform.requestNextPulse();
     }
 
+    /**
+     * Méthode appelée dans le constructeur qui initialise le panneau JavaFX
+     * sur lequel les tuiles seront affichées.
+     */
+    private void initializePane() {
+        canvas = new Canvas();
+        pane = new Pane(canvas);
+        graphicsContext = canvas.getGraphicsContext2D();
+    }
+
 
     /**
      * Méthode appelée dans le constructeur, permet de gérer les auditeurs JavaFX
      * qui détectent les situations dans lesquelles le fond de carte doit être redessiné
      * et appeler la méthode redrawOnNextPulse() dans ce cas.
      */
-    private void listenersHandler() {
+    private void setupListeners() {
         mapParameters.zoomProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         mapParameters.minXProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         mapParameters.minYProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         canvas.widthProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
         canvas.heightProperty().addListener((p, oldS, newS) -> redrawOnNextPulse());
+        canvas.sceneProperty().addListener((p, oldS, newS) -> {
+            assert oldS == null;
+            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
+        });
     }
 
     /**
@@ -119,7 +124,7 @@ public final class BaseMapController {
      * et le déplacement de la souris lorsque le bouton gauche est maintenu pressé (permet
      * de faire glisser la carte).
      */
-    private void eventHandler() {
+    private void setupEvents() {
 
         LongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {
@@ -146,6 +151,15 @@ public final class BaseMapController {
 
         pane.setOnMouseReleased(e -> memoryPosition = null);
 
+    }
+
+    /**
+     * Méthode appelée dans le constructeur.
+     * Permet de mettre en place les liens sur le Canvas.
+     */
+    private void setupBindings() {
+        canvas.widthProperty().bind(pane.widthProperty());
+        canvas.heightProperty().bind(pane.heightProperty());
     }
 
     /**

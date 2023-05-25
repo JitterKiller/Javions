@@ -65,18 +65,10 @@ public final class AircraftController {
 
         this.mapParameters = mapParameters;
         this.selectedAircraft = selectedAircraft;
+
         initializePane();
+        setupListeners(aircraftStates);
         aircraftStates.forEach(this::annotatedAircraft);
-        aircraftStates.addListener((SetChangeListener<ObservableAircraftState>)
-                change -> {
-                    if (change.wasAdded()) {
-                        annotatedAircraft(change.getElementAdded());
-                    }
-                    if (change.wasRemoved()) {
-                        pane.getChildren().removeIf(
-                                e -> change.getElementRemoved().getAddress().string().equals(e.getId()));
-                    }
-                });
     }
 
     /**
@@ -114,6 +106,27 @@ public final class AircraftController {
         pane = new Pane(new Canvas());
         pane.getStylesheets().add(CSS_FILE);
         pane.setPickOnBounds(false);
+    }
+
+    /**
+     * Méthode appelée dans le constructeur, permet de mettre en place un auditeur sur l'ensemble
+     * (observable, mais non modifiable) des états des aéronefs qui doivent apparaître sur la vue.
+     *
+     * @param aircraftStates   L'ensemble (observable, mais non modifiable) des états des aéronefs
+     *                         qui doivent apparaître sur la vue (provient de la méthode states()
+     *                         de la classe AircraftStateManager).
+     */
+    private void setupListeners(ObservableSet<ObservableAircraftState> aircraftStates) {
+        aircraftStates.addListener((SetChangeListener<ObservableAircraftState>)
+                change -> {
+                    if (change.wasAdded()) {
+                        annotatedAircraft(change.getElementAdded());
+                    }
+                    if (change.wasRemoved()) {
+                        pane.getChildren().removeIf(
+                                e -> change.getElementRemoved().getAddress().string().equals(e.getId()));
+                    }
+                });
     }
 
     /**
@@ -185,7 +198,8 @@ public final class AircraftController {
         aircraftState.getTrajectory().addListener((ListChangeListener<ObservableAircraftState.AirbornePos>)
                 c -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
 
-        mapParameters.zoomProperty().addListener((z, oldZ, newZ) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
+        mapParameters.zoomProperty().addListener(
+                (z, oldZ, newZ) -> trajectoryUpdate(trajectory, aircraftState.getTrajectory()));
     }
 
     /**
@@ -343,8 +357,7 @@ public final class AircraftController {
         AircraftData data = aircraftState.getData();
         CallSign callSign = aircraftState.getCallSign();
 
-        return (data != null && !data.registration().string().isEmpty()) ?
-                data.registration().string() :
+        return data != null ? data.registration().string() :
                 (callSign != null ? callSign.string() : aircraftState.getAddress().string());
     }
 
@@ -361,7 +374,7 @@ public final class AircraftController {
         if (!(Double.isNaN(aircraftState.getVelocity()))) {
             b.append((int) Math.rint(Units.convertTo(aircraftState.getVelocity(), Units.Speed.KILOMETER_PER_HOUR)));
         } else b.append("?");
-        b.append("km/h" + "\u2002").append((int) Math.rint(aircraftState.getAltitude())).append("m");
+        b.append(" km/h" + "\u2002").append((int) Math.rint(aircraftState.getAltitude())).append(" m");
         return b.toString();
     }
 
