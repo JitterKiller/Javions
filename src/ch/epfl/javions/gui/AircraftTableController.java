@@ -43,6 +43,7 @@ public final class AircraftTableController {
     private static final String LATITUDE_COLUMN_TITLE = "Latitude (°)";
     private static final String ALTITUDE_COLUMN_TITLE = "Altitude (m)";
     private static final String VELOCITY_COLUMN_TITLE = "Vitesse (km/h)";
+    private static final String EMPTY_CELL = "";
     private static final int ICAO_PREF_WIDTH = 60;
     private static final int CALL_SIGN_PREF_WIDTH = 70;
     private static final int REGISTRATION_PREF_WIDTH = 90;
@@ -167,8 +168,9 @@ public final class AircraftTableController {
      * @param function  La fonction servant à bien afficher la valeur dans les cellules de la colonne.
      * @return Une colonne textuelle fonctionnelle.
      */
-    private TableColumn<ObservableAircraftState, String> createTextualColumn
-    (String title, int prefWidth, Function<ObservableAircraftState, ObservableValue<String>> function) {
+    private TableColumn<ObservableAircraftState, String> createTextualColumn(
+            String title, int prefWidth, Function<ObservableAircraftState,
+            ObservableValue<String>> function) {
 
         TableColumn<ObservableAircraftState, String> column = new TableColumn<>(title);
         column.setPrefWidth(prefWidth);
@@ -199,7 +201,7 @@ public final class AircraftTableController {
             return Bindings.createStringBinding(() -> {
                 if (!Double.isNaN(value.getValue())) {
                     return nf.format(Units.convertTo(value.getValue(), unit));
-                } else return "";
+                } else return EMPTY_CELL;
             }, value);
         });
         column.getStyleClass().add(NUMERIC_COLUMN_CLASS);

@@ -8,10 +8,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * La classe TileManager du sous-paquetage gui, représente un gestionnaire de tuiles OSM.
@@ -42,9 +39,13 @@ public final class TileManager {
      *
      * @param diskCachePath Le chemin d'accès au dossier contenant le cache disque.
      * @param serverName    Le nom du serveur de tuile.
+     * @throws IllegalArgumentException Si le nom du serveur est vide.
+     * @throws NullPointerException Si le chemin d'accès au cache disque est nul.
      */
     public TileManager(Path diskCachePath, String serverName) {
-        this.diskCachePath = diskCachePath;
+        Preconditions.checkArgument(!serverName.isEmpty());
+
+        this.diskCachePath = Objects.requireNonNull(diskCachePath);
         this.severName = serverName;
     }
 

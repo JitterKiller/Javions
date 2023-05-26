@@ -40,6 +40,11 @@ public final class AircraftController {
     private static final String TRAJECTORY_CLASS = "trajectory";
     private static final String ICON_CLASS = "aircraft";
     private static final String LABEL_CLASS = "label";
+    public static final String UNKNOWN_SPEED = "?";
+    public static final String KM_H = " km/h";
+    public static final String SPACE = "\u2002";
+    public static final String M = " m";
+    public static final String EMPTY = "";
     private static final int MAX_ALT = 12_000;
     private static final int MIN_ZOOM_LABEL_VISIBLE = 11;
     private static final int RECT_OFFSET = 4;
@@ -373,8 +378,8 @@ public final class AircraftController {
         StringBuilder b = new StringBuilder();
         if (!(Double.isNaN(aircraftState.getVelocity()))) {
             b.append((int) Math.rint(Units.convertTo(aircraftState.getVelocity(), Units.Speed.KILOMETER_PER_HOUR)));
-        } else b.append("?");
-        b.append(" km/h" + "\u2002").append((int) Math.rint(aircraftState.getAltitude())).append(" m");
+        } else b.append(UNKNOWN_SPEED);
+        b.append(KM_H + SPACE).append((int) Math.rint(aircraftState.getAltitude())).append(M);
         return b.toString();
     }
 
@@ -415,8 +420,8 @@ public final class AircraftController {
                         );
                     } else {
                         aircraftIcon = AircraftIcon.iconFor(
-                                new AircraftTypeDesignator(""),
-                                new AircraftDescription(""),
+                                new AircraftTypeDesignator(EMPTY),
+                                new AircraftDescription(EMPTY),
                                 category.intValue(),
                                 WakeTurbulenceCategory.UNKNOWN
                         );

@@ -94,7 +94,7 @@ public final class Main extends Application {
         } catch (EOFException ignored) {
 
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new Error(e);
         }
     }
 

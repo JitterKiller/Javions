@@ -291,8 +291,8 @@ public final class ObservableAircraftState implements AircraftStateSetter {
      * Chaque élément de la trajectoire est une paire constituée d'une position à la surface de la Terre
      * (longitude et latitude) ainsi qu'une altitude.
      *
-     * @param position La longitude de l'aéronef exprimé en T32.
-     * @param altitude La latitude de l'aéronef exprimé en T32.
+     * @param position La position de l'aéronef.
+     * @param altitude L'altitude de l'aéronef.
      */
     public record AirbornePos(GeoPos position, double altitude) {
     }
