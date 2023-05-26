@@ -63,7 +63,7 @@ public final class TileManager {
         if (memoryCache.containsKey(id)) return memoryCache.get(id);
 
         Path tilePath = Path.of(String.valueOf(diskCachePath), String.valueOf(id.zoom),
-                String.valueOf(id.X), id.Y + PNG);
+                String.valueOf(id.x), id.y + PNG);
 
         /* Sinon, on retourne l'image si elle est contenue dans le cache disque
          * Sinon on la télécharge depuis le serveur de tuile et on la retourne avec la méthode load()
@@ -92,7 +92,7 @@ public final class TileManager {
      */
     private Image load(TileId id, Path tilePath) throws IOException {
         StringJoiner imageURL = new StringJoiner(DELIMITER, PREFIX, PNG);
-        imageURL.add(severName).add(String.valueOf(id.zoom)).add(String.valueOf(id.X)).add(String.valueOf(id.Y));
+        imageURL.add(severName).add(String.valueOf(id.zoom)).add(String.valueOf(id.x)).add(String.valueOf(id.y));
         URL u = new URL(imageURL.toString());
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "Javions");
@@ -125,10 +125,10 @@ public final class TileManager {
      * L'enregistrement TileId, imbriqué dans la classe TileManager représente l'identité d'une tuile OSM.
      *
      * @param zoom Le niveau de zoom de la tuile.
-     * @param X    L'index X de la tuile.
-     * @param Y    L'index Y de la tuile.
+     * @param x    L'index X de la tuile.
+     * @param y    L'index Y de la tuile.
      */
-    record TileId(int zoom, int X, int Y) {
+    record TileId(int zoom, int x, int y) {
 
         /**
          * Constructeur compact de l'enregistrement TileID, vérifie si les
@@ -138,21 +138,21 @@ public final class TileManager {
          *                                  (ne constituent pas une tuile valide).
          */
         public TileId {
-            Preconditions.checkArgument(isValid(zoom, X, Y));
+            Preconditions.checkArgument(isValid(zoom, x, y));
         }
 
         /**
-         * Méthode publique et statique retournant vrai si et seulement si les attributs zoom, X et Y
+         * Méthode publique et statique retournant vrai si et seulement si les attributs zoom, x et y
          * constituent une tuile valide.
          *
          * @param zoom Le niveau de zoom de la tuile a vérifié.
-         * @param X    L'index X de la tuile a vérifié.
-         * @param Y    L'index Y de la tuile a vérifié.
+         * @param x    L'index x de la tuile a vérifié.
+         * @param y    L'index y de la tuile a vérifié.
          * @return Vrai si les trois attributs constituent une tuile valide, sinon faux.
          */
-        public static boolean isValid(int zoom, int X, int Y) {
+        public static boolean isValid(int zoom, int x, int y) {
             double maxXY = 1 << zoom;
-            return (0 <= X && X < maxXY) && (0 <= Y && Y < maxXY);
+            return (0 <= x && x < maxXY) && (0 <= y && y < maxXY);
         }
     }
 

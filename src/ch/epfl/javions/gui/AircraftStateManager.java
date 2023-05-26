@@ -78,8 +78,8 @@ public final class AircraftStateManager {
      * la réception du dernier message passé à updateWithMessage.
      */
     public void purge() {
-        table.values().removeIf(accumulator -> {
-            ObservableAircraftState state = accumulator.stateSetter();
+        table.entrySet().removeIf(entry -> {
+            ObservableAircraftState state = entry.getValue().stateSetter();
             boolean shouldBeRemoved = previousMessageTimeStampNs - state.getLastMessageTimeStampNs() >= ONE_MINUTE_TIME_STAMP_NS;
             if (shouldBeRemoved) {
                 aircraftStatesPosition.remove(state);
