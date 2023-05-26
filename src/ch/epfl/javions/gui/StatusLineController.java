@@ -1,6 +1,9 @@
 package ch.epfl.javions.gui;
 
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
@@ -53,6 +56,7 @@ public final class StatusLineController {
 
     /**
      * Méthode qui retourne la propriété (modifiable) contenant le nombre d'aéronefs actuellement visibles.
+     *
      * @return La propriété (modifiable) contenant le nombre d'aéronefs actuellement visibles.
      */
     public IntegerProperty aircraftCountProperty() {

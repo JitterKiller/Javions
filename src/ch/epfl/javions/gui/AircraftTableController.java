@@ -72,7 +72,7 @@ public final class AircraftTableController {
                                    ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
         setupNumberFormats();
-        setupListeners(states,selectedAircraft);
+        setupListeners(states, selectedAircraft);
         setupEvents();
         setupTableView();
     }
