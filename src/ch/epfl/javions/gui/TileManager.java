@@ -40,7 +40,7 @@ public final class TileManager {
      * @param diskCachePath Le chemin d'accès au dossier contenant le cache disque.
      * @param serverName    Le nom du serveur de tuile.
      * @throws IllegalArgumentException Si le nom du serveur est vide.
-     * @throws NullPointerException Si le chemin d'accès au cache disque est nul.
+     * @throws NullPointerException     Si le chemin d'accès au cache disque est nul.
      */
     public TileManager(Path diskCachePath, String serverName) {
         Preconditions.checkArgument(!serverName.isEmpty());
@@ -70,7 +70,7 @@ public final class TileManager {
          * (en s'assurant de bien la placée dans le cache disque et le cache mémoire. */
         if (Files.exists(tilePath)) {
             Image image = new Image(String.valueOf(tilePath.toUri()));
-            addToMemoryCache(id,image);
+            addToMemoryCache(id, image);
             return image;
         } else {
             if (!Files.isDirectory(tilePath.getParent())) {
@@ -91,7 +91,7 @@ public final class TileManager {
      * @throws IOException Si une erreur d'entrée/sortie se produit.
      */
     private Image load(TileId id, Path tilePath) throws IOException {
-        StringJoiner imageURL = new StringJoiner(DELIMITER,PREFIX,PNG);
+        StringJoiner imageURL = new StringJoiner(DELIMITER, PREFIX, PNG);
         imageURL.add(severName).add(String.valueOf(id.zoom)).add(String.valueOf(id.X)).add(String.valueOf(id.Y));
         URL u = new URL(imageURL.toString());
         URLConnection c = u.openConnection();
@@ -101,7 +101,7 @@ public final class TileManager {
             byte[] imageBytes = i.readAllBytes();
             o.write(imageBytes);
             Image image = new Image(new ByteArrayInputStream(imageBytes));
-            addToMemoryCache(id,image);
+            addToMemoryCache(id, image);
             return image;
         }
     }
@@ -109,7 +109,8 @@ public final class TileManager {
     /**
      * Méthode qui permet d'ajouter une image au cache mémoire.
      * Si la taille du cache mémoire est égale à 100, on supprime l'Image la moins utilisée du cache.
-     * @param id L'identité de la tuile à télécharger.
+     *
+     * @param id    L'identité de la tuile à télécharger.
      * @param image L'image correspondant à la tuile.
      */
     private void addToMemoryCache(TileId id, Image image) {
@@ -117,7 +118,7 @@ public final class TileManager {
             Iterator<TileId> it = memoryCache.keySet().iterator();
             memoryCache.remove(it.next());
         }
-        memoryCache.put(id,image);
+        memoryCache.put(id, image);
     }
 
     /**
