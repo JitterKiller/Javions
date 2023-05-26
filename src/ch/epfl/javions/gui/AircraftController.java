@@ -1,6 +1,7 @@
 package ch.epfl.javions.gui;
 
 import ch.epfl.javions.GeoPos;
+import ch.epfl.javions.Preconditions;
 import ch.epfl.javions.Units;
 import ch.epfl.javions.WebMercator;
 import ch.epfl.javions.adsb.CallSign;
@@ -27,6 +28,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 
+import java.util.Objects;
+
 import static javafx.scene.paint.CycleMethod.NO_CYCLE;
 
 /**
@@ -36,15 +39,15 @@ import static javafx.scene.paint.CycleMethod.NO_CYCLE;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class AircraftController {
-    private static final String CSS_FILE = "aircraft.css";
-    private static final String TRAJECTORY_CLASS = "trajectory";
-    private static final String ICON_CLASS = "aircraft";
-    private static final String LABEL_CLASS = "label";
     public static final String UNKNOWN_SPEED = "?";
     public static final String KM_H = " km/h";
     public static final String SPACE = "\u2002";
     public static final String M = " m";
     public static final String EMPTY = "";
+    private static final String CSS_FILE = "aircraft.css";
+    private static final String TRAJECTORY_CLASS = "trajectory";
+    private static final String ICON_CLASS = "aircraft";
+    private static final String LABEL_CLASS = "label";
     private static final int MAX_ALT = 12_000;
     private static final int MIN_ZOOM_LABEL_VISIBLE = 11;
     private static final int RECT_OFFSET = 4;
@@ -63,12 +66,17 @@ public final class AircraftController {
      *                         qui doivent apparaître sur la vue (provient de la méthode states()
      *                         de la classe AircraftStateManager).
      * @param selectedAircraft La propriété JavaFX contenant l'état de l'aéronef sélectionné.
+     * @throws IllegalArgumentException si la propriété JavaFX contenant l'état de l'aéronef sélectionné
+     *                                  passée en argument dans le constructeur n'est pas vide.
+     * @throws NullPointerException     si l'argument mapParameters passé en argument dans le constructeur
+     *                                  est nul.
      */
     public AircraftController(MapParameters mapParameters,
                               ObservableSet<ObservableAircraftState> aircraftStates,
                               ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
-        this.mapParameters = mapParameters;
+        Preconditions.checkArgument(selectedAircraft.isNull().get());
+        this.mapParameters = Objects.requireNonNull(mapParameters);
         this.selectedAircraft = selectedAircraft;
 
         initializePane();
@@ -117,9 +125,9 @@ public final class AircraftController {
      * Méthode appelée dans le constructeur, permet de mettre en place un auditeur sur l'ensemble
      * (observable, mais non modifiable) des états des aéronefs qui doivent apparaître sur la vue.
      *
-     * @param aircraftStates   L'ensemble (observable, mais non modifiable) des états des aéronefs
-     *                         qui doivent apparaître sur la vue (provient de la méthode states()
-     *                         de la classe AircraftStateManager).
+     * @param aircraftStates L'ensemble (observable, mais non modifiable) des états des aéronefs
+     *                       qui doivent apparaître sur la vue (provient de la méthode states()
+     *                       de la classe AircraftStateManager).
      */
     private void setupListeners(ObservableSet<ObservableAircraftState> aircraftStates) {
         aircraftStates.addListener((SetChangeListener<ObservableAircraftState>)
