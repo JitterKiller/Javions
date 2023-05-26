@@ -56,11 +56,8 @@ public final class AircraftStateManager {
      */
     public void updateWithMessage(Message message) throws IOException {
         IcaoAddress address = message.icaoAddress();
-
-        if (table.isEmpty() || table.get(address) == null) {
-            ObservableAircraftState state = new ObservableAircraftState(address, database.get(address));
-            table.put(address, new AircraftStateAccumulator<>(state));
-        }
+        table.putIfAbsent(address,
+                new AircraftStateAccumulator<>(new ObservableAircraftState(address,database.get(address))));
 
         AircraftStateAccumulator<ObservableAircraftState> accumulator = table.get(address);
         accumulator.update(message);
@@ -80,12 +77,24 @@ public final class AircraftStateManager {
     public void purge() {
         table.entrySet().removeIf(entry -> {
             ObservableAircraftState state = entry.getValue().stateSetter();
-            boolean shouldBeRemoved = previousMessageTimeStampNs - state.getLastMessageTimeStampNs() >= ONE_MINUTE_TIME_STAMP_NS;
-            if (shouldBeRemoved) {
+            if (shouldBeRemoved(state)) {
                 aircraftStatesPosition.remove(state);
+                return true;
             }
-            return shouldBeRemoved;
+            return false;
         });
+    }
+
+    /**
+     * Méthode utilisée dans la méthode purge().
+     * Regarde si un aéronef n'a reçu aucun message dans la minute précédant
+     * la réception du dernier message passé à updateWithMessage et retourne true si c'est vrai.
+     * @param state L'état d'un aéronef.
+     * @return      Vrai si un aéronef doit être supprimé de la table et de
+     *              l'ensemble des états observables, sinon faux.
+     */
+    private boolean shouldBeRemoved(ObservableAircraftState state) {
+        return previousMessageTimeStampNs - state.getLastMessageTimeStampNs() >= ONE_MINUTE_TIME_STAMP_NS;
     }
 
 }
