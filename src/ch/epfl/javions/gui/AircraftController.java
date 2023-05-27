@@ -57,17 +57,14 @@ public final class AircraftController {
 
     /**
      * Constructeur public de la classe AircraftController.
-     * Mise en place d'un autiteur sur l'ensemble (observable, mais non modifiable) des états des aéronefs
-     * qui doivent apparaître sur la vue passée en argument pour ajouter et supprimer des états d'aéronefs
-     * lors d'un ajout ou du retrait d'aéronefs sur cet ensemble.
      *
      * @param mapParameters    Les paramètres de la portion de la carte visible à l'écran.
      * @param aircraftStates   L'ensemble (observable, mais non modifiable) des états des aéronefs
      *                         qui doivent apparaître sur la vue (provient de la méthode states()
      *                         de la classe AircraftStateManager).
      * @param selectedAircraft La propriété JavaFX contenant l'état de l'aéronef sélectionné.
-     * @throws IllegalArgumentException si la propriété JavaFX contenant l'état de l'aéronef sélectionné
-     *                                  passée en argument dans le constructeur n'est pas vide.
+     * @throws IllegalArgumentException si l'ensemble (observable, mais non modifiable) des états des aéronefs
+     *                                  qui doivent apparaître sur la vue n'est pas vide.
      * @throws NullPointerException     si l'argument mapParameters passé en argument dans le constructeur
      *                                  est nul.
      */
@@ -75,7 +72,7 @@ public final class AircraftController {
                               ObservableSet<ObservableAircraftState> aircraftStates,
                               ObjectProperty<ObservableAircraftState> selectedAircraft) {
 
-        Preconditions.checkArgument(selectedAircraft.isNull().get());
+        Preconditions.checkArgument(aircraftStates.isEmpty());
         this.mapParameters = Objects.requireNonNull(mapParameters);
         this.selectedAircraft = selectedAircraft;
 
@@ -411,14 +408,35 @@ public final class AircraftController {
      * @return Son icône correspondante.
      */
     private SVGPath icon(ObservableAircraftState aircraftState) {
-        AircraftData data = aircraftState.getData();
-
-        ObjectProperty<AircraftIcon> aircraftIconProperty = new SimpleObjectProperty<>();
         SVGPath icon = new SVGPath();
 
+        /* On crée une propriété AircraftIcon qui possède un lien avec la catégorie.
+         *  Si la catégorie de l'aéronef change, alors l'objet AircraftIcon est aussi modifié.*/
+        ObjectProperty<AircraftIcon> aircraftIconProperty = new SimpleObjectProperty<>();
+        aircraftIconBinds(aircraftState, aircraftIconProperty);
+
+        /* Mise en place des liens sur l'icône */
+        iconBinds(aircraftState, aircraftIconProperty, icon);
+        /* Mise en place du gestionnaire d'événement */
+        icon.setOnMousePressed(e -> setSelectedAircraft(aircraftState));
+        icon.getStyleClass().add(ICON_CLASS);
+        return icon;
+    }
+
+    /**
+     * Méthode appelée dans icon().
+     * Permet de mettre en place un lien sur la propriété AircraftIcon qui dépend
+     * de la catégorie de l'aéronef.
+     *
+     * @param aircraftState        L'état d'un aéronef.
+     * @param aircraftIconProperty La propriété contenant l'objet AircraftIcon.
+     */
+    private void aircraftIconBinds(ObservableAircraftState aircraftState,
+                                   ObjectProperty<AircraftIcon> aircraftIconProperty) {
         aircraftIconProperty.bind(aircraftState.categoryProperty().map(
                 (category) -> {
                     AircraftIcon aircraftIcon;
+                    AircraftData data = aircraftState.getData();
                     if (data != null) {
                         aircraftIcon = AircraftIcon.iconFor(
                                 data.typeDesignator(),
@@ -436,18 +454,29 @@ public final class AircraftController {
                     }
                     return aircraftIcon;
                 }));
+    }
 
+    /**
+     * Méthode appelée dans icon(), permettant de mettre en place des liens sur ses propriétés
+     * contentProperty, rotateProperty et fillProperty.
+     *
+     * @param aircraftState        L'état d'un aéronef.
+     * @param aircraftIconProperty La propriété contenant l'objet AircraftIcon.
+     * @param icon                 L'instance icon où les liens sont mis en place.
+     */
+    private void iconBinds(ObservableAircraftState aircraftState,
+                           ObjectProperty<AircraftIcon> aircraftIconProperty,
+                           SVGPath icon) {
         icon.contentProperty().bind(aircraftIconProperty.map(AircraftIcon::svgPath));
+
         icon.rotateProperty().bind(Bindings.createDoubleBinding(
                 () -> (aircraftIconProperty.get().canRotate()) &&
                         (!Double.isNaN(aircraftState.getTrackOrHeading())) ?
                         Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
                 aircraftState.trackOrHeadingProperty()));
+
         icon.fillProperty().bind(aircraftState.altitudeProperty().map(
                 (b) -> getColor(b.doubleValue())));
-        icon.setOnMousePressed(e -> setSelectedAircraft(aircraftState));
-        icon.getStyleClass().add(ICON_CLASS);
-        return icon;
     }
 
     /**
