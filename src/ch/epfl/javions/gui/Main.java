@@ -109,7 +109,7 @@ public final class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws URISyntaxException {
 
-        ConcurrentLinkedQueue<RawMessage> queue = new ConcurrentLinkedQueue<>();
+        final ConcurrentLinkedQueue<RawMessage> queue = new ConcurrentLinkedQueue<>();
         List<String> args = getParameters().getRaw();
 
         TileManager tm = new TileManager(Path.of(DEFAULT_CACHE_DIR), DEFAULT_TILE_SERVER);

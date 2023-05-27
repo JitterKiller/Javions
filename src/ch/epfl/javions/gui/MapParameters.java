@@ -139,7 +139,7 @@ public final class MapParameters {
 
         setZoom(newZoom);
 
-        double scaleFactor = Math.scalb(1d, newZoom - oldZoom);
+        double scaleFactor = Math.pow(2, newZoom - oldZoom);
         setMinX(getMinX() * scaleFactor);
         setMinY(getMinY() * scaleFactor);
     }

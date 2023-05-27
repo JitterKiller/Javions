@@ -73,10 +73,8 @@ public final class BaseMapController {
                     int xToPlace = (int) (xTile * TILE_SIDE - mapParameters.getMinX());
                     int yToPlace = (int) (yTile * TILE_SIDE - mapParameters.getMinY());
                     try {
-                        graphicsContext.drawImage(tileManager.imageForTileAt(id),
-                                xToPlace, yToPlace);
-                    } catch (IOException ignored) {
-                    }
+                        graphicsContext.drawImage(tileManager.imageForTileAt(id), xToPlace, yToPlace);
+                    } catch (IOException ignored) {}
                 }
             }
         }
