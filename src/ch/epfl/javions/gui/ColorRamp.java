@@ -49,7 +49,7 @@ public final class ColorRamp {
      */
     public ColorRamp(Color... colors) {
         Preconditions.checkArgument(colors.length >= MINIMUM_COLORS);
-        this.colors = colors;
+        this.colors = colors.clone();
     }
 
     /**
