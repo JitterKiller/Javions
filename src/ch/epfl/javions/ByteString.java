@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author Abdellah JANATI IDRISSI (362341)
  */
 public final class ByteString {
-    private static final HexFormat hf = HexFormat.of().withUpperCase();
+    private static final HexFormat HF = HexFormat.of().withUpperCase();
     private final byte[] bytes;
 
     /**
@@ -34,7 +34,7 @@ public final class ByteString {
      * @throws IllegalArgumentException si la chaîne contient un caractère qui n'est pas un chiffre hexadécimal.
      */
     public static ByteString ofHexadecimalString(String hexString) {
-        return new ByteString(hf.parseHex(hexString));
+        return new ByteString(HF.parseHex(hexString));
     }
 
     /**
@@ -116,7 +116,7 @@ public final class ByteString {
      */
     @Override
     public String toString() {
-        return hf.formatHex(bytes);
+        return HF.formatHex(bytes);
     }
 }
 
