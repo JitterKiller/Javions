@@ -470,8 +470,7 @@ public final class AircraftController {
         icon.contentProperty().bind(aircraftIconProperty.map(AircraftIcon::svgPath));
 
         icon.rotateProperty().bind(Bindings.createDoubleBinding(
-                () -> (aircraftIconProperty.get().canRotate()) &&
-                        (!Double.isNaN(aircraftState.getTrackOrHeading())) ?
+                () -> aircraftIconProperty.get().canRotate() ?
                         Units.convertTo(aircraftState.getTrackOrHeading(), Units.Angle.DEGREE) : 0,
                 aircraftState.trackOrHeadingProperty()));
 

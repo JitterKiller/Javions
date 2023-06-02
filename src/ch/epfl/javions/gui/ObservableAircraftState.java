@@ -31,7 +31,7 @@ public final class ObservableAircraftState implements AircraftStateSetter {
             = FXCollections.unmodifiableObservableList(trajectory);
     private final DoubleProperty altitude = new SimpleDoubleProperty(Double.NaN);
     private final DoubleProperty velocity = new SimpleDoubleProperty(Double.NaN);
-    private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(Double.NaN);
+    private final DoubleProperty trackOrHeading = new SimpleDoubleProperty(0);
     private long curentMessageTimeStampNsTrajectory;
 
     /**
