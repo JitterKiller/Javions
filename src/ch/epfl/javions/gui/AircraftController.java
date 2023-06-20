@@ -78,7 +78,6 @@ public final class AircraftController {
 
         initializePane();
         setupListeners(aircraftStates);
-        aircraftStates.forEach(this::annotatedAircraft);
     }
 
     /**

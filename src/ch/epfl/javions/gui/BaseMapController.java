@@ -27,7 +27,6 @@ public final class BaseMapController {
     private Canvas canvas;
     private GraphicsContext graphicsContext;
     private Pane pane;
-    private Point2D memoryPosition;
     private boolean redrawNeeded;
 
     /**
@@ -123,7 +122,7 @@ public final class BaseMapController {
      * de faire glisser la carte).
      */
     private void setupEvents() {
-
+        final Point2D[] memoryPosition = new Point2D[1];
         LongProperty minScrollTime = new SimpleLongProperty();
         pane.setOnScroll(e -> {
             int zoomDelta = (int) Math.signum(e.getDeltaY());
@@ -137,17 +136,17 @@ public final class BaseMapController {
             mapParameters.scroll(-e.getX(), -e.getY());
         });
 
-        pane.setOnMousePressed(e -> memoryPosition = new Point2D(e.getX(), e.getY()));
+        pane.setOnMousePressed(e -> memoryPosition[0] = new Point2D(e.getX(), e.getY()));
 
         pane.setOnMouseDragged(e -> {
-            double x = (memoryPosition.getX() - e.getX());
-            double y = (memoryPosition.getY() - e.getY());
+            double x = (memoryPosition[0].getX() - e.getX());
+            double y = (memoryPosition[0].getY() - e.getY());
 
             mapParameters.scroll(x, y);
-            memoryPosition = new Point2D(e.getX(), e.getY());
+            memoryPosition[0] = new Point2D(e.getX(), e.getY());
         });
 
-        pane.setOnMouseReleased(e -> memoryPosition = null);
+        pane.setOnMouseReleased(e -> memoryPosition[0] = null);
 
     }
 
